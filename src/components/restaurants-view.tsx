@@ -57,7 +57,7 @@ export const RestaurantsView = ({
     if (restoRecs.length >= 1) {
       (containerRef.current as HTMLDivElement).scrollTo({
         //Add some padding to the scroll
-        top: NAV_HEIGHT - 8,
+        top: 0,
         behavior: 'smooth',
       });
     }
@@ -90,7 +90,10 @@ export const RestaurantsView = ({
                 {resto.review}
             </StyledBody>
             <StyledBody>
-                {resto.nbrhood} | {resto.priceRange}
+                {resto.nbrhood}&nbsp;&nbsp;|&nbsp;&nbsp;{resto.priceRange}&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;
+                <a href={resto.websiteUrl} target="_blank">
+                  {resto.restoName} Website
+                </a>
             </StyledBody>
             <StyledAction>
                 <Button overrides={{BaseButton: {style: {width: '100%'}}}}>

@@ -129,8 +129,10 @@ def get_top_restos(query: str, embed_model: HuggingFaceEmbeddings, index_name):
     vector_store = Pinecone.from_existing_index(index_name, embed_model)
     # Restos are returned as Langchain Documents, containing appropriate metadata and reviews
     print(f"Searching vector database..." , file=sys.stderr)
-    top_restos = vector_store.similarity_search(query, k=3)
-    print("Found the top 4 restaurants!! Watch out... their spppiiiicccyyyyyyy...", file=sys.stderr)
+    top_restos = vector_store.similarity_search_with_score(query, k=3)
+    print("Found the top 3 restaurants!! Watch out... their spppiiiicccyyyyyyy...", file=sys.stderr)
+    for i in top_restos:
+        print(f"{i[0].metadata['resto_name']} similarity search score: {i[1]}\n")
     return top_restos
 
 

@@ -91,6 +91,8 @@ const Index = () => {
           perfectFor: resto.perfect_for,
           priceRange: resto.price_range,
           imageUrl: resto.image_url,
+          websiteUrl: resto.website,
+          nbrhood: resto.neighborhood
         };
         return restoRec;
       });
