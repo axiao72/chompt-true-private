@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Optional
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 
 from src.py_ai_util import *
 
@@ -12,7 +12,7 @@ class IdealMeal(BaseModel):
 
 app = FastAPI()
 
-load_dotenv()
+# load_dotenv()
 EMBED_MODEL = instantiate_embed_model("intfloat/e5-large-v2", 'HF')
 
 # Initialize Pinecone vector db
