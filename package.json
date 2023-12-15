@@ -1,0 +1,33 @@
+{
+  "name": "chompt-webapp",
+  "version": "1.0.0",
+  "license": "MIT",
+  "scripts": {
+    "fastapi-dev": "python3 -m uvicorn api.app_api:app --reload",
+    "dev": "concurrently \"next\" \"npm run fastapi-dev\"",
+    "build": "next build",
+    "lint": "next lint",
+    "start": "next start",
+    "typecheck": "tsc --noEmit",
+    "ui": "next",
+    "build:digitalocean": "npm install --production=false && npm audit fix --force && npm run build && npm ci"
+  },
+  "dependencies": {
+    "@types/node": "^18.16.1",
+    "@types/react": "^18.2.0",
+    "baseui": "^10.9.2",
+    "concurrently": "^8.2.2",
+    "eslint-config-next": "^13.3.1",
+    "eslint-config-prettier": "^8.8.0",
+    "next": "^13.3.1",
+    "prettier": "^2.8.8",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "styletron-engine-monolithic": "^1.0.0",
+    "styletron-react": "^6.1.0",
+    "typescript": "^5.0.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.49.0"
+  }
+}
