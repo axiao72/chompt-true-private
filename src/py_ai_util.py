@@ -170,16 +170,18 @@ def get_top_restos(query: str, embed_model: HuggingFaceEmbeddings, index, metada
             filter=metadata_filters,
             top_k=3,
             include_metadata=True
-        )
+        )['matches']
+        if len(top_restos) == 0:
+            print(f"Metadata filter search returned no results. Re-running vector database search with no metadata filters..." , file=sys.stderr)
+            top_restos = index.query(vector=embedded_query, top_k=3, include_metadata=True)['matches']
     else:
         print(f"Searching vector database with no metadata filters..." , file=sys.stderr)
-        top_restos = index.query(vector=embedded_query, top_k=3, include_metadata=True)
+        top_restos = index.query(vector=embedded_query, top_k=3, include_metadata=True)['matches']
     # Get actual resto data from matches key
-    return_restos = top_restos['matches']
     print("Found the top 3 restaurants!! Watch out... their spppiiiicccyyyyyyy...", file=sys.stderr)
-    for i in return_restos:
+    for i in top_restos:
         print(f"{i.metadata['resto_name']} similarity search score: {i.score}\n")
-    return return_restos
+    return top_restos
 
 
 def query_llm(restaurant_name: str, review: str, vision: str, openai_api_key):
