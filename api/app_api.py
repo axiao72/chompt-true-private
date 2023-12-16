@@ -20,25 +20,35 @@ initialize_pinecone(api_key=os.getenv('PINECONE_API_KEY'), environment=os.getenv
 # Store restaurant reviews in Pinecone
 # store_reviews(filename='data/reviews.pkl', embed_model=EMBED_MODEL, index_name=os.getenv('PINECONE_INDEX_NAME'))
 
+# Initialize Pinecone index
+INDEX = pinecone.Index(os.getenv('PINECONE_INDEX_NAME'))
+
 
 @app.post("/api/chat")
 async def chat(vision: IdealMeal):    
     # vision_dict = vision.model_dump()
-    print(f"Getting recommendations.... loading..... ", file=sys.stderr)
+    print(f"Getting recommendations for the query: '{vision.description}'....", file=sys.stderr)
+    # Extract cuisine and neighborhood for metadata filter
+    metadata_filters = extract_entities(vision.description, os.getenv('OPENAI_API_KEY'))
     # Get recommendations from Pinecone
-    resto_recs = get_top_restos(query=vision.description, embed_model=EMBED_MODEL, index_name=os.getenv('PINECONE_INDEX_NAME'))
+    resto_recs = get_top_restos(
+        query=vision.description, 
+        embed_model=EMBED_MODEL, 
+        index_name=INDEX,
+        metadata_filters=metadata_filters
+    )
     # Get just the review and metadata, without the sim search score 
-    resto_recs_wo_score = [i[0] for i in resto_recs]
+    resto_recs_wo_score = [i['metadata'] for i in resto_recs]
     print(f"Broncos Country... Let's Ride!!!", file=sys.stderr)
     restos_list = []
     for resto in resto_recs_wo_score:
-        resto_name = resto.metadata['resto_name']
-        price_range = resto.metadata['price_range']
-        perfect_for = resto.metadata['perfect_for_tags']
-        image_url = resto.metadata['image_url']
-        website = resto.metadata['resto_website']
-        neighborhood = resto.metadata['neighborhood'].replace('-', ' ').title()
-        review = resto.page_content
+        resto_name = resto['resto_name']
+        price_range = resto['price_range']
+        perfect_for = resto['perfect_for_tags']
+        image_url = resto['image_url']
+        website = resto['resto_website']
+        neighborhood = resto['neighborhood'].replace('-', ' ').title()
+        review = resto['text']
         restos_list.append({
             'resto_name': resto_name,
             'review': review,

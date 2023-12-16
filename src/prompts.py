@@ -9,3 +9,9 @@ Review: {review}
 Vision: {vision}
 Helpful Answer:
 """
+
+PYDANTIC_TEMPLATE = """You are an assistant that excels at extracting specific restaurant attributes from a description of a restaurant.
+{format_instructions}
+If you are unsure of a field, then do not include anything for it! Do not take a guess.
+{query}\n
+"""

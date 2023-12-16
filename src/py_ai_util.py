@@ -9,11 +9,14 @@ import pinecone
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.chat_models import ChatOpenAI
+from langchain.llms import OpenAI
 from langchain.chains.llm import LLMChain
 from langchain.vectorstores import Pinecone
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
 from langchain.schema.document import Document
 from langchain.prompts import PromptTemplate
+from langchain.output_parsers import PydanticOutputParser
+from langchain.pydantic_v1 import BaseModel, Field, validator
 from datetime import datetime
 import os
 import sys
@@ -25,6 +28,10 @@ from src.prompts import *
 
 
 # load_dotenv()
+class Restaurant(BaseModel):
+    # Pydantic class for extracting entities using LLM
+    cuisine: str = Field(description="cuisine of a restaurant")
+    neighborhood: str = Field(description="neighborhood a restaurant is located in")
 
 
 def initialize_pinecone(api_key, environment):
@@ -125,15 +132,54 @@ def store_reviews(filename: str, embed_model: HuggingFaceEmbeddings, index_name)
         print(f"Exception occured while storing infatuation reviews in Pinecone: {e}", file=sys.stderr)
 
 
-def get_top_restos(query: str, embed_model: HuggingFaceEmbeddings, index_name):
-    vector_store = Pinecone.from_existing_index(index_name, embed_model)
-    # Restos are returned as Langchain Documents, containing appropriate metadata and reviews
-    print(f"Searching vector database..." , file=sys.stderr)
-    top_restos = vector_store.similarity_search_with_score(query, k=3)
+def extract_entities(query: str, openai_api_key):
+    # Extract cuisine and/or neighborhood to use as metadata filters
+    llm = OpenAI(
+    openai_api_key=openai_api_key,
+    temperature=0, 
+    model="text-davinci-003"
+    )
+
+    parser = PydanticOutputParser(pydantic_object=Restaurant)
+    pydantic_prompt = PromptTemplate(
+        template=PYDANTIC_TEMPLATE,
+        input_variables=['query'],
+        partial_variables={"format_instructions": parser.get_format_instructions()},
+    )
+
+    extract_input = pydantic_prompt.format_prompt(query=query)
+    output = llm(extract_input.to_string())
+    filters = parser.parse(output)
+    metadata_filter = {}
+    if filters.cuisine:
+        # Change metadata to lower() and then use lower() for this instead of title()
+        metadata_filter['cuisine'] = {"$in": [filters.cuisine.title()]}
+    if filters.neighborhood:
+        metadata_filter['neighborhood'] = {"$in": [filters.neighborhood.lower()]}
+    return metadata_filter
+
+
+def get_top_restos(query: str, embed_model: HuggingFaceEmbeddings, index, metadata_filters):
+    embedded_query = embed_model.embed_query(query)
+    # vector_store = Pinecone.from_existing_index(index_name, embed_model)
+    # Restos are returned containing appropriate metadata and reviews
+    if metadata_filters:
+        print(f"Searching vector database with metadata filters: {metadata_filters}..." , file=sys.stderr)
+        top_restos = index.query(
+            vector=embedded_query,
+            filter=metadata_filters,
+            top_k=3,
+            include_metadata=True
+        )
+    else:
+        print(f"Searching vector database with no metadata filters..." , file=sys.stderr)
+        top_restos = index.query(vector=embedded_query, top_k=3, include_metadata=True)
+    # Get actual resto data from matches key
+    return_restos = top_restos['matches']
     print("Found the top 3 restaurants!! Watch out... their spppiiiicccyyyyyyy...", file=sys.stderr)
-    for i in top_restos:
-        print(f"{i[0].metadata['resto_name']} similarity search score: {i[1]}\n")
-    return top_restos
+    for i in return_restos:
+        print(f"{i.metadata['resto_name']} similarity search score: {i.score}\n")
+    return return_restos
 
 
 def query_llm(restaurant_name: str, review: str, vision: str, openai_api_key):
