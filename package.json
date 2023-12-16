@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "fastapi-dev": "python3 -m uvicorn api.app_api:app --reload",
+    "fastapi-dev": "python3 -m uvicorn api.app_api:app --port=8000 --reload",
     "dev": "concurrently \"next\" \"npm run fastapi-dev\"",
     "build": "next build",
     "lint": "next lint",

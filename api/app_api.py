@@ -1,6 +1,7 @@
-from fastapi import FastAPI
+from fastapi import Body, FastAPI
 from pydantic import BaseModel
 from typing import Optional
+from typing import Annotated
 # from dotenv import load_dotenv
 
 from src.py_ai_util import *
@@ -34,7 +35,7 @@ async def chat(vision: IdealMeal):
     resto_recs = get_top_restos(
         query=vision.description, 
         embed_model=EMBED_MODEL, 
-        index_name=INDEX,
+        index=INDEX,
         metadata_filters=metadata_filters
     )
     # Get just the review and metadata, without the sim search score 

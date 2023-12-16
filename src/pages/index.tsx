@@ -69,15 +69,17 @@ const Index = () => {
         isLoading: true,
       },
     ]);
+    console.log(input)
+    const idealMealData = {
+      "description": input
+    };
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
         'Accept': 'application/json',
         'Content-type': 'application/json'
       },
-      body: JSON.stringify({
-        "description": input,
-      }),
+      body: JSON.stringify(idealMealData),
     });
 
     const responseJson = await response.json();

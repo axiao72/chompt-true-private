@@ -16,7 +16,7 @@ from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTex
 from langchain.schema.document import Document
 from langchain.prompts import PromptTemplate
 from langchain.output_parsers import PydanticOutputParser
-from langchain.pydantic_v1 import BaseModel, Field, validator
+from langchain.pydantic_v1 import BaseModel as LangchainBaseModel, Field, validator
 from datetime import datetime
 import os
 import sys
@@ -28,7 +28,7 @@ from src.prompts import *
 
 
 # load_dotenv()
-class Restaurant(BaseModel):
+class Restaurant(LangchainBaseModel):
     # Pydantic class for extracting entities using LLM
     cuisine: str = Field(description="cuisine of a restaurant")
     neighborhood: str = Field(description="neighborhood a restaurant is located in")
