@@ -173,7 +173,6 @@ def extract_entities(query: str, openai_api_key):
 
 def get_top_restos_mongo(query: str, embed_model: HuggingFaceEmbeddings, mongo_reviews, metadata_filters):
     embedded_query = embed_model.embed_query(query)
-    # vector_store = Pinecone.from_existing_index(index_name, embed_model)
     try:
         # Restos are returned containing appropriate metadata and reviews
         # Prepare mongo vector search pipeline
