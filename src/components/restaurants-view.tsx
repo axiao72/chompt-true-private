@@ -13,9 +13,10 @@ import { Button } from "baseui/button";
 const Container = styled('div', ({$theme}) => ({
   background: $theme.colors.backgroundPrimary,
 //   minHeight: '1000px',
-  padding: '0 16px',
+  padding: '8px 16px',
   overflow: 'auto',
   overflowY: 'auto',
+  overflowX: 'hidden',
 //   display: 'webkit-box',
   flexDirection: 'column',
   rowGap: '10px',

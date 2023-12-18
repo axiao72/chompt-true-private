@@ -150,16 +150,81 @@ def extract_entities(query: str, openai_api_key):
     extract_input = pydantic_prompt.format_prompt(query=query)
     output = llm(extract_input.to_string())
     filters = parser.parse(output)
-    metadata_filter = {}
+    # metadata_filter = {} # Pinecone filter
+    metadata_filter = {'$and':[]} # Mongo filter
     if filters.cuisine:
-        # Change metadata to lower() and then use lower() for this instead of title()
-        metadata_filter['cuisine'] = {"$in": [filters.cuisine.title()]}
+        # Mongo filter
+        metadata_filter['$and'].append(
+            {
+                'cuisine': {"$in": [filters.cuisine.lower()]}
+            }
+        )
+        # metadata_filter['cuisine'] = {"$in": [filters.cuisine.lower()]} # Pinecone filter
     if filters.neighborhood:
-        metadata_filter['neighborhood'] = {"$in": [filters.neighborhood.lower()]}
+        # Mongo filter
+        metadata_filter['$and'].append(
+            {
+                'neighborhood': {"$in": [filters.neighborhood.lower()]}
+            }
+        )
+        # metadata_filter['neighborhood'] = {"$in": [filters.neighborhood.lower()]} # Pinecone filter
     return metadata_filter
 
 
-def get_top_restos(query: str, embed_model: HuggingFaceEmbeddings, index, metadata_filters):
+def get_top_restos_mongo(query: str, embed_model: HuggingFaceEmbeddings, mongo_reviews, metadata_filters):
+    embedded_query = embed_model.embed_query(query)
+    # vector_store = Pinecone.from_existing_index(index_name, embed_model)
+    try:
+        # Restos are returned containing appropriate metadata and reviews
+        # Prepare mongo vector search pipeline
+        pipeline = [
+            {
+                '$vectorSearch': {
+                    'index': 'reviews_content_index',
+                    'path': 'content_embedding',
+                    'queryVector': embedded_query,
+                    'numCandidates': 45,
+                    'limit': 3
+                }
+            }, {
+                '$project': {
+                    '_id': 0,
+                    'text': 1,
+                    'resto_name': 1,
+                    'cuisine': 1,
+                    'perfect_for_tags': 1,
+                    'price_range': 1,
+                    'image_url': 1,
+                    'resto_website': 1,
+                    'neighborhood': 1,
+                    'score': {
+                        '$meta': 'vectorSearchScore'
+                    }
+                }
+            }
+        ]
+        if metadata_filters:
+            print(f"Searching vector database with metadata filters: {metadata_filters}..." , file=sys.stderr)
+            pipeline[0]['$vectorSearch']['filter'] = metadata_filters
+            top_restos = list(mongo_reviews.aggregate(pipeline))
+            if len(top_restos) == 0:
+                print(f"Metadata filter search returned no results. Re-running vector database search with no metadata filters..." , file=sys.stderr)
+                removed_filter = pipeline[0]['$vectorSearch'].pop('filter')
+                print(f"Removed filter: {removed_filter}")
+                top_restos = list(mongo_reviews.aggregate(pipeline))
+        else:
+            print(f"Searching vector database with no metadata filters..." , file=sys.stderr)
+            top_restos = list(mongo_reviews.aggregate(pipeline))
+        print("Found the top 3 restaurants!! Watch out... their spppiiiicccyyyyyyy...", file=sys.stderr)
+        for i in top_restos:
+            print(f"{i['resto_name']} similarity search score: {i['score']}\n")
+    except Exception as e:
+        print(f"Exception occured while vector searching Mongo: {e}") 
+        top_restos = []   
+    return top_restos
+
+
+def get_top_restos_pinecone(query: str, embed_model: HuggingFaceEmbeddings, index, metadata_filters):
     embedded_query = embed_model.embed_query(query)
     # vector_store = Pinecone.from_existing_index(index_name, embed_model)
     # Restos are returned containing appropriate metadata and reviews
