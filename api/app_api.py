@@ -48,36 +48,34 @@ async def chat(vision: IdealMeal):
         mongo_reviews=mongo_reviews,
         metadata_filters=metadata_filters
     )
+    print(f"Broncos Country... Let's Ride!!!", file=sys.stderr)
     # Insert recommended restaurants into Mongo
     mongo_recs = DB["recommendations"]
     insert_recs = {
-        'user_input': vision.description,
-        'restaurant1_name': resto_recs[0]['resto_name'],
-        'restaurant1_score': resto_recs[0]['score'],
-        'restaurant2_name': resto_recs[1]['resto_name'],
-        'restaurant2_score': resto_recs[1]['score'],
-        'restaurant3_name': resto_recs[2]['resto_name'],
-        'restaurant3_score': resto_recs[2]['score'],
+        'user_input': vision.description
     }
+    # (Don't need to do this with Mongo) Get just the review and metadata, without the sim search score
+    # resto_recs_wo_score = [i['metadata'] for i in resto_recs]
+    restos_list = []        
+    for count, rec in enumerate(resto_recs):
+        insert_recs[f'restaurant{count+1}_name'] = rec['resto_name']
+        insert_recs[f'restaurant{count+1}_score'] = rec['score']
+        restos_list.append({
+            'resto_name': rec['resto_name'],
+            'review': rec['text'],
+            'perfect_for': rec['perfect_for_tags'],
+            'price_range': rec['price_range'],
+            'image_url': rec['image_url'],
+            'website': rec['resto_website'],
+            'neighborhood': rec['neighborhood'].title()
+        })
+    
     try:
         insert_result = mongo_recs.insert_one(insert_recs)
         print(f"Inserted recommendation to Mongo: {insert_result}")
     except pymongo.errors.OperationFailure:
         print("An authentication error was received. Are you sure your database user is authorized to perform write operations?")
-    # (Don't need to do this with Mongo) Get just the review and metadata, without the sim search score
-    # resto_recs_wo_score = [i['metadata'] for i in resto_recs]
-    print(f"Broncos Country... Let's Ride!!!", file=sys.stderr)
-    restos_list = []
-    for resto in resto_recs:
-        restos_list.append({
-            'resto_name': resto['resto_name'],
-            'review': resto['text'],
-            'perfect_for': resto['perfect_for_tags'],
-            'price_range': resto['price_range'],
-            'image_url': resto['image_url'],
-            'website': resto['resto_website'],
-            'neighborhood': resto['neighborhood'].title()
-        })
+    
     top_rec = restos_list[0]
     pitch = query_llm(restaurant_name=top_rec['resto_name'], review=top_rec['review'], vision=vision.description, openai_api_key=os.getenv('OPENAI_API_KEY'))
     
