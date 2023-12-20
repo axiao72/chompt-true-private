@@ -47,7 +47,7 @@ export const AboutModal = ({
             </li>
             <li>The "Book Reservation" button will go directly to the restaurant's Resy page IF available. I currently only have a small 
               subset of restaurants linked to a Resy page, so if there's no Resy link available the button will go to the restaurant's 
-              home page. </li>
+              home page. (Sometimes it will go to the wrong restaurant's Resy page, sorry!!! Working on this 👨🏻‍💻) </li>
             <li>Some recommended restaurants might be outdated or permanently closed, my data source includes old reviews 
               and I'm not currently checking for restaurant status (not my top priority rn but will address eventually!). </li>
             <li>Like everything else in this app, the interaction framework and flow is in progress. Stay tuned, more to come 😁 </li>
