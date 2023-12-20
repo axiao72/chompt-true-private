@@ -54,7 +54,7 @@ export const AboutModal = ({
           </ul>
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
-          Made by Arthur Xiao (with some lovely help from the unknown Dylan Babbs). Please don't hesitate to reach
+          Made by Arthur Xiao (with some lovely initial help from the unknown Dylan Babbs). Please don't hesitate to reach
           out at axiao72@gmail.com with any feedback! Would love to hear both good and bad.
         </ParagraphMedium>
       </ModalBody>
