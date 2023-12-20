@@ -148,6 +148,7 @@ def extract_entities(query: str, openai_api_key):
     )
 
     extract_input = pydantic_prompt.format_prompt(query=query)
+    print(f"Using prompt: {extract_input.to_string()}", file=sys.stderr)
     output = llm(extract_input.to_string())
     filters = parser.parse(output)
     # metadata_filter = {} # Pinecone filter
@@ -205,7 +206,7 @@ def get_top_restos_mongo(query: str, embed_model: HuggingFaceEmbeddings, mongo_r
                 }
             }
         ]
-        if metadata_filters:
+        if metadata_filters['$and']:
             print(f"Searching vector database with metadata filters: {metadata_filters}..." , file=sys.stderr)
             pipeline[0]['$vectorSearch']['filter'] = metadata_filters
             top_restos = list(mongo_reviews.aggregate(pipeline))
