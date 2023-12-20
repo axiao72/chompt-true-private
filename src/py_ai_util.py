@@ -196,6 +196,9 @@ def get_top_restos_mongo(query: str, embed_model: HuggingFaceEmbeddings, mongo_r
                     'image_url': 1,
                     'resto_website': 1,
                     'neighborhood': 1,
+                    'resy_venue_id_1': 1,
+                    'resy_venue_name_1': 1,
+                    'resy_venue_url_1': 1,
                     'score': {
                         '$meta': 'vectorSearchScore'
                     }

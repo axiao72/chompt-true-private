@@ -54,6 +54,14 @@ export const RestaurantsView = ({
   const [, theme] = useStyletron();
   const containerRef = useRef();
 
+  const openResPage = ({
+    url,
+  }: {
+    url: string;
+  }) => {
+    window.open(url, '_blank');
+  };
+
   useEffect(() => {
     if (restoRecs.length >= 1) {
       (containerRef.current as HTMLDivElement).scrollTo({
@@ -97,7 +105,11 @@ export const RestaurantsView = ({
                 </a>
             </StyledBody>
             <StyledAction>
-                <Button overrides={{BaseButton: {style: {width: '100%'}}}}>
+                <Button
+                  overrides={{BaseButton: {style: {width: '100%'}}}} 
+                  onClick={() => window.open(resto.resyUrl, '_blank')}
+                  disabled={!resto.resyUrl}
+                >
                     Book Reservation
                 </Button>
             </StyledAction>

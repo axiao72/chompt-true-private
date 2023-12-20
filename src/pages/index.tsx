@@ -39,6 +39,7 @@ export type RestoRec = {
   imageUrl ? : string;
   websiteUrl : string;
   nbrhood : string;
+  resyUrl ? : string;
 }
 
 export type Document = {
@@ -94,7 +95,8 @@ const Index = () => {
           priceRange: resto.price_range,
           imageUrl: resto.image_url,
           websiteUrl: resto.website,
-          nbrhood: resto.neighborhood
+          nbrhood: resto.neighborhood,
+          resyUrl: resto.resy_url
         };
         return restoRec;
       });
