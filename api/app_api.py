@@ -58,7 +58,7 @@ async def chat(vision: IdealMeal):
     # resto_recs_wo_score = [i['metadata'] for i in resto_recs]
     restos_list = []        
     for count, rec in enumerate(resto_recs):
-        print(f"Returned rec #{count}: \n{rec}")
+        # print(f"Returned rec #{count}: \n{rec}")
         insert_recs[f'restaurant{count+1}_name'] = rec['resto_name']
         insert_recs[f'restaurant{count+1}_score'] = rec['score']
         restos_list.append({
@@ -72,7 +72,7 @@ async def chat(vision: IdealMeal):
         })
         if 'resy_venue_url_1' in rec:
             restos_list[count]['resy_url'] = rec['resy_venue_url_1']
-        print(f"Final rec formatted for UI: \n{restos_list[count]}")
+        # print(f"Final rec formatted for UI: \n{restos_list[count]}")
     
     try:
         insert_result = mongo_recs.insert_one(insert_recs)
