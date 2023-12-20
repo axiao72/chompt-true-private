@@ -5,6 +5,7 @@ import json
 # import re
 # import time
 import pickle
+from typing import List
 import pinecone
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.embeddings.openai import OpenAIEmbeddings
@@ -30,8 +31,8 @@ from src.prompts import *
 # load_dotenv()
 class Restaurant(LangchainBaseModel):
     # Pydantic class for extracting entities using LLM
-    cuisine: str = Field(description="cuisine of a restaurant")
-    neighborhood: str = Field(description="neighborhood a restaurant is located in")
+    cuisine: List[str] = Field(description="List of cuisines of a restaurant")
+    neighborhood: List[str] = Field(description="List of neighborhoods a restaurant is located in")
 
 
 def initialize_pinecone(api_key, environment):
@@ -149,26 +150,30 @@ def extract_entities(query: str, openai_api_key):
 
     extract_input = pydantic_prompt.format_prompt(query=query)
     print(f"Using prompt: {extract_input.to_string()}", file=sys.stderr)
-    output = llm(extract_input.to_string())
-    filters = parser.parse(output)
-    # metadata_filter = {} # Pinecone filter
-    metadata_filter = {'$and':[]} # Mongo filter
-    if filters.cuisine:
-        # Mongo filter
-        metadata_filter['$and'].append(
-            {
-                'cuisine': {"$in": [filters.cuisine.lower()]}
-            }
-        )
-        # metadata_filter['cuisine'] = {"$in": [filters.cuisine.lower()]} # Pinecone filter
-    if filters.neighborhood:
-        # Mongo filter
-        metadata_filter['$and'].append(
-            {
-                'neighborhood': {"$in": [filters.neighborhood.lower()]}
-            }
-        )
-        # metadata_filter['neighborhood'] = {"$in": [filters.neighborhood.lower()]} # Pinecone filter
+    try:
+        output = llm(extract_input.to_string())
+        filters = parser.parse(output)
+        # metadata_filter = {} # Pinecone filter
+        metadata_filter = {'$and':[]} # Mongo filter
+        if filters.cuisine:
+            # Mongo filter
+            metadata_filter['$and'].append(
+                {
+                    'cuisine': {"$in": [i.lower() for i in filters.cuisine]}
+                }
+            )
+            # metadata_filter['cuisine'] = {"$in": [filters.cuisine.lower()]} # Pinecone filter
+        if filters.neighborhood:
+            # Mongo filter
+            metadata_filter['$and'].append(
+                {
+                    'neighborhood': {"$in": [i.lower() for i in filters.neighborhood]}
+                }
+            )
+            # metadata_filter['neighborhood'] = {"$in": [filters.neighborhood.lower()]} # Pinecone filter
+    except Exception as e:
+        print(f"Exception while extracting cuisine and neighborhood: {e}", file=sys.stderr)
+        metadata_filter = {'$and':[]} # Keep empty if exception happens so recommendation can continue without filters
     return metadata_filter
 
 
