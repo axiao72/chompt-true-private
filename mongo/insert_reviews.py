@@ -34,11 +34,12 @@ except pymongo.errors.ConfigurationError:
 # Connect to Chompt db and reviews collection
 db = client.chompt 
 mongo_reviews = db["reviews"]
-deleted = mongo_reviews.delete_many({})
-print(f"Deleted {deleted.deleted_count} records.")
+# CAREFUL only delete if you want to restart a collection fresh
+# deleted = mongo_reviews.delete_many({})
+# print(f"Deleted {deleted.deleted_count} records.")
 
 # Read infatuation reviews from file and insert them to Mongo
-with open('../data/infatuation_reviews_v4.json', 'r') as file:
+with open('../data/infatuation_reviews_v5.json', 'r') as file:
     resto_reviews = json.load(file)
 print("Read reviews from file.")
 
@@ -65,6 +66,12 @@ for i, resto in enumerate(tqdm(resto_reviews)):
         cleaned_resto_tags = resto['perfect_for_tags'].replace("&amp;", "&").replace('&apos;', "'")
         review_date = resto['review_date'].split('T')[0]
         neighborhood = resto['resto_neighborhood'].split('/')[-1].replace('-', ' ').lower()
+
+        # Check if the restaurant is already in Mongo. If it is, skip. (Unless adding updated reviews)
+        check_mongo = mongo_reviews.find_one({"$and": [{"resto_name": cleaned_resto_name}, {"review_date": review_date}]})
+        if check_mongo is not None:
+            print(f"Mongo already has a review for {cleaned_resto_name} from {review_date}! Skipping...")
+            continue
         
         # Set the metadata for this restaurant review
         review_data = {
