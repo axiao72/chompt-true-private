@@ -71,6 +71,6 @@ for page_cnt in tqdm(range(1, 21)):
     print(f"Sleeping for {sleep_time} secs.... Let... Him.. Cook.")
     time.sleep(sleep_time)
 
-with open('all_resy_venues.json', 'wb') as file:
+with open('all_resy_venues.json', 'w') as file:
     json.dump(resy_venues, file)
     
