@@ -1,6 +1,6 @@
 import {Modal, ModalHeader, ModalBody} from 'baseui/modal';
 import {useStyletron} from 'baseui';
-import {ParagraphMedium} from 'baseui/typography';
+import {ParagraphMedium, ParagraphSmall} from 'baseui/typography';
 import {StyledLink} from 'baseui/link';
 
 export const AboutModal = ({
@@ -57,6 +57,14 @@ export const AboutModal = ({
           Made by Arthur Xiao (with some lovely initial help from the unknown Dylan Babbs). Please don't hesitate to reach
           out at axiao72@gmail.com with any feedback! Would love to hear both good and bad.
         </ParagraphMedium>
+        {/* <ParagraphSmall color={theme.colors.contentSecondary}>
+          <StyledLink 
+            href="https://www.freepik.com/icon/information_545674#fromView=keyword&term=Information&page=1&position=0&uuid=8e294117-0ba3-4069-83e9-934df1da31b4"
+            target='_blank'
+          >
+            Icon by Freepik
+          </StyledLink>
+        </ParagraphSmall> */}
       </ModalBody>
     </Modal>
   );

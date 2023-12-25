@@ -55,6 +55,7 @@ const Index = () => {
   const [input, setInput] = useState('');
   const [highlightedText, setHighlightedText] = useState<string | null>(null);
   const [restoRecs, setRestoRecs] = useState<RestoRec[]>([]);
+  const [resMode, setResMode] = useState<boolean>(false);
 
   const sendQuery = useCallback(async () => {
     if (!restoRecs) {
@@ -122,6 +123,8 @@ const Index = () => {
       <Container>
         <RestaurantsView
           restoRecs={restoRecs}
+          resMode={resMode}
+          setResMode={setResMode}
         />
         <ChatView
           messages={messages}

@@ -84,7 +84,8 @@ current_date = datetime.today().strftime('%Y-%m-%d')
 res_date = current_date
 party_size = 2
 resy_counter = 0
-mongo_docs = list(mongo_reviews.find())
+# Get mongo documents that don't already have a Resy link
+mongo_docs = list(mongo_reviews.find({"resy_venue_id_0": {"$exists": False}}))
 print(f"Got {len(mongo_docs)} documents from Mongo. Cheffing up Resy data now...")
 for doc in tqdm(mongo_docs):
     using_neighborhood = "Yes"

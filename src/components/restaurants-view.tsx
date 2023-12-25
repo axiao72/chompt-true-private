@@ -9,8 +9,31 @@ import {
     StyledAction
   } from "baseui/card";
 import { Button } from "baseui/button";
+import { StatefulTooltip } from "baseui/tooltip";
+import { Checkbox } from "baseui/checkbox";
+import Image from "next/image";
+import infoIcon from './icons/info_icon_1.png';
+import {Block} from 'baseui/block';
 
 const Container = styled('div', ({$theme}) => ({
+  background: $theme.colors.backgroundPrimary,
+  overflow: 'auto',
+  display: 'flex',
+  flexDirection: 'column',
+}));
+
+const EmptyContainer = styled('div', {
+  flex: 1,
+  display: 'flex',
+  flexDirection: 'row',
+  gap: '12px',
+  overflowY: 'auto',
+  padding: '16px',
+  alignItems: 'center',
+  justifyContent: 'center'
+});
+
+const RecContainer = styled('div', ({$theme}) => ({
   background: $theme.colors.backgroundPrimary,
 //   minHeight: '1000px',
   padding: '8px 16px',
@@ -28,28 +51,77 @@ const Container = styled('div', ({$theme}) => ({
   
 }));
 
-const EmptyState = () => {
+const FooterContainer = styled('div', ({$theme}) => ({
+  display: 'flex',
+  gap: '8px',
+  borderTop: `1px solid ${$theme.colors.borderOpaque}`,
+  // paddingTop: '16px',
+  padding: '12px',
+  justifyContent: 'center'
+}));
+
+const EmptyState = ({resMode, setResMode}) => {
   const [, theme] = useStyletron();
   return (
-    <Container
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}
-    >
-      <ParagraphSmall color={theme.colors.contentTertiary}>
-        To get a quick rundown, click the &quot;About&quot; button in the top
-        right!
-      </ParagraphSmall>
+    <Container>
+      <EmptyContainer>
+        <ParagraphSmall color={theme.colors.contentTertiary}>
+          To get a quick rundown, click the &quot;About&quot; button in the top
+          right!
+        </ParagraphSmall>
+      </EmptyContainer>
+      {/* <Container
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '100px 0'
+        }}
+      >
+        <ParagraphSmall color={theme.colors.contentTertiary}>
+          To get a quick rundown, click the &quot;About&quot; button in the top
+          right!
+        </ParagraphSmall>
+      </Container> */}
+      <FooterContainer>
+        <Checkbox
+          checked={resMode}
+          onChange={() => setResMode(!resMode)}
+        >
+          Reservation Mode
+        </Checkbox>
+        <StatefulTooltip
+          content={() => (
+            <Block width={'500px'}>
+              When Reservation Mode is enabled, only restaurants with available reservations for your desired date, 
+              time, and party size will be recommended.
+            </Block>
+          )}
+          returnFocus
+          autoFocus
+        >
+          <Image
+            src={infoIcon}
+            width={15}
+            height={15}
+            alt="Information icon"
+            style={{ margin: '5px 0' }}
+          />
+        </StatefulTooltip>
+      </FooterContainer>
     </Container>
+    
   );
 };
 
 export const RestaurantsView = ({
   restoRecs,
+  resMode,
+  setResMode
 }: {
   restoRecs: Array<RestoRec>;
+  resMode: boolean;
+  setResMode: (resModeOn: boolean) => void;
 }) => {
   const [, theme] = useStyletron();
   const containerRef = useRef();
@@ -73,49 +145,79 @@ export const RestaurantsView = ({
   }, [restoRecs]);
 
   if (restoRecs.length === 0) {
-    return <EmptyState />;
+    console.log("Current Working Directory:", process.cwd());
+    return <EmptyState resMode={resMode} setResMode={setResMode} />;
   }
 
   return (
-    <Container ref={containerRef}>
-      {restoRecs.map((resto, index) => {
-        return (
-          <Card
-            overrides={{Root: {style: {
-                width: '100%', 
-                // display:'webkit-box', 
-                flexDirection: 'column', 
-                alignItems: 'center',
-                WebkitBoxOrient: 'vertical', 
-                WebkitBoxDirection: 'normal',
-                WebkitBoxAlign: 'center',
-                // overflow: 'auto',
-            }}}}
-            headerImage={resto.imageUrl}
-            title={resto.restoName}
-            key={`resto-${index}`}
-          >
-            <StyledBody>
-                {resto.review}
-            </StyledBody>
-            <StyledBody>
-                {resto.nbrhood}&nbsp;&nbsp;|&nbsp;&nbsp;{resto.priceRange}&nbsp;&nbsp; 
-                {/* <a href={resto.websiteUrl} target="_blank">
-                  {resto.restoName} Website
-                </a> */}
-            </StyledBody>
-            <StyledAction>
-                <Button
-                  overrides={{BaseButton: {style: {width: '100%'}}}} 
-                  onClick={resto.resyUrl ? () => window.open(resto.resyUrl, '_blank') : () => window.open(resto.websiteUrl, '_blank')}
-                  disabled={!resto.resyUrl && !resto.websiteUrl}
-                >
-                    Book Reservation
-                </Button>
-            </StyledAction>
-          </Card>
-        );
-      })}
+    <Container>
+      <RecContainer ref={containerRef}>
+        {restoRecs.map((resto, index) => {
+          return (
+            <Card
+              overrides={{Root: {style: {
+                  width: '100%', 
+                  // display:'webkit-box', 
+                  flexDirection: 'column', 
+                  alignItems: 'center',
+                  WebkitBoxOrient: 'vertical', 
+                  WebkitBoxDirection: 'normal',
+                  WebkitBoxAlign: 'center',
+                  // overflow: 'auto',
+              }}}}
+              headerImage={resto.imageUrl}
+              title={resto.restoName}
+              key={`resto-${index}`}
+            >
+              <StyledBody>
+                  {resto.review}
+              </StyledBody>
+              <StyledBody>
+                  {resto.nbrhood}&nbsp;&nbsp;|&nbsp;&nbsp;{resto.priceRange}&nbsp;&nbsp; 
+                  {/* <a href={resto.websiteUrl} target="_blank">
+                    {resto.restoName} Website
+                  </a> */}
+              </StyledBody>
+              <StyledAction>
+                  <Button
+                    overrides={{BaseButton: {style: {width: '100%'}}}} 
+                    onClick={resto.resyUrl ? () => window.open(resto.resyUrl, '_blank') : () => window.open(resto.websiteUrl, '_blank')}
+                    disabled={!resto.resyUrl && !resto.websiteUrl}
+                  >
+                      Book Reservation
+                  </Button>
+              </StyledAction>
+            </Card>
+          );
+        })}
+      </RecContainer>
+      <FooterContainer>
+        <Checkbox
+          checked={resMode}
+          onChange={() => setResMode(!resMode)}
+        >
+          Reservation Mode
+        </Checkbox>
+        <StatefulTooltip
+          content={() => (
+            <Block width={'500px'}>
+              When Reservation Mode is enabled, only restaurants with available reservations for your desired date, 
+              time, and party size will be recommended.
+            </Block>
+          )}
+          returnFocus
+          autoFocus
+        >
+          <Image
+            src={infoIcon}
+            width={15}
+            height={15}
+            alt="Information icon"
+            style={{ margin: '5px 0' }}
+          />
+        </StatefulTooltip>
+      </FooterContainer>
     </Container>
+    
   );
 };

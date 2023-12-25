@@ -39,7 +39,7 @@ mongo_reviews = db["reviews"]
 # print(f"Deleted {deleted.deleted_count} records.")
 
 # Read infatuation reviews from file and insert them to Mongo
-with open('../data/infatuation_reviews_v5.json', 'r') as file:
+with open('../docker_webscraping/infatuation_reviews_v5.json', 'r') as file:
     resto_reviews = json.load(file)
 print("Read reviews from file.")
 
