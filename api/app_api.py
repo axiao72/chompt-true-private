@@ -70,8 +70,8 @@ async def chat(vision: IdealMeal):
             'website': rec['resto_website'],
             'neighborhood': rec['neighborhood'].title()
         })
-        if 'resy_venue_url_1' in rec:
-            restos_list[count]['resy_url'] = rec['resy_venue_url_1']
+        if 'resy_venue_url_0' in rec:
+            restos_list[count]['resy_url'] = rec['resy_venue_url_0']
         # print(f"Final rec formatted for UI: \n{restos_list[count]}")
     
     try:

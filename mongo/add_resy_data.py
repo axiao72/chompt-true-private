@@ -156,9 +156,9 @@ for doc in tqdm(mongo_docs):
             mongo_reviews.update_one(
                 {"resto_name": name, "neighborhood": neighborhood},
                 {"$set": {
-                    f"resy_venue_id_1": resy_venue_id, 
-                    f"resy_venue_name_1": resy_venue_name, 
-                    f"resy_venue_url_1": resy_venue_url
+                    f"resy_venue_id_0": resy_venue_id, 
+                    f"resy_venue_name_0": resy_venue_name, 
+                    f"resy_venue_url_0": resy_venue_url
                 }}
             )
             print(f"Added: \n{resy_venue_id}, \n{resy_venue_name}, \n{resy_venue_url} \nto {name} in {neighborhood} Mongo document.")
