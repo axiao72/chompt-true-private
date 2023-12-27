@@ -56,11 +56,13 @@ for page_cnt in tqdm(range(1, 21)):
             resy_venue_name = hit['name']
             resy_venue_id = hit['id']['resy']
             resy_venue_url = f"https://widgets.resy.com/?venueId={resy_venue_id}#/venues/{resy_venue_id}?seats=<party_size>&date=<res_date>"
+            resy_venue_neighborhood = hit['neighborhood']
             resy_venues.append(
                 {
                     'resy_venue_name': resy_venue_name,
                     'resy_venue_id': resy_venue_id,
-                    'resy_venue_url': resy_venue_url
+                    'resy_venue_url': resy_venue_url,
+                    'resy_venue_neighborhood': resy_venue_neighborhood
                 }
             )
         print(f"Added venue info for page {page_cnt}")
@@ -71,6 +73,6 @@ for page_cnt in tqdm(range(1, 21)):
     print(f"Sleeping for {sleep_time} secs.... Let... Him.. Cook.")
     time.sleep(sleep_time)
 
-with open('all_resy_venues.json', 'w') as file:
+with open('all_resy_venues_12-26-2023.json', 'w') as file:
     json.dump(resy_venues, file)
     

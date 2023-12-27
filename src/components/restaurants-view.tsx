@@ -8,7 +8,7 @@ import {
     StyledBody,
     StyledAction
   } from "baseui/card";
-import { Button } from "baseui/button";
+import { Button, SIZE, KIND } from "baseui/button";
 import { StatefulTooltip } from "baseui/tooltip";
 import { Checkbox } from "baseui/checkbox";
 import Image from "next/image";
@@ -60,7 +60,8 @@ const FooterContainer = styled('div', ({$theme}) => ({
   justifyContent: 'center'
 }));
 
-const EmptyState = ({resMode, setResMode}) => {
+
+const EmptyState = ({resMode, clickResMode, setResModalIsOpen}) => {
   const [, theme] = useStyletron();
   return (
     <Container>
@@ -70,23 +71,10 @@ const EmptyState = ({resMode, setResMode}) => {
           right!
         </ParagraphSmall>
       </EmptyContainer>
-      {/* <Container
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '100px 0'
-        }}
-      >
-        <ParagraphSmall color={theme.colors.contentTertiary}>
-          To get a quick rundown, click the &quot;About&quot; button in the top
-          right!
-        </ParagraphSmall>
-      </Container> */}
       <FooterContainer>
         <Checkbox
           checked={resMode}
-          onChange={() => setResMode(!resMode)}
+          onChange={clickResMode}
         >
           Reservation Mode
         </Checkbox>
@@ -108,6 +96,13 @@ const EmptyState = ({resMode, setResMode}) => {
             style={{ margin: '5px 0' }}
           />
         </StatefulTooltip>
+        <Button
+          onClick={() => setResModalIsOpen(true)}
+          size={SIZE.mini}
+          kind={KIND.tertiary}
+        >
+          Edit Filters
+        </Button>
       </FooterContainer>
     </Container>
     
@@ -117,14 +112,31 @@ const EmptyState = ({resMode, setResMode}) => {
 export const RestaurantsView = ({
   restoRecs,
   resMode,
-  setResMode
+  resModalIsOpen,
+  setResMode,
+  setResModalIsOpen,
 }: {
   restoRecs: Array<RestoRec>;
   resMode: boolean;
+  resModalIsOpen: boolean;
   setResMode: (resModeOn: boolean) => void;
+  setResModalIsOpen: (isOpen: boolean) => void;
 }) => {
   const [, theme] = useStyletron();
   const containerRef = useRef();
+
+  const clickResMode = () => {
+    // Move this to an Apply button within the Modal so Res Mode only gets activated when user clicks "Apply". This should be when resMode get's changed
+    // If Res Mode is off, then clicking the checkbox should just open the modal    
+    // If Res Mode is on, clicking the checkbox should just turn Res Mode off 
+   
+    if (!resMode) {
+      setResModalIsOpen(true)
+    }
+    else {
+      setResMode(false);
+    }
+  };
 
   const openResPage = ({
     url,
@@ -146,7 +158,7 @@ export const RestaurantsView = ({
 
   if (restoRecs.length === 0) {
     console.log("Current Working Directory:", process.cwd());
-    return <EmptyState resMode={resMode} setResMode={setResMode} />;
+    return <EmptyState resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen}/>;
   }
 
   return (
@@ -194,7 +206,7 @@ export const RestaurantsView = ({
       <FooterContainer>
         <Checkbox
           checked={resMode}
-          onChange={() => setResMode(!resMode)}
+          onChange={clickResMode}
         >
           Reservation Mode
         </Checkbox>
@@ -216,6 +228,13 @@ export const RestaurantsView = ({
             style={{ margin: '5px 0' }}
           />
         </StatefulTooltip>
+        <Button
+          onClick={() => setResModalIsOpen(true)}
+          size={SIZE.mini}
+          kind={KIND.tertiary}
+        >
+          Edit Filters
+        </Button>
       </FooterContainer>
     </Container>
     

@@ -1,0 +1,122 @@
+import {Modal, ModalHeader, ModalBody, ModalFooter, ModalButton} from 'baseui/modal';
+import {useStyletron} from 'baseui';
+import {FormControl} from 'baseui/form-control';
+import {Input} from 'baseui/input';
+import { DatePicker, StatefulDatePicker } from "baseui/datepicker";
+import { TimePicker } from "baseui/timepicker";
+import { Select, Value } from "baseui/select";
+import {useState, useCallback} from 'react';
+import {type ReservationCriteria} from '../pages';
+
+export const ResModal = ({
+    isOpen,
+    setIsOpen,
+    resMode,
+    setResMode,
+    resCriteria,
+    setResCriteria
+  }: {
+    isOpen: boolean;
+    setIsOpen: (isOpen: boolean) => void;
+    resMode: boolean;
+    resCriteria: ReservationCriteria;
+    setResMode: (resModeOn: boolean) => void;
+    setResCriteria: (resCriterida: ReservationCriteria) => void;
+  }) => {
+    const [, theme] = useStyletron();
+    const handleClose = () => {
+      setIsOpen(false);
+    };
+    const handleApply = () => {
+        // When user hits Apply, set resCriteria to the specified filters, set resMode to True, and close the modal
+        const year = resDate.getFullYear();
+        const month = (resDate.getMonth() + 1).toString().padStart(2, '0');
+        const day = resDate.getDate().toString().padStart(2, '0');
+        const formattedDate = `${year}-${month}-${day}`;
+        const hours = resTime.getHours().toString().padStart(2, '0');
+        const minutes = resTime.getMinutes().toString().padStart(2, '0');
+        const timeString = `${hours}:${minutes}`;
+        const criteria: ReservationCriteria = {
+            date: formattedDate,
+            time: timeString,
+            partySize: resPartySize[0].id,
+        }
+        setResCriteria(criteria);
+        setResMode(true);
+        setIsOpen(false);
+        console.log('Reservation Criteria: ', resCriteria)
+    };
+    const [resDate, setResDate] = useState(new Date());
+    const [resTime, setResTime] = useState(null);
+    const [resPartySize, setResPartySize] = useState(null);
+    return (
+      <Modal onClose={handleClose} closeable isOpen={isOpen} animate autoFocus={false}>
+        <ModalHeader>Tell me about your reservation</ModalHeader>
+        <ModalBody>
+            <FormControl label="Date">
+                <DatePicker
+                    value={resDate}
+                    onChange={({date}) => setResDate(date as Date)}
+                    // initialState={{value: []}}
+                    formatString='yyyy-MM-dd'
+                    placeholder="YYYY-MM-DD"
+                    autoFocusCalendar={false}
+                />
+            </FormControl>
+            <FormControl label="Time">
+                <TimePicker
+                    value={resTime}
+                    // onChange={date => console.log(date)}
+                    onChange={date => setResTime(date)}
+                    minTime={new Date("2023-12-26T05:00:00.000Z")}
+                />
+            </FormControl>
+            <FormControl label="Party size">
+                <Select
+                    options={[
+                        {
+                            label: "2",
+                            id: 2
+                        },
+                        {
+                            label: "3",
+                            id: 3
+                        },
+                        {
+                            label: "4",
+                            id: 4
+                        },
+                        {
+                            label: "5",
+                            id: 5
+                        },
+                        {
+                            label: "6",
+                            id: 6
+                        },
+                        {
+                            label: "7",
+                            id: 7
+                        },
+                        {
+                            label:"8",
+                            id: 8
+                        }
+                    ]}
+                    value={resPartySize}
+                    placeholder="Select party size"
+                    // onChange={params => console.log(params.value)}
+                    onChange={params => setResPartySize(params.value)}
+                />
+            </FormControl>
+        </ModalBody>
+        <ModalFooter>
+            <ModalButton kind="tertiary" onClick={handleClose}>
+                Cancel
+            </ModalButton>
+            <ModalButton onClick={handleApply}>Apply</ModalButton>
+        </ModalFooter>
+      </Modal>
+    );
+  };
+  

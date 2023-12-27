@@ -62,7 +62,7 @@ for i, resto in enumerate(tqdm(resto_reviews)):
         print(f"Chunking and preparing review #{i}...")
         # Clean up review data
         cleaned_review = resto['review'].replace('&apos;', "'").replace("&amp;", "&").replace('&quot;', '"').replace("&quot", '"')
-        cleaned_resto_name = resto['resto_name'].replace("&amp;", "&").replace('&apos;', "'")
+        cleaned_resto_name = resto['resto_name'].replace("&amp;", "&").replace('&apos;', "'").replace('&quot;', '"').replace("&quot", '"')
         cleaned_resto_tags = resto['perfect_for_tags'].replace("&amp;", "&").replace('&apos;', "'")
         review_date = resto['review_date'].split('T')[0]
         neighborhood = resto['resto_neighborhood'].split('/')[-1].replace('-', ' ').lower()

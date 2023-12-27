@@ -1,7 +1,7 @@
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 import json
-# import requests
+import requests
 # import re
 # import time
 import pickle
@@ -20,15 +20,15 @@ from langchain.output_parsers import PydanticOutputParser
 from langchain.pydantic_v1 import BaseModel as LangchainBaseModel, Field, validator
 from datetime import datetime
 import os
+import random
 import sys
-# from dotenv import load_dotenv
 from tqdm.auto import tqdm
 from uuid import uuid4
 import sys
 from src.prompts import *
+import time
 
 
-# load_dotenv()
 class Restaurant(LangchainBaseModel):
     # Pydantic class for extracting entities using LLM
     cuisine: List[str] = Field(description="List of cuisines of a restaurant")
@@ -149,7 +149,7 @@ def extract_entities(query: str, openai_api_key):
     )
 
     extract_input = pydantic_prompt.format_prompt(query=query)
-    print(f"Using prompt: {extract_input.to_string()}", file=sys.stderr)
+    # print(f"Using prompt: {extract_input.to_string()}", file=sys.stderr)
     try:
         output = llm(extract_input.to_string())
         filters = parser.parse(output)
@@ -202,9 +202,9 @@ def get_top_restos_mongo(query: str, embed_model: HuggingFaceEmbeddings, mongo_r
                     'image_url': 1,
                     'resto_website': 1,
                     'neighborhood': 1,
-                    'resy_venue_id_1': 1,
-                    'resy_venue_name_1': 1,
-                    'resy_venue_url_1': 1,
+                    'resy_venue_id': 1,
+                    'resy_venue_name': 1,
+                    'resy_venue_url': 1,
                     'score': {
                         '$meta': 'vectorSearchScore'
                     }
@@ -297,3 +297,68 @@ def instantiate_embed_model(model_name: str, model_type: str):
     return embed_model
 
 
+def get_resy_search_headers():
+    resy_api_key = os.environ.get('RESY_API_KEY')
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json, text/plain, */*',
+        'Authorization': f'ResyAPI api_key="{resy_api_key}"',
+        'X-Resy-Auth-Token': os.environ.get('RESY_AUTH_TOKEN'),
+        'X-Resy-Universal-Auth': os.environ.get('RESY_UNIVERSAL_AUTH'),
+        'X-Origin': 'https://resy.com',
+        'Origin': 'https://resy.com',
+        'Referer': 'https://resy.com',
+        'Sec-Fetch-Dest': 'empty',
+        'Sec-Fetch-Mode': 'cors',
+        'Sec-Fetch-Mode': 'same-site'
+    }
+    return headers
+
+
+def get_available_resy_venues(res_date: str, res_time: str, party_size: int):
+    # Resy search API
+    url = 'https://api.resy.com/3/venuesearch/search'
+    available_venues = []
+    # Construct availability search parameters with user's specified filters
+    data = {
+            'availability': True,
+            'order_by': 'availability',
+            'geo': {'latitude': 40.712941, 'longitude': -74.006393, 'radius': 35420},
+            # 'page': 1,
+            'per_page': 50,
+            'query': '',
+            'slot_filter': {'day': res_date, 'party_size': party_size, 'time_filter': res_time},
+            'types': ['venue']
+        }
+    headers = get_resy_search_headers()
+    # Loop through all 20 pages of Resy search api (the API maxes out at 1000 total hits, 20 pages with 50 hits per page)
+    for page_nbr in tqdm(range(1,21)):
+        print(f"Getting available Resy reservations on page {page_nbr}...")
+        data['page'] = page_nbr
+        response = requests.post(
+            url,
+            data=json.dumps(data),
+            headers=headers
+        )
+        # Check if the request was successful (status code 200)
+        if response.status_code == 200:
+            # Add venues if they have available slots
+            resy_json = json.loads(response.text)
+            resy_search_results = resy_json['search']['hits']
+            # Loop through each search hit to check if they actually have available slots
+            for i in resy_search_results:
+                if len(i['availability']['slots']) > 0:
+                    available_venues.append({
+                        'name': i['name'],
+                        'resy_id': i['id']['resy'],
+                        'open_slots': [slot['date'] for slot in i['availability']['slots']]
+                    })
+            print(f"Got available Resy reservations on page {page_nbr}!")
+        else:
+            print(f"Error: {response.status_code}")
+        if page_nbr == 10:
+            sleep_time = random.randint(1, 3)
+            print(f"Sleeping for {sleep_time} secs.... Let... Him.. Cook.")
+            time.sleep(sleep_time)
+    print(f"Got all venues with available reservations on {res_date} at {res_time} for {party_size}. Let's Ride.")
+    return available_venues

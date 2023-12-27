@@ -5,6 +5,7 @@ import {Header} from '../components/header';
 import {RestaurantsView} from '../components/restaurants-view';
 import {ChatView} from '../components/chat-view';
 import {AboutModal} from '../components/about-modal';
+import {ResModal} from '../components/res-modal';
 
 const Page = styled('div', ({$theme}) => ({
   position: 'absolute',
@@ -47,6 +48,12 @@ export type Document = {
   name: string;
 } | null;
 
+export type ReservationCriteria = {
+  date: string;
+  time: string;
+  partySize: number;
+} | null;
+
 const Index = () => {
   const [uploadModalIsOpen, setUploadModalIsOpen] = useState(false);
   const [aboutModalIsOpen, setAboutModalIsOpen] = useState(false);
@@ -56,6 +63,13 @@ const Index = () => {
   const [highlightedText, setHighlightedText] = useState<string | null>(null);
   const [restoRecs, setRestoRecs] = useState<RestoRec[]>([]);
   const [resMode, setResMode] = useState<boolean>(false);
+  const [resModalIsOpen, setResModalIsOpen] = useState(false);
+  // Set the defaults to today's date and a time!
+  // const currentDate = new Date();
+  // const [resDate, setResDate] = useState(currentDate);
+  // const [resTime, setResTime] = useState(null);
+  // const [resPartySize, setResPartySize] = useState(null);
+  const [resCriteria, setResCriteria] = useState<ReservationCriteria>(null);
 
   const sendQuery = useCallback(async () => {
     if (!restoRecs) {
@@ -72,9 +86,25 @@ const Index = () => {
       },
     ]);
     console.log(input)
-    const idealMealData = {
-      "description": input
-    };
+    // console.log('Date: ', resCriteria.date)
+    // console.log('Time: ', resCriteria.time)
+    // console.log('Party Size: ', resCriteria.partySize)  
+    console.log('Reservation Criteria: ', resCriteria)
+    let idealMealData = {}
+    if (resMode) {
+      idealMealData = {
+        "description": input,
+        "res_mode_on": resMode,
+        "res_date": resCriteria.date,
+        "res_time": resCriteria.time,
+        "party_size": resCriteria.partySize
+      };
+    }
+    else {
+      idealMealData = {
+        "description": input,
+      };
+    }
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
@@ -115,6 +145,15 @@ const Index = () => {
         <title>CHOMPT</title>
       </Head>
       <AboutModal isOpen={aboutModalIsOpen} setIsOpen={setAboutModalIsOpen} />
+      <ResModal
+        isOpen={resModalIsOpen}
+        setIsOpen={setResModalIsOpen}
+        resMode={resMode}
+        setResMode={setResMode}
+        resCriteria={resCriteria}
+        setResCriteria={setResCriteria}
+      >
+      </ResModal>
       <Header
         setRestoRecs={setRestoRecs}
         setAboutModalIsOpen={setAboutModalIsOpen}
@@ -124,7 +163,9 @@ const Index = () => {
         <RestaurantsView
           restoRecs={restoRecs}
           resMode={resMode}
+          resModalIsOpen={resModalIsOpen}
           setResMode={setResMode}
+          setResModalIsOpen={setResModalIsOpen}
         />
         <ChatView
           messages={messages}
@@ -139,31 +180,3 @@ const Index = () => {
 };
 
 export default Index;
-
-
-
-// Place holder UI restos
-// [
-//   {
-//     restoName: "Mr. Unlimited", 
-//     review: "Serves the best Dangerwiches. Best part is the man just won't stop SLINGING touchdowns. It's incredible. But wait I forgot.... shhhhhh.... it's spppiiicccyyyyy....",
-//     perfectFor: "Dangerwich",
-//     priceRange: "$$$$$$$",
-//     imageUrl: 'https://res.cloudinary.com/the-infatuation/image/upload/q_auto,f_auto/images/NYC_Roscioli_Group_AlexStaniloff-3_rcj3ub',
-//     // image: 'https://phantom-marca.unidadeditorial.es/94ab73711619b8595a59c7a92786f0a6/resize/1320/f/webp/assets/multimedia/imagenes/2022/10/21/16663054271574.jpg'
-//   },
-//   {
-//     restoName: "Arty's Chinese Pancakes", 
-//     review: "Best in the fucking game!!!! Could eat a million of these. Truly unbelievable. Shoutout Mom",
-//     perfectFor: "Eating your face off",
-//     priceRange: "$",
-//     imageUrl: 'https://emojis.wiki/thumbs/emojis/fuel-pump.webp'
-//   },
-//   {
-//     restoName: "Broncos Country! Let's Ride!", 
-//     review: "Kinda weird... this guy inside would not stop yelling Broncos Country!!! Let's ride.... He said it at least 35 times",
-//     perfectFor: "Broncos Country",
-//     priceRange: "$$$",
-//     imageUrl: 'https://media.tenor.com/FKYPddIiP-oAAAAd/lets-ride-broncos.gif'
-//   }
-// ]
