@@ -63,11 +63,12 @@ def chat(vision: IdealMeal):
     else:
         print("Reservation mode off.")
     # Get recommendations
-    resto_recs = get_top_restos_mongo(
+    resto_recs, used_reservations = get_top_restos_mongo(
         query=vision.description, 
         embed_model=EMBED_MODEL, 
         mongo_reviews=mongo_reviews,
-        metadata_filters=metadata_filters
+        metadata_filters=metadata_filters,
+        res_mode_on=vision.res_mode_on
     )
     print(f"Broncos Country... Let's Ride!!!", file=sys.stderr)
     print(f"Got {len(resto_recs)} recs.", file=sys.stderr)
@@ -112,6 +113,7 @@ def chat(vision: IdealMeal):
     # print(restos_list)
     return {
         'restos': restos_list,
+        'used_reservations': used_reservations,
         'pitch': pitch
     }
 

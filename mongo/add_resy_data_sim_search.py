@@ -46,6 +46,7 @@ for doc in tqdm(mongo_docs):
     cleaned_name = name.replace('&quot;', '"').replace("&quot", '"')
     neighborhood = doc['neighborhood']
     print(f"Getting Resy info for {name}... Truss...")
+    # Check if Mongo has multiple documents with the restaurant name. If it does, add neighborhood to the query.
     docs_w_name = list(mongo_reviews.find({"resto_name": name}))
     if len(docs_w_name) > 1:
         print(f"{name} has multiple Infatuation Mongo docs. Sim Searching with name and neighborhood combined...")

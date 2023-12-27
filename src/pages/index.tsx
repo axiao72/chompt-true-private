@@ -91,6 +91,7 @@ const Index = () => {
     // console.log('Party Size: ', resCriteria.partySize)  
     console.log('Reservation Criteria: ', resCriteria)
     let idealMealData = {}
+    // If Reservation Mode is on, add the criteria to request payload object
     if (resMode) {
       idealMealData = {
         "description": input,
@@ -100,9 +101,11 @@ const Index = () => {
         "party_size": resCriteria.partySize
       };
     }
+    // Otherwise, don't include those field (they're optional on the FastAPI side)
     else {
       idealMealData = {
         "description": input,
+        "res_mode_on": resMode
       };
     }
     const response = await fetch('/api/chat', {

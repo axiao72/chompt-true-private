@@ -177,9 +177,11 @@ def extract_entities(query: str, openai_api_key):
     return metadata_filter
 
 
-def get_top_restos_mongo(query: str, embed_model: HuggingFaceEmbeddings, mongo_reviews, metadata_filters):
+def get_top_restos_mongo(query: str, embed_model: HuggingFaceEmbeddings, mongo_reviews, metadata_filters, res_mode_on: bool):
     embedded_query = embed_model.embed_query(query)
     try:
+        # Keep track if reservation filter was used in final recommendations so we can display to user
+        used_reservations = res_mode_on
         # Restos are returned containing appropriate metadata and reviews
         # Prepare mongo vector search pipeline
         pipeline = [
@@ -215,8 +217,15 @@ def get_top_restos_mongo(query: str, embed_model: HuggingFaceEmbeddings, mongo_r
             print(f"Searching vector database with metadata filters: {metadata_filters}..." , file=sys.stderr)
             pipeline[0]['$vectorSearch']['filter'] = metadata_filters
             top_restos = list(mongo_reviews.aggregate(pipeline))
+            if len(top_restos) == 0 and res_mode_on:
+                print(f"Search with available restaurants returned no results. Re-running vector database search without reservation availability, but with other metadata filters..." , file=sys.stderr)
+                # Delete the last filter expression, assuming the last one is the available reservations filter.
+                del pipeline[0]['$vectorSearch']['filter']['$and'][-1]
+                print(f"Removed available res filter")
+                top_restos = list(mongo_reviews.aggregate(pipeline))
+                used_reservations = False
             if len(top_restos) == 0:
-                print(f"Metadata filter search returned no results. Re-running vector database search with no metadata filters..." , file=sys.stderr)
+                print(f"Metadata filter search returned no results. Re-running vector database search with no metadata filters at all..." , file=sys.stderr)
                 removed_filter = pipeline[0]['$vectorSearch'].pop('filter')
                 print(f"Removed filter: {removed_filter}")
                 top_restos = list(mongo_reviews.aggregate(pipeline))
@@ -229,7 +238,7 @@ def get_top_restos_mongo(query: str, embed_model: HuggingFaceEmbeddings, mongo_r
     except Exception as e:
         print(f"Exception occured while vector searching Mongo: {e}") 
         top_restos = []   
-    return top_restos
+    return top_restos, used_reservations
 
 
 def get_top_restos_pinecone(query: str, embed_model: HuggingFaceEmbeddings, index, metadata_filters):
