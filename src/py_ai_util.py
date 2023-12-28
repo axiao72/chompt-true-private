@@ -226,6 +226,7 @@ def get_top_restos_mongo(vision: IdealMeal, embed_model: HuggingFaceEmbeddings, 
                 candidates = list(mongo_reviews.aggregate(pipeline))
                 print(f"Generated Candidates. Getting final recs based on Resy availability...")
                 top_restos = get_top_available_candidates(candidates, vision.res_date, vision.res_time, vision.party_size)
+                pipeline[0]['$vectorSearch']['limit'] = 3  # set back to 3 for downstream recs if needed
             # If Res Mode is off, continue without separate candidate generation step
             else:
                 top_restos = list(mongo_reviews.aggregate(pipeline))
