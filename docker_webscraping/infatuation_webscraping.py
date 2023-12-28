@@ -59,11 +59,6 @@ for count, url in enumerate(tqdm(review_urls)):
         
         # Get resto name
         resto_name = review_dict['itemReviewed']['name']
-
-        # # Check if restaurant has already been scraped (not optimal i know)
-        # resto_present = any(resto_name in d.values() for d in resto_reviews)
-        # if resto_present:
-        #     continue
         
         # Entire review body split into list containing normal review and food rundown section
         review_body = review_dict['reviewBody']
@@ -125,7 +120,7 @@ with open('already_scraped_urls.txt', 'w') as file:
 # with open('already_scraped_urls.pkl', 'wb') as file:
 #     pickle.dump(already_scraped_urls, file, protocol=pickle.HIGHEST_PROTOCOL)
 
-output_file_name = 'infatuation_reviews_v5'
+output_file_name = 'infatuation_reviews_v6'
 # Write infatuation restaurant reviews to pkl and json file
 with open(f'{output_file_name}.pkl', 'wb') as file:
     pickle.dump(resto_reviews, file, protocol=pickle.HIGHEST_PROTOCOL)
