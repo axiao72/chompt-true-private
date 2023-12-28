@@ -10,8 +10,9 @@ import time
 
 
 def construct_resy_query_with_neighborhood(resto_name: str, neighborhood: str, day: str, party_size: int):
-    resto_name_str = resto_name.split(' ') + [neighborhood]
-    resy_venue_str = '%20'.join(resto_name_str)
+    # resto_name_str = resto_name.split(' ') + [neighborhood]
+    # resy_venue_str = '%20'.join(resto_name_str)
+    resy_venue_str = resto_name + ' ' + neighborhood
     data = {
         # 'availability': True,
         # 'order_by': 'availability',
@@ -29,15 +30,15 @@ def construct_resy_query_with_neighborhood(resto_name: str, neighborhood: str, d
     return data
         
 def construct_resy_query_without_neighborhood(resto_name: str, day: str, party_size: int):
-    resto_name_str = resto_name.split(' ')
-    resy_venue_str = '%20'.join(resto_name_str)
+    # resto_name_str = resto_name.split(' ')
+    # resy_venue_str = '%20'.join(resto_name_str)
     data = {
         # 'availability': True,
         # 'order_by': 'availability',
         'geo': {'latitude': 40.712941, 'longitude': -74.006393, 'radius': 35420},
         'page': 1,
         'per_page': 50,
-        'query': resy_venue_str,
+        'query': resto_name,
         'slot_filter': {
             'day': day, 
             'party_size': party_size 
@@ -59,7 +60,8 @@ except pymongo.errors.ConfigurationError:
 db = client.chompt 
 mongo_reviews = db["reviews"]
 # *** CAREFUL!!! Make sure you want to unset
-mongo_reviews.update_many({}, {'$unset': {f"resy_venue_id": "", f"resy_venue_name": "", f"resy_venue_url": ""}})
+mongo_reviews.update_many({}, {'$unset': {"resy_venue_id": "", "resy_venue_name": "", "resy_venue_url": ""}})
+mongo_reviews.update_many({}, {'$set': {"hasResy": False}})
 
 # Resy API authorization headers
 authorization = 'ResyAPI api_key="VbWk7s3L4KiK5fzlO7JD3Q5EYolJI7n5"'
@@ -89,7 +91,7 @@ res_date = current_date
 party_size = 2
 resy_counter = 0
 # Get mongo documents that don't already have a Resy link
-mongo_docs = list(mongo_reviews.find({"resy_venue_id_0": {"$exists": False}}))
+mongo_docs = list(mongo_reviews.find({"hasResy": False}))
 print(f"Got {len(mongo_docs)} documents from Mongo. Cheffing up Resy data now...")
 for doc in tqdm(mongo_docs):
     name = doc['resto_name']
@@ -98,14 +100,14 @@ for doc in tqdm(mongo_docs):
     # Check if Mongo has multiple documents with the restaurant name. If it does, add neighborhood to the query.
     docs_w_name = list(mongo_reviews.find({"resto_name": name}))
     if len(docs_w_name) > 1:
-        print(f"{name} has multiple Infatuation Mongo docs. Sim Searching with name and neighborhood combined...")
+        print(f"{name} has multiple Infatuation Mongo docs. Searching with name and neighborhood combined...")
         using_neighborhood = "Yes"
         data = construct_resy_query_with_neighborhood(resto_name=name, 
                                            neighborhood=neighborhood, 
                                            day=res_date, 
                                            party_size=party_size)
     else:
-        print(f"{name} has 1 Infatuation Mongo doc. Sim Searching with just name...")
+        print(f"{name} has 1 Infatuation Mongo doc. Searching with just name...")
         using_neighborhood = "No"
         data = construct_resy_query_without_neighborhood(resto_name=name, 
                                            day=res_date, 
@@ -124,7 +126,7 @@ for doc in tqdm(mongo_docs):
         print(f"Error while pinging resy for {name}: {response.status_code}. Moving to next restaurant\n")
         continue
     if resy_search_results:
-        print(f"Received results from Resy! Used neighborhood in query: {using_neighborhood}\n")
+        print(f"Received results from Resy! Used neighborhood in query? {using_neighborhood}\n")
         # Take the first result
         hit = resy_search_results[0]
         resy_venue_id = hit['id']['resy']
@@ -134,9 +136,10 @@ for doc in tqdm(mongo_docs):
         mongo_reviews.update_many(
             {"resto_name": name, "neighborhood": neighborhood},
             {"$set": {
-                f"resy_venue_id": resy_venue_id, 
-                f"resy_venue_name": resy_venue_name, 
-                f"resy_venue_url": resy_venue_url
+                "resy_venue_id": resy_venue_id, 
+                "resy_venue_name": resy_venue_name, 
+                "resy_venue_url": resy_venue_url,
+                "hasResy": True
             }}
         )
         print(f"Added: \n{resy_venue_id}, \n{resy_venue_name}, \n{resy_venue_url} \nto {name} in {neighborhood} Mongo document.")

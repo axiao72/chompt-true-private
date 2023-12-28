@@ -8,12 +8,13 @@ import {
     StyledBody,
     StyledAction
   } from "baseui/card";
-import { Button, SIZE, KIND } from "baseui/button";
+import { Button, SIZE, KIND as ButtonKIND } from "baseui/button";
 import { StatefulTooltip } from "baseui/tooltip";
 import { Checkbox } from "baseui/checkbox";
 import Image from "next/image";
 import infoIcon from './icons/info_icon_1.png';
 import {Block} from 'baseui/block';
+import {Notification, KIND as NotiKIND} from 'baseui/notification';
 
 const Container = styled('div', ({$theme}) => ({
   background: $theme.colors.backgroundPrimary,
@@ -99,7 +100,7 @@ const EmptyState = ({resMode, clickResMode, setResModalIsOpen}) => {
         <Button
           onClick={() => setResModalIsOpen(true)}
           size={SIZE.mini}
-          kind={KIND.tertiary}
+          kind={ButtonKIND.tertiary}
         >
           Edit Filters
         </Button>
@@ -115,12 +116,14 @@ export const RestaurantsView = ({
   resModalIsOpen,
   setResMode,
   setResModalIsOpen,
+  usedReservations
 }: {
   restoRecs: Array<RestoRec>;
   resMode: boolean;
   resModalIsOpen: boolean;
   setResMode: (resModeOn: boolean) => void;
   setResModalIsOpen: (isOpen: boolean) => void;
+  usedReservations: boolean;
 }) => {
   const [, theme] = useStyletron();
   const containerRef = useRef();
@@ -138,13 +141,14 @@ export const RestaurantsView = ({
     }
   };
 
-  const openResPage = ({
-    url,
-  }: {
-    url: string;
-  }) => {
-    window.open(url, '_blank');
-  };
+  // const openResPage = ({
+  //   url,
+  // }: {
+  //   url: string;
+  // }) => {
+  //   window.open(url, '_blank');
+  // };
+  console.log(usedReservations);
 
   useEffect(() => {
     if (restoRecs.length >= 1) {
@@ -157,12 +161,21 @@ export const RestaurantsView = ({
   }, [restoRecs]);
 
   if (restoRecs.length === 0) {
-    console.log("Current Working Directory:", process.cwd());
     return <EmptyState resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen}/>;
   }
 
   return (
     <Container>
+      {resMode && !usedReservations && 
+      <Notification 
+        closeable
+        kind={NotiKIND.warning}
+        overrides={{
+          Body: {style: {width: '85%', alignSelf: 'center'}},
+        }}
+      >
+        Was not able to consider reservation availability for these recommendations 🥴 So, these spots may or may not have available reservations (blame Resy for not making their data easily accessible!)
+      </Notification>}
       <RecContainer ref={containerRef}>
         {restoRecs.map((resto, index) => {
           return (
@@ -231,7 +244,7 @@ export const RestaurantsView = ({
         <Button
           onClick={() => setResModalIsOpen(true)}
           size={SIZE.mini}
-          kind={KIND.tertiary}
+          kind={ButtonKIND.tertiary}
         >
           Edit Filters
         </Button>

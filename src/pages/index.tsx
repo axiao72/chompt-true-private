@@ -70,11 +70,13 @@ const Index = () => {
   // const [resTime, setResTime] = useState(null);
   // const [resPartySize, setResPartySize] = useState(null);
   const [resCriteria, setResCriteria] = useState<ReservationCriteria>(null);
+  const [usedReservations, setUsedReservations] = useState(true);
 
   const sendQuery = useCallback(async () => {
     if (!restoRecs) {
       return;
     }
+    setUsedReservations(true);
     setInput('');
     setMessages((prev) => [
       ...prev,
@@ -140,6 +142,8 @@ const Index = () => {
       ...prev.slice(0, prev.length - 1),
       {role: 'assistant', content: responseJson.pitch},
     ]);
+    setUsedReservations(responseJson.usedReservations);
+    console.log(usedReservations);
   }, [input, restoRecs]);
 
   return (
@@ -169,6 +173,7 @@ const Index = () => {
           resModalIsOpen={resModalIsOpen}
           setResMode={setResMode}
           setResModalIsOpen={setResModalIsOpen}
+          usedReservations={usedReservations}
         />
         <ChatView
           messages={messages}

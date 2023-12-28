@@ -27,6 +27,7 @@ from uuid import uuid4
 import sys
 from src.prompts import *
 import time
+from api.pydantic_models import IdealMeal
 
 
 class Restaurant(LangchainBaseModel):
@@ -177,7 +178,9 @@ def extract_entities(query: str, openai_api_key):
     return metadata_filter
 
 
-def get_top_restos_mongo(query: str, embed_model: HuggingFaceEmbeddings, mongo_reviews, metadata_filters, res_mode_on: bool):
+def get_top_restos_mongo(vision: IdealMeal, embed_model: HuggingFaceEmbeddings, mongo_reviews, metadata_filters):
+    res_mode_on = vision.res_mode_on
+    query = vision.description
     embedded_query = embed_model.embed_query(query)
     try:
         # Keep track if reservation filter was used in final recommendations so we can display to user
@@ -216,7 +219,17 @@ def get_top_restos_mongo(query: str, embed_model: HuggingFaceEmbeddings, mongo_r
         if metadata_filters['$and']:
             print(f"Searching vector database with metadata filters: {metadata_filters}..." , file=sys.stderr)
             pipeline[0]['$vectorSearch']['filter'] = metadata_filters
-            top_restos = list(mongo_reviews.aggregate(pipeline))
+            # If Res Mode is on, change limit to same as candidates to perform candidate generation then the first 3 that have available reservations
+            if res_mode_on:
+                pipeline[0]['$vectorSearch']['limit'] = 45  # same as numCandidates (assign separately to avoid accidentally changing numCandidates later or something)
+                print(f"Res Mode is ON. Generating candidates...")
+                candidates = list(mongo_reviews.aggregate(pipeline))
+                print(f"Generated Candidates. Getting final recs based on Resy availability...")
+                top_restos = get_top_available_candidates(candidates, vision.res_date, vision.res_time, vision.party_size)
+            # If Res Mode is off, continue without separate candidate generation step
+            else:
+                top_restos = list(mongo_reviews.aggregate(pipeline))
+            # If Res Mode is on and no results with reservations filter, run again without reservation filters but keep other filters
             if len(top_restos) == 0 and res_mode_on:
                 print(f"Search with available restaurants returned no results. Re-running vector database search without reservation availability, but with other metadata filters..." , file=sys.stderr)
                 # Delete the last filter expression, assuming the last one is the available reservations filter.
@@ -224,6 +237,7 @@ def get_top_restos_mongo(query: str, embed_model: HuggingFaceEmbeddings, mongo_r
                 print(f"Removed available res filter")
                 top_restos = list(mongo_reviews.aggregate(pipeline))
                 used_reservations = False
+            # If no results from basic metadata filter, remove all filters and run again
             if len(top_restos) == 0:
                 print(f"Metadata filter search returned no results. Re-running vector database search with no metadata filters at all..." , file=sys.stderr)
                 removed_filter = pipeline[0]['$vectorSearch'].pop('filter')
@@ -232,7 +246,7 @@ def get_top_restos_mongo(query: str, embed_model: HuggingFaceEmbeddings, mongo_r
         else:
             print(f"Searching vector database with no metadata filters..." , file=sys.stderr)
             top_restos = list(mongo_reviews.aggregate(pipeline))
-        print("Found the top 3 restaurants!! Watch out... their spppiiiicccyyyyyyy...", file=sys.stderr)
+        print(f"Found the top {len(top_restos)} recommendations!! Watch out... their spppiiiicccyyyyyyy...", file=sys.stderr)
         for i in top_restos:
             print(f"{i['resto_name']} similarity search score: {i['score']}\n")
     except Exception as e:
@@ -371,3 +385,40 @@ def get_available_resy_venues(res_date: str, res_time: str, party_size: int):
             time.sleep(sleep_time)
     print(f"Got all venues with available reservations on {res_date} at {res_time} for {party_size}. Let's Ride.")
     return available_venues
+
+
+def get_top_available_candidates(candidates: List, res_date: str, res_time: str, party_size: int):
+    final_candidates = []
+    url = 'https://api.resy.com/3/venuesearch/search'
+    data = {
+        'geo': {'latitude': 40.712941, 'longitude': -74.006393, 'radius': 35420},
+        'availability': True,
+        'order_by': 'availability',
+        'page': 1,
+        'per_page': 50,
+        'query': '',
+        'slot_filter': {'day': res_date, 'time_filter': res_time, 'party_size': party_size},
+        'types': ['venue']
+    }
+    headers = get_resy_search_headers()
+    # Loop through candidates until find 3 available on Resy or exhaust all candidates
+    i = 0
+    while i < len(candidates) and len(final_candidates) < 3:
+        print(f"Checking candidate #{i+1} availability")
+        cand = candidates[i]
+        data['query'] = cand['resy_venue_name']
+        response = requests.post(
+            url,
+            data=json.dumps(data),
+            headers=headers
+        )
+        if response.status_code == 200:
+            resy_json = json.loads(response.text)
+            if (len(resy_json['search']['hits'][0]['availability']['slots'])) > 0:
+                final_candidates.append(cand)
+                print(f"Found available candidate! Candidate #{i+1}")
+        else:
+            print(f"Error: {response.status_code}")
+        i += 1
+    print(f"Returning {len(final_candidates)} final candidates.")
+    return final_candidates
