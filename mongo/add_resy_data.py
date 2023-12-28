@@ -113,9 +113,32 @@ for doc in tqdm(mongo_docs):
         print(f"{name} already got Resy info!")
         continue
     print(f"***** Getting Resy info for {name} at the {neighborhood} location *****\n")
-    # Check if Mongo has multiple documents with the restaurant name. If it does, add neighborhood to the query.
-    docs_w_name = list(mongo_reviews.find({"resto_name": name}))
-    if len(docs_w_name) > 1:
+    # Check if Mongo has multiple restaurant name + neighborhood combos. If it does, add neighborhood to the query.
+    distinct_combos = mongo_reviews.aggregate([
+        {
+            '$match': {
+                'resto_name': name
+            }
+        },
+        {
+            '$group': {
+                '_id': {
+                    'resto_name': '$resto_name',
+                    'neighborhood': '$neighborhood'
+                }
+            }
+        },
+        {
+            '$group': {
+                '_id': None,
+                'count': {'$sum': 1}
+            }
+        }
+    ])
+    # Extract the count from the result
+    result = list(distinct_combos)
+    count = result[0]['count'] if result else 0
+    if count > 1:
         print(f"{name} has multiple Infatuation Mongo docs. Searching with name and neighborhood combined...")
         using_neighborhood = "Yes"
         data = construct_resy_query_with_neighborhood(resto_name=name, 
