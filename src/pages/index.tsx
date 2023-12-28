@@ -71,12 +71,18 @@ const Index = () => {
   // const [resPartySize, setResPartySize] = useState(null);
   const [resCriteria, setResCriteria] = useState<ReservationCriteria>(null);
   const [usedReservations, setUsedReservations] = useState(true);
+  const [usedBoth, setUsedBoth] = useState(true);
+  const [usedNeighborhood, setUsedNeighborhood] = useState(true);
+  const [usedCuisine, setUsedCuisine] = useState(true);
 
   const sendQuery = useCallback(async () => {
     if (!restoRecs) {
       return;
     }
     setUsedReservations(true);
+    setUsedBoth(true);
+    setUsedNeighborhood(true);
+    setUsedCuisine(true);
     setInput('');
     setMessages((prev) => [
       ...prev,
@@ -143,7 +149,13 @@ const Index = () => {
       {role: 'assistant', content: responseJson.pitch},
     ]);
     setUsedReservations(responseJson.usedReservations);
-    console.log(usedReservations);
+    setUsedBoth(responseJson.usedBoth);
+    setUsedNeighborhood(responseJson.usedNeighborhood);
+    setUsedCuisine(responseJson.usedCuisine);
+    console.log("Used Reservation Mode: ", usedReservations);
+    console.log("Used both filters: ", usedBoth);
+    console.log("Used neighborhood filter:", usedNeighborhood);
+    console.log("Used cuisine filter:", usedCuisine);
   }, [input, restoRecs]);
 
   return (
@@ -174,6 +186,9 @@ const Index = () => {
           setResMode={setResMode}
           setResModalIsOpen={setResModalIsOpen}
           usedReservations={usedReservations}
+          usedBoth={usedBoth}
+          usedNeighborhood={usedNeighborhood}
+          usedCuisine={usedCuisine}
         />
         <ChatView
           messages={messages}

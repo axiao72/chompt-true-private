@@ -58,7 +58,8 @@ except pymongo.errors.ConfigurationError:
 
 # Connect to Chompt db and reviews collection
 db = client.chompt 
-mongo_reviews = db["reviews"]
+# mongo_reviews = db["reviews"]
+mongo_reviews = db["chunked_reviews"]
 # *** CAREFUL!!! Make sure you want to unset
 mongo_reviews.update_many({}, {'$unset': {"resy_venue_id": "", "resy_venue_name": "", "resy_venue_url": ""}})
 mongo_reviews.update_many({}, {'$set': {"hasResy": False}})
@@ -92,10 +93,25 @@ party_size = 2
 resy_counter = 0
 # Get mongo documents that don't already have a Resy link
 mongo_docs = list(mongo_reviews.find({"hasResy": False}))
+infatuation_to_resy_urls = {}
 print(f"Got {len(mongo_docs)} documents from Mongo. Cheffing up Resy data now...")
 for doc in tqdm(mongo_docs):
     name = doc['resto_name']
     neighborhood = doc['neighborhood']
+    already_has_resy = list(mongo_reviews.find({'$and': [
+        {
+            'resto_name': name
+        },
+        {
+            'neighborhood': neighborhood
+        },
+        {
+            'hasResy': True
+        }
+    ]}))
+    if already_has_resy:
+        print(f"{name} already got Resy info!")
+        continue
     print(f"***** Getting Resy info for {name} at the {neighborhood} location *****\n")
     # Check if Mongo has multiple documents with the restaurant name. If it does, add neighborhood to the query.
     docs_w_name = list(mongo_reviews.find({"resto_name": name}))

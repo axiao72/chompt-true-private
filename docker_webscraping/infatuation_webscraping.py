@@ -60,10 +60,10 @@ for count, url in enumerate(tqdm(review_urls)):
         # Get resto name
         resto_name = review_dict['itemReviewed']['name']
 
-        # Check if restaurant has already been scraped (not optimal i know)
-        resto_present = any(resto_name in d.values() for d in resto_reviews)
-        if resto_present:
-            continue
+        # # Check if restaurant has already been scraped (not optimal i know)
+        # resto_present = any(resto_name in d.values() for d in resto_reviews)
+        # if resto_present:
+        #     continue
         
         # Entire review body split into list containing normal review and food rundown section
         review_body = review_dict['reviewBody']

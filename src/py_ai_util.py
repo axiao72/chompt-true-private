@@ -387,7 +387,7 @@ def get_available_resy_venues(res_date: str, res_time: str, party_size: int):
     return available_venues
 
 
-def get_top_available_candidates(candidates: List, res_date: str, res_time: str, party_size: int):
+def get_top_available_candidates(candidates: list, res_date: str, res_time: str, party_size: int):
     final_candidates = []
     url = 'https://api.resy.com/3/venuesearch/search'
     data = {

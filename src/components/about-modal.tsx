@@ -48,6 +48,10 @@ export const AboutModal = ({
             <li>The "Book Reservation" button will go directly to the restaurant's Resy page IF available. I currently only have a small 
               subset of restaurants linked to a Resy page, so if there's no Resy link available the button will go to the restaurant's 
               home page. (Sometimes it will go to the wrong restaurant's Resy page, sorry!!! Working on this 👨🏻‍💻) </li>
+            <li>Recommendation Priorities: When you specify a neighborhood and cuisine in your input, I will prioritize neighborhood over cuisine if I can't 
+              find restaurants that fit both. If I can't find recs in the neighborhood, then I will go to cuisine. If all else fails, I won't consider 
+              either cuisine or neighborhood in an explicit filter and fully rely on semantic search, which may or may not capture those specifications. 
+              (Please let me know your thoughts on these priorities! It's all about you guys)</li>
             <li>Some recommended restaurants might be outdated or permanently closed, my data source includes old reviews 
               and I'm not currently checking for restaurant status (not my top priority rn but will address eventually!). </li>
             <li>Like everything else in this app, the interaction framework and flow is in progress. Stay tuned, more to come 😁 </li>

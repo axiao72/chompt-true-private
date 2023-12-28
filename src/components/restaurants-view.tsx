@@ -116,7 +116,10 @@ export const RestaurantsView = ({
   resModalIsOpen,
   setResMode,
   setResModalIsOpen,
-  usedReservations
+  usedReservations,
+  usedBoth,
+  usedNeighborhood,
+  usedCuisine
 }: {
   restoRecs: Array<RestoRec>;
   resMode: boolean;
@@ -124,6 +127,9 @@ export const RestaurantsView = ({
   setResMode: (resModeOn: boolean) => void;
   setResModalIsOpen: (isOpen: boolean) => void;
   usedReservations: boolean;
+  usedBoth: boolean;
+  usedNeighborhood: boolean;
+  usedCuisine: boolean;
 }) => {
   const [, theme] = useStyletron();
   const containerRef = useRef();
