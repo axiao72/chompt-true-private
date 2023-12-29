@@ -177,6 +177,7 @@
 /new-york/reviews/caridad-china
 /new-york/reviews/jardin-de-china
 /new-york/reviews/el-pabellon-de-oro
+/new-york/reviews/la-dinastia
 /new-york/reviews/la-nueva-victoria
 /new-york/reviews/don-ceviche
 /new-york/reviews/kwik-cup
@@ -397,6 +398,7 @@
 /new-york/reviews/tbar
 /new-york/reviews/sen
 /new-york/reviews/almond
+/new-york/reviews/kissaki
 /new-york/reviews/highway-restaurant-and-bar
 /new-york/reviews/carissas
 /new-york/reviews/mr-bun
@@ -647,6 +649,7 @@
 /new-york/reviews/okdongsik
 /new-york/reviews/monkey-bar
 /new-york/reviews/soup-queen
+/new-york/reviews/zaab-zaab-williamsburg
 /new-york/reviews/mirage-diner
 /new-york/reviews/casa-tulum
 /new-york/reviews/dashi-okume
@@ -933,6 +936,7 @@
 /new-york/reviews/breakfast-by-salts-cure-west-village
 /new-york/reviews/cafe-spaghetti
 /new-york/reviews/bar-tulix
+/new-york/reviews/zaab-zaab
 /new-york/reviews/brooklyn-hots
 /new-york/reviews/belluccis-pizzeria
 /new-york/reviews/aromi
@@ -996,6 +1000,7 @@
 /new-york/reviews/idas-nearabout
 /new-york/reviews/lobster-joint
 /new-york/reviews/kuih-cafe
+/new-york/reviews/lady-wong
 /new-york/reviews/greenpoint-beer-and-ale-co
 /new-york/reviews/dear-irving-on-hudson
 /new-york/reviews/the-crown
@@ -1042,6 +1047,7 @@
 /new-york/reviews/via-carota
 /new-york/reviews/golden-diner
 /new-york/reviews/le-french-diner
+/new-york/reviews/tong-bangladeshi-nyc
 /new-york/reviews/birria-landia
 /new-york/reviews/lindustrie-pizzeria
 /new-york/reviews/absolute-bagels
@@ -1052,6 +1058,7 @@
 /new-york/reviews/shu-jiao-fu-zhou-cuisine
 /new-york/reviews/wus-wonton-king
 /new-york/reviews/paulie-gees
+/new-york/reviews/di-fara-pizza
 /new-york/reviews/rosella
 /new-york/reviews/abuqir
 /new-york/reviews/4-charles-prime-rib
@@ -1070,6 +1077,7 @@
 /new-york/reviews/spy-c
 /new-york/reviews/dhamaka
 /new-york/reviews/keens-steakhouse
+/new-york/reviews/sushi-on-me
 /new-york/reviews/delhi-heights
 /new-york/reviews/for-all-things-good
 /new-york/reviews/wildair
@@ -1172,10 +1180,12 @@
 /new-york/reviews/chick-chick
 /new-york/reviews/sushi-jin
 /new-york/reviews/dimes
+/new-york/reviews/diner
 /new-york/reviews/tone-cafe
 /new-york/reviews/native-noodles
 /new-york/reviews/nicks-pizza
 /new-york/reviews/the-bund-forest-hills
+/new-york/reviews/harlem-shake-nyc
 /new-york/reviews/allans-bakery
 /new-york/reviews/lhasa-tibetan-restaurant
 /new-york/reviews/blue-willow
@@ -1183,6 +1193,7 @@
 /new-york/reviews/wayla
 /new-york/reviews/tomi-jazz
 /new-york/reviews/sona
+/new-york/reviews/ras-plant-based
 /new-york/reviews/au-cheval-nyc
 /new-york/reviews/kikis
 /new-york/reviews/king-souvlaki-of-astoria
@@ -1196,6 +1207,7 @@
 /new-york/reviews/camillo
 /new-york/reviews/karasu
 /new-york/reviews/sol-sips-cafe-bushwick
+/new-york/reviews/tong
 /new-york/reviews/veselka-1
 /new-york/reviews/walters
 /new-york/reviews/peppas-jerk-chicken-crown-heights
@@ -1209,6 +1221,7 @@
 /new-york/reviews/le-coucou
 /new-york/reviews/ichiran
 /new-york/reviews/the-dutch
+/new-york/reviews/tradisyon
 /new-york/reviews/cafe-habana
 /new-york/reviews/legend-of-taste
 /new-york/reviews/samesa
@@ -1257,6 +1270,7 @@
 /new-york/reviews/la-chula
 /new-york/reviews/harlem-biscuit-company
 /new-york/reviews/benyam
+/new-york/reviews/field-trip
 /new-york/reviews/pizza-by-lucilles
 /new-york/reviews/land-of-plenty
 /new-york/reviews/morandi
@@ -1284,6 +1298,7 @@
 /new-york/reviews/marys-fish-camp
 /new-york/reviews/two-hands
 /new-york/reviews/2nd-floor-bar-essen
+/new-york/reviews/blue-ribbon-sushi-bar-grill
 /new-york/reviews/abc-cocina
 /new-york/reviews/don-antonio
 /new-york/reviews/the-clocktower
@@ -1303,6 +1318,7 @@
 /new-york/reviews/dirt-candy
 /new-york/reviews/zaragoza-grocery
 /new-york/reviews/boulton-watt
+/new-york/reviews/tsurutontan
 /new-york/reviews/umami-burger-nyc
 /new-york/reviews/caffe-storico
 /new-york/reviews/pies-n-thighs
@@ -1326,6 +1342,7 @@
 /new-york/reviews/stickys-finger-joint
 /new-york/reviews/dirty-french
 /new-york/reviews/vics
+/new-york/reviews/mister-dips
 /new-york/reviews/pastrami-queen
 /new-york/reviews/the-commodore
 /new-york/reviews/union-square-cafe
@@ -1357,6 +1374,7 @@
 /new-york/reviews/da-umberto
 /new-york/reviews/village-yokocho
 /new-york/reviews/gage-and-tollner
+/new-york/reviews/sushi-katsuei
 /new-york/reviews/pho-bar-chinatown
 /new-york/reviews/quality-meats
 /new-york/reviews/american-cut
@@ -1368,6 +1386,7 @@
 /new-york/reviews/santa-panza
 /new-york/reviews/peacefood-cafe
 /new-york/reviews/mominette
+/new-york/reviews/dim-sum-go-go
 /new-york/reviews/semicolon
 /new-york/reviews/trapizzino
 /new-york/reviews/tasty-hand-pulled-noodles
@@ -1391,6 +1410,7 @@
 /new-york/reviews/bar-jamon
 /new-york/reviews/pepe-rosso-to-go
 /new-york/reviews/jun-men-ramen
+/new-york/reviews/rosies
 /new-york/reviews/inti
 /new-york/reviews/acapulco-deli
 /new-york/reviews/bricolage
@@ -1412,6 +1432,7 @@
 /new-york/reviews/hatsuhana
 /new-york/reviews/charlie-bird
 /new-york/reviews/edie-jos
+/new-york/reviews/miriam
 /new-york/reviews/frangos-peri-peri
 /new-york/reviews/o-ya
 /new-york/reviews/domodomo
@@ -1448,6 +1469,7 @@
 /new-york/reviews/pera-mediterranean-brasserie
 /new-york/reviews/colina-cuervo
 /new-york/reviews/sally-roots
+/new-york/reviews/emily-west-village
 /new-york/reviews/jing-fong-chinatown
 /new-york/reviews/fish
 /new-york/reviews/eds-lobster-bar
@@ -1577,6 +1599,7 @@
 /new-york/reviews/osteria-laguna
 /new-york/reviews/toms-restaurant
 /new-york/reviews/cowgirl-sea-horse
+/new-york/reviews/crave-fishbar-upper-west-side
 /new-york/reviews/russ-daughters-cafe
 /new-york/reviews/the-odeon
 /new-york/reviews/sushi-seki-chelsea
@@ -1590,6 +1613,7 @@
 /new-york/reviews/rossopomodoro
 /new-york/reviews/3-guys-restaurant
 /new-york/reviews/coco-pazzo
+/new-york/reviews/strip-house
 /new-york/reviews/blue-hill-new-york
 /new-york/reviews/defontes
 /new-york/reviews/pasquale-jones
@@ -1621,6 +1645,7 @@
 /new-york/reviews/tartine
 /new-york/reviews/ushiwakamaru
 /new-york/reviews/death-co
+/new-york/reviews/jacks-wife-freda-west-village
 /new-york/reviews/wallflower
 /new-york/reviews/miss-lilys-7a-cafe
 /new-york/reviews/tortilleria-mexicana-los-hermanos
@@ -1640,9 +1665,11 @@
 /new-york/reviews/phayul
 /new-york/reviews/blue-ribbon-sushi-izakaya
 /new-york/reviews/momofuku-ko
+/new-york/reviews/stickys-finger-joint-midtown-murray-hill
 /new-york/reviews/perry-st
 /new-york/reviews/prune
 /new-york/reviews/chinese-tuxedo
+/new-york/reviews/takahachi
 /new-york/reviews/tia-pol
 /new-york/reviews/gemma
 /new-york/reviews/faro
@@ -1654,8 +1681,10 @@
 /new-york/reviews/east-harbor-seafood-palace
 /new-york/reviews/barrio-chino
 /new-york/reviews/mermaid-oyster-bar
+/new-york/reviews/shake-shack
 /new-york/reviews/tuome
 /new-york/reviews/benjamin-steakhouse
+/new-york/reviews/sel-rrose
 /new-york/reviews/hardings
 /new-york/reviews/aria-wine-bar
 /new-york/reviews/the-brooklyneer
@@ -1670,6 +1699,7 @@
 /new-york/reviews/antica-pesa
 /new-york/reviews/the-jeffrey
 /new-york/reviews/avant-garden
+/new-york/reviews/cocoron
 /new-york/reviews/the-smith-midtown
 /new-york/reviews/milos
 /new-york/reviews/marc-forgione
@@ -1696,6 +1726,7 @@
 /new-york/reviews/david-burke-kitchen
 /new-york/reviews/txikito
 /new-york/reviews/petite-crevette
+/new-york/reviews/veselka
 /new-york/reviews/sweet-chick
 /new-york/reviews/hearth
 /new-york/reviews/coppelia
@@ -1780,6 +1811,8 @@
 /new-york/reviews/little-prince
 /new-york/reviews/khe-yo
 /new-york/reviews/acme
+/new-york/reviews/21-greenpoint
+/new-york/reviews/sugarfish
 /new-york/reviews/lido-harlem
 /new-york/reviews/dan-and-johns-wings
 /new-york/reviews/eleven-madison-park
@@ -1798,9 +1831,12 @@
 /new-york/reviews/happy-stony-noodle
 /new-york/reviews/los-tacos-no-1
 /new-york/reviews/sariling-atin
+/new-york/reviews/patacon-pisao-elmhurst
 /new-york/reviews/lhasa-fresh-food
 /new-york/reviews/eim-khao-mun-kai
 /new-york/reviews/fiaschetteria-pistoia-west-village
+/new-york/reviews/fiaschetteria-pistoia
+/new-york/reviews/the-good-fork
 /new-york/reviews/candle-cafe
 /new-york/reviews/the-brew-inn
 /new-york/reviews/redfarm-uws
@@ -1890,6 +1926,7 @@
 /new-york/reviews/lower-east-side-ice-cream-factory
 /new-york/reviews/tortilleria-nixtamal
 /new-york/reviews/dragon-bing
+/new-york/reviews/the-ten-bells-1
 /new-york/reviews/temperance-wine-bar
 /new-york/reviews/bar-blondeau
 /new-york/reviews/curry-king
@@ -1933,6 +1970,7 @@
 /new-york/reviews/tarim-uyghur-food
 /new-york/reviews/harlem-public
 /new-york/reviews/mofongo-del-valle
+/new-york/reviews/raku-east-village
 /new-york/reviews/au-zaatar
 /new-york/reviews/chopped-parsley
 /new-york/reviews/frijolitos
@@ -1986,6 +2024,7 @@
 /new-york/reviews/rhodora-wine-bar
 /new-york/reviews/troost
 /new-york/reviews/la-lanterna-di-vittorio
+/new-york/reviews/somtum-der-red-hook
 /new-york/reviews/brooklyn-ice-house
 /new-york/reviews/the-raines-law-room-at-the-william
 /new-york/reviews/cafe-luluc
@@ -2045,6 +2084,7 @@
 /new-york/reviews/reception-bar
 /new-york/reviews/fat-buddha
 /new-york/reviews/cha-an-bonbon
+/new-york/reviews/bird-branch
 /new-york/reviews/te-company
 /new-york/reviews/hamlet-coffee-company
 /new-york/reviews/coffee-project-ny
@@ -2071,8 +2111,11 @@
 /new-york/reviews/claudys-kitchen
 /new-york/reviews/nuchas-artisan-empanadas
 /new-york/reviews/cafe-argentino
+/new-york/reviews/breads-bakery
+/new-york/reviews/stretch-pizza-wylie-dufresne
 /new-york/reviews/ruta-oaxaca
 /new-york/reviews/utopia-bagels
+/new-york/reviews/hh-bagels
 /new-york/reviews/bagel-oasis
 /new-york/reviews/empanada-loca
 /new-york/reviews/wild-birds
@@ -2131,6 +2174,7 @@
 /new-york/reviews/chickys
 /new-york/reviews/black-nile
 /new-york/reviews/tony-lukes-1
+/new-york/reviews/ayat
 /new-york/reviews/top-thai-vintage
 /new-york/reviews/farine-baking-company
 /new-york/reviews/kabul-kabab-house
@@ -2150,6 +2194,7 @@
 /new-york/reviews/island-burger
 /new-york/reviews/ital-fusion
 /new-york/reviews/sushi-kai
+/new-york/reviews/birria-landia-williamsburg
 /new-york/reviews/nenes-deli-taqueria
 /new-york/reviews/chong-qing-lao-zao
 /new-york/reviews/xiang-hot-pot
@@ -2170,6 +2215,7 @@
 /new-york/reviews/joy-cho-pastry
 /new-york/reviews/love-nelly
 /new-york/reviews/fox-bread-bakery
+/new-york/reviews/high-low-beverage-company
 /new-york/reviews/le-petit-monstre
 /new-york/reviews/frenchette-bakery
 /new-york/reviews/jasmines-caribbean-cuisine
@@ -2191,6 +2237,7 @@
 /new-york/reviews/leland-eating-drinking-house
 /new-york/reviews/yoon-haeundae-galbi
 /new-york/reviews/shan-halal-meat-grocery
+/new-york/reviews/back-alley-bread
 /new-york/reviews/suki
 /new-york/reviews/santo-bruklin
 /new-york/reviews/junzi-kitchen
@@ -2203,6 +2250,7 @@
 /new-york/reviews/the-halal-guys
 /new-york/reviews/indian-king-biryani-house
 /new-york/reviews/makina-cafe
+/new-york/reviews/thai-farm-kitchen-seaport
 /new-york/reviews/the-noodle
 /new-york/reviews/mokyo
 /new-york/reviews/momofuku-207
@@ -2231,6 +2279,7 @@
 /new-york/reviews/com-tam-ninh-kieu
 /new-york/reviews/papas-kitchen
 /new-york/reviews/bilao
+/new-york/reviews/kapet-torta
 /new-york/reviews/lahi
 /new-york/reviews/han-dynasty-east-village
 /new-york/reviews/szechuan-mountain-house-flushing
@@ -2238,6 +2287,7 @@
 /new-york/reviews/v-nam-cafe
 /new-york/reviews/district-saigon
 /new-york/reviews/banh-mi-zon
+/new-york/reviews/5ive-spice
 /new-york/reviews/amigo-by-nai
 /new-york/reviews/adja-khady
 /new-york/reviews/patisserie-des-ambassades
@@ -2253,6 +2303,7 @@
 /new-york/reviews/caffe-panna
 /new-york/reviews/brooklyn-noosh
 /new-york/reviews/farra
+/new-york/reviews/fuku
 /new-york/reviews/malecon-restaurant-ii
 /new-york/reviews/endswell
 /new-york/reviews/black-iris
@@ -2260,6 +2311,7 @@
 /new-york/reviews/las-santas
 /new-york/reviews/cafe-paulette
 /new-york/reviews/imani-caribbean-kitchen-bar
+/new-york/reviews/rome-to-brooklyn-pizza
 /new-york/reviews/five-boroughs-brewing-co-1
 /new-york/reviews/barking-dog
 /new-york/reviews/n-11th-cookout
@@ -2331,6 +2383,7 @@
 /new-york/reviews/peachys
 /new-york/reviews/heaven-or-las-vegas
 /new-york/reviews/anassa-taverna
+/new-york/reviews/taco-mix-east-harlem
 /new-york/reviews/three-times
 /new-york/reviews/paloma-at-hotel-hendricks
 /new-york/reviews/ten-hope
@@ -2390,6 +2443,7 @@
 /new-york/reviews/ends-meat
 /new-york/reviews/sahadis
 /new-york/reviews/yaso-tangbao-industry-city
+/new-york/reviews/hometown-bar-b-que-industry-city
 /new-york/reviews/yafa-cafe
 /new-york/reviews/the-roast
 /new-york/reviews/hot-space
@@ -2403,8 +2457,10 @@
 /new-york/reviews/bamboo-garden
 /new-york/reviews/park-asia
 /new-york/reviews/don-pepe-tortas-y-jugos
+/new-york/reviews/tacos-el-bronco-truck
 /new-york/reviews/pio-pio-ues
 /new-york/reviews/roys-fish-market
+/new-york/reviews/xian-famous-foods-ues
 /new-york/reviews/winter-garden-at-the-standard
 /new-york/reviews/mama-capri
 /new-york/reviews/brandy-library
@@ -2418,6 +2474,7 @@
 /new-york/reviews/veronika
 /new-york/reviews/the-grand-delancey
 /new-york/reviews/the-chapel-bar-at-fotografiska
+/new-york/reviews/angkor-cambodian-bistro
 /new-york/reviews/edwards-steakhouse
 /new-york/reviews/wurstbar
 /new-york/reviews/the-archer
@@ -2431,6 +2488,7 @@
 /new-york/reviews/madame-claude-bis
 /new-york/reviews/biryani-darbar
 /new-york/reviews/skinners-loft
+/new-york/reviews/nowon
 /new-york/reviews/cellar-335
 /new-york/reviews/citi-grill
 /new-york/reviews/latham-house
@@ -2448,6 +2506,7 @@
 /new-york/reviews/divyas-kitchen
 /new-york/reviews/ps-kitchen
 /new-york/reviews/plant-food-wine
+/new-york/reviews/spicy-moon
 /new-york/reviews/parlay
 /new-york/reviews/bar-bete
 /new-york/reviews/portale
@@ -2456,6 +2515,7 @@
 /new-york/reviews/getaway
 /new-york/reviews/karaoke-city
 /new-york/reviews/landmark-diner-soho
+/new-york/reviews/hampton-chutney-co
 /new-york/reviews/souk-sandwich
 /new-york/reviews/the-woo
 /new-york/reviews/emmy-squared-ues
@@ -2491,6 +2551,7 @@
 /new-york/reviews/la-napa
 /new-york/reviews/evil-twin-brewing-nyc
 /new-york/reviews/connie-cocktail-lounge
+/new-york/reviews/sugar-sweet-sunshine
 /new-york/reviews/aita-trattoria
 /new-york/reviews/testo
 /new-york/reviews/el-gran-castillo-de-jagua
@@ -2498,6 +2559,7 @@
 /new-york/reviews/ogliastro-pizza-bar
 /new-york/reviews/geido
 /new-york/reviews/lola-taverna
+/new-york/reviews/daily-provisions-uws
 /new-york/reviews/daymoves
 /new-york/reviews/elsa-la-reina-del-chicharron
 /new-york/reviews/la-nueva-espana
@@ -2530,6 +2592,7 @@
 /new-york/reviews/nobody-told-me
 /new-york/reviews/las-lap
 /new-york/reviews/super-pollo-1
+/new-york/reviews/pio-pio
 /new-york/reviews/chirping-chicken
 /new-york/reviews/ganesh-temple-canteen
 /new-york/reviews/bengal-tiger
@@ -2556,6 +2619,7 @@
 /new-york/reviews/brunetti
 /new-york/reviews/the-little-taco-house
 /new-york/reviews/ainslie-enoteca-e-birreria
+/new-york/reviews/seamores-gotham-west-market-midtown
 /new-york/reviews/jackdaw
 /new-york/reviews/wine-escape
 /new-york/reviews/cedar-local
@@ -2568,6 +2632,7 @@
 /new-york/reviews/bukhara-grill
 /new-york/reviews/lalou
 /new-york/reviews/pedros
+/new-york/reviews/shake-shack-5
 /new-york/reviews/butler-bakeshop
 /new-york/reviews/hearth-on-the-high-line
 /new-york/reviews/abracadabra-brooklyn
@@ -2583,11 +2648,13 @@
 /new-york/reviews/angaar
 /new-york/reviews/pi-greek-bakerie
 /new-york/reviews/salud
+/new-york/reviews/taim-nolita
 /new-york/reviews/baz-bagel-and-restaurant
 /new-york/reviews/depanneur
 /new-york/reviews/lella-alimentari
 /new-york/reviews/omakase-by-maaser
 /new-york/reviews/abes-pagoda
+/new-york/reviews/rays
 /new-york/reviews/moca-bar-and-lounge
 /new-york/reviews/67-orange-street
 /new-york/reviews/harlem-hops
@@ -2621,6 +2688,7 @@
 /new-york/reviews/zusik
 /new-york/reviews/la-diagonal
 /new-york/reviews/cantina-taqueria-tequila-bar
+/new-york/reviews/cantina-taqueria-tequila-bar-lenox
 /new-york/reviews/belle-harlem
 /new-york/reviews/keur-sokhna-chez-maty-et-sokhna
 /new-york/reviews/pikine
@@ -2646,6 +2714,7 @@
 /new-york/reviews/naya-express
 /new-york/reviews/shukos-somasdiez-guatemala
 /new-york/reviews/pathos-cafe
+/new-york/reviews/souvlaki-gr-1
 /new-york/reviews/le-petit-parisien
 /new-york/reviews/gai-chicken-rice
 /new-york/reviews/grk-fresh-greek-midtown
@@ -2664,12 +2733,15 @@
 /new-york/reviews/henrietta-hudson
 /new-york/reviews/ronin-stones
 /new-york/reviews/bati-ethiopian-restaurant
+/new-york/reviews/99-favor-taste-lower-east-side
 /new-york/reviews/wo-hop
 /new-york/reviews/hop-kee
 /new-york/reviews/nha-trang-centre
 /new-york/reviews/royal-seafood-restaurant
 /new-york/reviews/august-gatherings
+/new-york/reviews/golden-steamer
 /new-york/reviews/dim-sum-vip
+/new-york/reviews/super-taste
 /new-york/reviews/sun-hing-lung
 /new-york/reviews/shanghai-21
 /new-york/reviews/casa-bocado
@@ -2677,6 +2749,7 @@
 /new-york/reviews/madre-greenpoint
 /new-york/reviews/benemon
 /new-york/reviews/kafana
+/new-york/reviews/ravagh-persian-grill-east-village
 /new-york/reviews/joes-pizza-times-square
 /new-york/reviews/la-esquina-midtown
 /new-york/reviews/bar-pisellino
@@ -2725,6 +2798,7 @@
 /new-york/reviews/mar
 /new-york/reviews/lena-hudson-yards
 /new-york/reviews/bar-stanley
+/new-york/reviews/estiatorio-milos
 /new-york/reviews/wild-ink
 /new-york/reviews/the-zodiac-room
 /new-york/reviews/hudson-yards-grill
@@ -2747,6 +2821,7 @@
 /new-york/reviews/fika-espresso-bar
 /new-york/reviews/the-long-island-bar
 /new-york/reviews/bushniwa
+/new-york/reviews/sugarfish-soho
 /new-york/reviews/headless-horseman
 /new-york/reviews/barn-joo
 /new-york/reviews/thai-villa
@@ -2754,7 +2829,9 @@
 /new-york/reviews/kokage
 /new-york/reviews/momosan-ramen-sake
 /new-york/reviews/sip-sak
+/new-york/reviews/alidoro-midtown
 /new-york/reviews/omusubi-gonbei
+/new-york/reviews/momofuku-noodle-bar-uws
 /new-york/reviews/grace-street-cafe
 /new-york/reviews/amaranto
 /new-york/reviews/tacos-matamoros
@@ -2785,6 +2862,7 @@
 /new-york/reviews/dutch-kills
 /new-york/reviews/gupshup
 /new-york/reviews/benno
+/new-york/reviews/aria-wine-bar-hells-kitchen
 /new-york/reviews/nizza
 /new-york/reviews/il-gattopardo
 /new-york/reviews/viceversa
@@ -2826,6 +2904,7 @@
 /new-york/reviews/harolds
 /new-york/reviews/bluebird-london
 /new-york/reviews/gazalas
+/new-york/reviews/pho-bar
 /new-york/reviews/sauce-pizzeria
 /new-york/reviews/bodega-88
 /new-york/reviews/st-james-gate
@@ -2837,12 +2916,14 @@
 /new-york/reviews/taqueria-tlaxcalli
 /new-york/reviews/berber-street-food
 /new-york/reviews/randazzos-seafood
+/new-york/reviews/court-street-grocers-williamsburg
 /new-york/reviews/lillo
 /new-york/reviews/tessa
 /new-york/reviews/sans
 /new-york/reviews/kleins
 /new-york/reviews/the-owls-tail
 /new-york/reviews/teitel-brothers
+/new-york/reviews/kotti-berliner-doner-kebab
 /new-york/reviews/taco-mix
 /new-york/reviews/cabana-restaurant-bar
 /new-york/reviews/alberto-restaurant
@@ -2850,6 +2931,7 @@
 /new-york/reviews/eddies-sweet-shop
 /new-york/reviews/deasura
 /new-york/reviews/forest-hills-station-house
+/new-york/reviews/shake-shack-forest-hills
 /new-york/reviews/5-burro-cafe
 /new-york/reviews/tamashii-ramen
 /new-york/reviews/matiz-latin-cuisine
@@ -2862,6 +2944,7 @@
 /new-york/reviews/ume
 /new-york/reviews/sala-thai
 /new-york/reviews/randalls-barbecue
+/new-york/reviews/good-thanks
 /new-york/reviews/citizens-of-gramercy
 /new-york/reviews/smile-to-go-flatiron
 /new-york/reviews/charley-st
@@ -2881,6 +2964,7 @@
 /new-york/reviews/williams-candy-shop
 /new-york/reviews/rubys-bar-grill
 /new-york/reviews/footprints-cafe
+/new-york/reviews/toms-restaurant-coney-island
 /new-york/reviews/grimaldis-coal-brick-oven-pizza-coney-island
 /new-york/reviews/gargiulos-restaurant
 /new-york/reviews/place-to-beach
@@ -2902,8 +2986,11 @@
 /new-york/reviews/ed-bevs
 /new-york/reviews/fletchers-bbq-rockaway-beach
 /new-york/reviews/cuisine-by-claudette
+/new-york/reviews/cuisine-by-claudette-riis
 /new-york/reviews/pizza-moto-rockaway
+/new-york/reviews/super-burrito
 /new-york/reviews/high-97
+/new-york/reviews/lobster-joint-rockaways
 /new-york/reviews/rockaway-bagels
 /new-york/reviews/pico
 /new-york/reviews/connollys
@@ -2917,6 +3004,7 @@
 /new-york/reviews/whits-end-pizza-parlour
 /new-york/reviews/rippers
 /new-york/reviews/kittery
+/new-york/reviews/dinosaur-bbq-gowanus
 /new-york/reviews/littleneck-1
 /new-york/reviews/surfish
 /new-york/reviews/brooklyn-pizza-market
@@ -2925,13 +3013,18 @@
 /new-york/reviews/the-breakers
 /new-york/reviews/tsion-cafe
 /new-york/reviews/hao-noodle
+/new-york/reviews/emmy-squared-east-village
 /new-york/reviews/taco-electrico
+/new-york/reviews/avant-garden-williamsburg
 /new-york/reviews/the-hidden-pearl
 /new-york/reviews/anable-basin
 /new-york/reviews/lic-bar
 /new-york/reviews/gmt-tavern
 /new-york/reviews/hartleys
 /new-york/reviews/miansai
+/new-york/reviews/kings-county-imperial-les
+/new-york/reviews/la-pecora-bianca-midtown
+/new-york/reviews/socarrat-paella-bar-midtown-east
 /new-york/reviews/pampano-taqueria-midtown
 /new-york/reviews/ess-a-bagel
 /new-york/reviews/otis
@@ -2943,6 +3036,7 @@
 /new-york/reviews/kobrick-coffee
 /new-york/reviews/cafe-amrita
 /new-york/reviews/the-grey-dog-west-village
+/new-york/reviews/hudsons
 /new-york/reviews/the-frying-pan
 /new-york/reviews/sevilla
 /new-york/reviews/lamano
@@ -2965,6 +3059,7 @@
 /new-york/reviews/take-31
 /new-york/reviews/jongro-bbq
 /new-york/reviews/okozushi
+/new-york/reviews/taqueria-diana-williamsburg
 /new-york/reviews/the-biergarten-at-the-standard
 /new-york/reviews/the-golden-hour
 /new-york/reviews/banhmigos
@@ -2976,9 +3071,11 @@
 /new-york/reviews/bia
 /new-york/reviews/entwine
 /new-york/reviews/the-roof
+/new-york/reviews/breads-bakery-lincoln-center
 /new-york/reviews/harriets-rooftop-lounge-1-hotel
 /new-york/reviews/stone-street-tavern
 /new-york/reviews/the-bari
+/new-york/reviews/joe-pats-east-village
 /new-york/reviews/terre
 /new-york/reviews/shinsen
 /new-york/reviews/the-pony-bar
@@ -3007,12 +3104,14 @@
 /new-york/reviews/andante
 /new-york/reviews/upnorth
 /new-york/reviews/house-of-small-wonder
+/new-york/reviews/beyond-sushi-garment-district
 /new-york/reviews/lukes-lobster-garment-district
 /new-york/reviews/el-sabroso
 /new-york/reviews/venisalvi
 /new-york/reviews/bens-kosher-delicatessen
 /new-york/reviews/bonchon-chicken-midtown
 /new-york/reviews/casa-nonna
+/new-york/reviews/tikka-indian-grill
 /new-york/reviews/vandal
 /new-york/reviews/boys-dont-cry
 /new-york/reviews/levante
@@ -3027,6 +3126,7 @@
 /new-york/reviews/amelie-west-village
 /new-york/reviews/doc-wine-bar
 /new-york/reviews/il-bambino
+/new-york/reviews/the-smith-nomad
 /new-york/reviews/chikarashi-1
 /new-york/reviews/tavern29
 /new-york/reviews/karakatta
@@ -3099,10 +3199,12 @@
 /new-york/reviews/good-move
 /new-york/reviews/banzarbar
 /new-york/reviews/les-enfants-de-boheme
+/new-york/reviews/fonda-park-slope
 /new-york/reviews/parkside
 /new-york/reviews/purple-yam
 /new-york/reviews/miznon-nyc
 /new-york/reviews/jacksons
+/new-york/reviews/hibino
 /new-york/reviews/the-inkan
 /new-york/reviews/51st-bakery-cafe
 /new-york/reviews/court-square-diner
@@ -3112,13 +3214,18 @@
 /new-york/reviews/zabars
 /new-york/reviews/due-west
 /new-york/reviews/saiguette
+/new-york/reviews/jin-ramen-upper-west-side
 /new-york/reviews/viand-cafe-upper-west-side
+/new-york/reviews/xian-famous-foods-upper-west-side
 /new-york/reviews/tum-yum
 /new-york/reviews/the-lobster-club
 /new-york/reviews/greca
 /new-york/reviews/russ-daughters-jewish-museum
+/new-york/reviews/la-esquina
+/new-york/reviews/calexico-upper-east-side
 /new-york/reviews/nica-trattoria
 /new-york/reviews/pengs-noodle-folk
+/new-york/reviews/the-meatball-shop-upper-east-side
 /new-york/reviews/san-matteo-pizzeria-e-cucina
 /new-york/reviews/tri-dim-shanghai
 /new-york/reviews/studio
@@ -3163,6 +3270,7 @@
 /new-york/reviews/bravest-on-38th
 /new-york/reviews/waterfront-ale-house
 /new-york/reviews/petes-tavern
+/new-york/reviews/sea-wolf
 /new-york/reviews/the-wheelhouse
 /new-york/reviews/tonchin
 /new-york/reviews/howlin-taco
@@ -3178,6 +3286,9 @@
 /new-york/reviews/pisillo
 /new-york/reviews/the-wooly-public
 /new-york/reviews/schilling
+/new-york/reviews/shake-shack-fidi
+/new-york/reviews/parm-2
+/new-york/reviews/pj-clarkes-fidi
 /new-york/reviews/eataly-downtown
 /new-york/reviews/barcade-1
 /new-york/reviews/the-malt-house-fidi
@@ -3185,6 +3296,7 @@
 /new-york/reviews/the-dead-rabbit
 /new-york/reviews/beverlys
 /new-york/reviews/westville-dumbo
+/new-york/reviews/smile-to-go-dumbo
 /new-york/reviews/sugarcane
 /new-york/reviews/loreley-restaurant-biergarten
 /new-york/reviews/the-shakespeare-the-william
@@ -3194,12 +3306,14 @@
 /new-york/reviews/ferns
 /new-york/reviews/lil-gem
 /new-york/reviews/risbo
+/new-york/reviews/alidoro
 /new-york/reviews/omen-azen
 /new-york/reviews/shigure
 /new-york/reviews/kubeh
 /new-york/reviews/sushi-kaito
 /new-york/reviews/bar-bruno
 /new-york/reviews/avlee-greek-kitchen
+/new-york/reviews/pizza-moto-1
 /new-york/reviews/gersi
 /new-york/reviews/good-story-rooftop-lounge
 /new-york/reviews/radegast-hall-biergarten
@@ -3227,6 +3341,7 @@
 /new-york/reviews/ground-central-coffee-company
 /new-york/reviews/gregorys-coffee
 /new-york/reviews/devocion
+/new-york/reviews/think-coffee
 /new-york/reviews/variety-coffee-roasters
 /new-york/reviews/rex
 /new-york/reviews/public-kitchen
@@ -3248,13 +3363,17 @@
 /new-york/reviews/circa-brewing-co
 /new-york/reviews/ms-yoo
 /new-york/reviews/pilot
+/new-york/reviews/los-tacos-no-1-midtown
 /new-york/reviews/petra
 /new-york/reviews/ela-taverna
 /new-york/reviews/cecconis-dumbo
 /new-york/reviews/loosies-cafe
+/new-york/reviews/barcade
 /new-york/reviews/banh-mi-saigon-bakery
 /new-york/reviews/thai-son
 /new-york/reviews/breakroom
+/new-york/reviews/xian-famous-foods-chinatown
+/new-york/reviews/seamores-1
 /new-york/reviews/little-alley
 /new-york/reviews/one-bedford
 /new-york/reviews/mad-tropical
@@ -3266,8 +3385,10 @@
 /new-york/reviews/ethyls-alcohol-food
 /new-york/reviews/toloache-82
 /new-york/reviews/le-bilboquet-1
+/new-york/reviews/egg-shop-1
 /new-york/reviews/ennju
 /new-york/reviews/soho-park
+/new-york/reviews/patacon-pisao
 /new-york/reviews/the-malt-house
 /new-york/reviews/hotel-chantelle
 /new-york/reviews/spyglass-rooftop
@@ -3275,6 +3396,7 @@
 /new-york/reviews/mr-purple
 /new-york/reviews/boucherie
 /new-york/reviews/humble-fish
+/new-york/reviews/caracas-arepa-bar-1
 /new-york/reviews/cape-house
 /new-york/reviews/aoc-laile-ou-la-cuisse
 /new-york/reviews/nowadays
@@ -3315,6 +3437,7 @@
 /new-york/reviews/bar-fortuna
 /new-york/reviews/bar-velo
 /new-york/reviews/malai-marke
+/new-york/reviews/banter
 /new-york/reviews/fancy-nancy
 /new-york/reviews/chinantla-restaurant
 /new-york/reviews/l-antagoniste
