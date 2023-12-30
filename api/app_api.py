@@ -25,9 +25,9 @@ def chat(vision: IdealMeal):
     # mongo_reviews = DB["chunked_reviews"]
     # vision_dict = vision.model_dump()
     print(f"Getting recommendations for the query: '{vision.description}'....", file=sys.stderr)
-    # Extract cuisine and neighborhood for metadata filter
-    # pre_metadata_filters, post_metadata_filters = extract_entities(vision.description, os.getenv('OPENAI_API_KEY'))
-    pre_metadata_filters, post_metadata_filters = {'$and': []}, {} # Searching on little chunks, point is to not need explicit filters
+    # Extract cuisine and neighborhood for metadata filter. Keeping these as post filters just for extra layer of re-ranking/validation
+    pre_metadata_filters, post_metadata_filters = extract_entities(vision.description, os.getenv('OPENAI_API_KEY'))
+    # pre_metadata_filters, post_metadata_filters = {'$and': []}, {} # Searching on little chunks, point is to not need explicit filters
     print(f"Got post search filters: {post_metadata_filters}")
     if vision.res_mode_on:
         print("Reservation mode on.")

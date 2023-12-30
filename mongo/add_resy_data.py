@@ -61,8 +61,8 @@ db = client.chompt
 # mongo_reviews = db["reviews"]
 mongo_reviews = db["chunked_reviews"]
 # *** CAREFUL!!! Make sure you want to unset
-mongo_reviews.update_many({}, {'$unset': {"resy_venue_id": "", "resy_venue_name": "", "resy_venue_url": ""}})
-mongo_reviews.update_many({}, {'$set': {"hasResy": False}})
+# mongo_reviews.update_many({}, {'$unset': {"resy_venue_id": "", "resy_venue_name": "", "resy_venue_url": ""}})
+# mongo_reviews.update_many({}, {'$set': {"hasResy": False}})
 
 # Resy API authorization headers
 authorization = 'ResyAPI api_key="VbWk7s3L4KiK5fzlO7JD3Q5EYolJI7n5"'
@@ -93,10 +93,14 @@ party_size = 2
 resy_counter = 0
 # Get mongo documents that don't already have a Resy link
 mongo_docs = list(mongo_reviews.find({"hasResy": False}))
+print(f"Docs to process: {len(mongo_docs)}")
 infatuation_to_resy_urls = {}
 print(f"Got {len(mongo_docs)} documents from Mongo. Cheffing up Resy data now...")
 for doc in tqdm(mongo_docs):
     name = doc['resto_name']
+    # Get rid of Chinese characters
+    chinese_pattern = re.compile("[\u4e00-\u9fa5]+")
+    cleaned_name = chinese_pattern.sub("", doc['resto_name']).strip()
     neighborhood = doc['neighborhood']
     already_has_resy = list(mongo_reviews.find({'$and': [
         {
@@ -141,14 +145,14 @@ for doc in tqdm(mongo_docs):
     if count > 1:
         print(f"{name} has multiple Infatuation Mongo docs. Searching with name and neighborhood combined...")
         using_neighborhood = "Yes"
-        data = construct_resy_query_with_neighborhood(resto_name=name, 
+        data = construct_resy_query_with_neighborhood(resto_name=cleaned_name, 
                                            neighborhood=neighborhood, 
                                            day=res_date, 
                                            party_size=party_size)
     else:
         print(f"{name} has 1 Infatuation Mongo doc. Searching with just name...")
         using_neighborhood = "No"
-        data = construct_resy_query_without_neighborhood(resto_name=name, 
+        data = construct_resy_query_without_neighborhood(resto_name=cleaned_name, 
                                            day=res_date, 
                                            party_size=party_size)
     

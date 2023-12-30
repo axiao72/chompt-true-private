@@ -22,11 +22,13 @@ def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbed
     query = vision.description
     embedded_query = embed_model.embed_query(query)
     final_recs = []
-    final_recs_names = []
+    # final_recs_names = []
     # Keep track of which filters were used in final recommendations so we can display to user
     used_neighborhood_and_cuisine = False
     used_neighborhood = False
     used_cuisine = False
+    unique_cands = []
+    unique_cand_names = []
     if collection_name == 'reviews':
         index = 'reviews_content_index'
     elif collection_name == 'chunked_reviews':
@@ -37,6 +39,11 @@ def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbed
         print(f"Stage 1: Searching vector database for candidates with just User's query..." , file=sys.stderr)
         candidates = list(mongo_reviews.aggregate(pipeline))
         print(f"Stage 1: Generated {len(candidates)} candidates..")
+        for candidate in candidates:
+            if candidate['resto_name'] not in unique_cand_names:
+                unique_cands.append(candidate)
+                unique_cand_names.append(candidate['resto_name'])
+        print(f"Stage 1: Reduced to {len(unique_cands)} unique candidates..")
         print(f"Final Stage: Filtering further by cuisine and neighborhood if possible...")
         # If filters were extracted, apply them in prioritized order
         if post_metadata_filters:
@@ -48,20 +55,19 @@ def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbed
                     cand = candidates[i]
                     # Filter on both neighborhood and cuisine for final 3 recs
                     if filter_cnt == 0:
-                        if ('cuisine' in post_metadata_filters and 'neighborhood' in post_metadata_filters) and (cand['cuisine'] in post_metadata_filters['cuisine'] and cand['neighborhood'] in post_metadata_filters['neighborhood']) and cand['resto_name'] not in final_recs_names:
+                        if ('cuisine' in post_metadata_filters and 'neighborhood' in post_metadata_filters) and (cand['cuisine'] in post_metadata_filters['cuisine'] and cand['neighborhood'] in post_metadata_filters['neighborhood']):
                             final_recs.append(cand)
-                            final_recs_names.append(cand['resto_name'])
                             used_neighborhood_and_cuisine = True
                             print("Used both Neighborhood and Cuisine filters!")
                     # Filter on neighborhood for final 3 recs if no recs with both neighborhood AND cuisine (prioritize neighborhood)
                     elif filter_cnt == 1:
-                        if 'neighborhood' in post_metadata_filters and cand['neighborhood'] in post_metadata_filters['neighborhood'] and cand['resto_name'] not in final_recs_names:
+                        if 'neighborhood' in post_metadata_filters and cand['neighborhood'] in post_metadata_filters['neighborhood']:
                             final_recs.append(cand)
                             used_neighborhood = True
                             print("Used just Neighborhood filter!")
                     # Filter on cuisine for final 3 recs if no recs with just neighborhood
                     elif filter_cnt == 2:
-                        if 'cuisine' in post_metadata_filters and cand['cuisine'] in post_metadata_filters['cuisine'] and cand['resto_name'] not in final_recs_names:
+                        if 'cuisine' in post_metadata_filters and cand['cuisine'] in post_metadata_filters['cuisine']:
                             final_recs.append(cand)
                             used_cuisine = True
                             print("Used just Cuisine filter!")
@@ -69,22 +75,11 @@ def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbed
                 filter_cnt += 1
                 # If filter_cnt == 3, we exhausted all filters. Just take top 3 available restos
                 if filter_cnt == 3:
-                    j = 0
-                    while j < len(candidates) and len(final_recs) < 3:
-                        cand = candidates[j]
-                        if cand['resto_name'] not in final_recs_names:
-                            final_recs.append(cand)
-                            final_recs_names.append(cand['resto_name'])
+                    final_recs = candidates[0:3]
                     print("Used just query.")
         # If no filters, just get top 3 candidates
         else:
-            j = 0
-            while j < len(candidates) and len(final_recs) < 3:
-                cand = candidates[j]
-                if cand['resto_name'] not in final_recs_names:
-                    final_recs.append(cand)
-                    final_recs_names.append(cand['resto_name'])
-                j += 1
+            final_recs = candidates[0:3]
             print(f'No filters provided. Got top {len(final_recs)} recs.')
         for i in final_recs:
             print(f"{i['resto_name']} similarity search score: {i['score']}\n")
@@ -101,12 +96,14 @@ def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbedding
     query = vision.description
     embedded_query = embed_model.embed_query(query)
     final_recs = []
-    final_recs_names = []
+    # final_recs_names = []
     # Keep track of which filters were used in final recommendations so we can display to user
     used_reservations = res_mode_on
     used_neighborhood_and_cuisine = False
     used_neighborhood = False
     used_cuisine = False
+    unique_cand_names = []
+    unique_cands = []
     if collection_name == 'reviews':
         index = 'reviews_content_index'
     elif collection_name == 'chunked_reviews':
@@ -121,8 +118,13 @@ def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbedding
         pipeline[0]['$vectorSearch']['filter'] = {'hasResy': post_metadata_filters.pop('hasResy')}
         candidates = list(mongo_reviews.aggregate(pipeline))
         print(f"Stage 1: Generated {len(candidates)} candidates..")
+        for candidate in candidates:
+            if candidate['resto_name'] not in unique_cand_names:
+                unique_cands.append(candidate)
+                unique_cand_names.append(candidate['resto_name'])
+        print(f"Stage 1: Reduced to {len(unique_cands)} unique candidates..")
         print(f"Stage 2: Filtering based on Resy availability...", file=sys.stderr)
-        available_candidates = get_top_available_candidates(candidates, vision.res_date, vision.res_time, vision.party_size)
+        available_candidates = get_top_available_candidates(unique_cands, vision.res_date, vision.res_time, vision.party_size)
         # If there are any available candidates, do final filtering stage
         if available_candidates:
             # If filters were extracted, apply them in prioritized order
@@ -136,19 +138,19 @@ def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbedding
                         cand = available_candidates[i]
                         # Filter on both neighborhood and cuisine for final 3 recs
                         if filter_cnt == 0:
-                            if ('cuisine' in post_metadata_filters and 'neighborhood' in post_metadata_filters) and (cand['cuisine'] in post_metadata_filters['cuisine'] and cand['neighborhood'] in post_metadata_filters['neighborhood']) and cand['resto_name'] not in final_recs_names:
+                            if ('cuisine' in post_metadata_filters and 'neighborhood' in post_metadata_filters) and (cand['cuisine'] in post_metadata_filters['cuisine'] and cand['neighborhood'] in post_metadata_filters['neighborhood']):
                                 final_recs.append(cand)
                                 used_neighborhood_and_cuisine = True
                                 print("Used both Neighborhood and Cuisine filters!", file=sys.stderr)
                         # Filter on neighborhood for final 3 recs if no recs with both neighborhood AND cuisine (prioritize neighborhood)
                         elif filter_cnt == 1:
-                            if 'neighborhood' in post_metadata_filters and cand['neighborhood'] in post_metadata_filters['neighborhood'] and cand['resto_name'] not in final_recs_names:
+                            if 'neighborhood' in post_metadata_filters and cand['neighborhood'] in post_metadata_filters['neighborhood']:
                                 final_recs.append(cand)
                                 used_neighborhood = True
                                 print("Used just Neighborhood filter!", file=sys.stderr)
                         # Filter on cuisine for final 3 recs if no recs with just neighborhood
                         elif filter_cnt == 2:
-                            if 'cuisine' in post_metadata_filters and cand['cuisine'] in post_metadata_filters['cuisine'] and cand['resto_name'] not in final_recs_names:
+                            if 'cuisine' in post_metadata_filters and cand['cuisine'] in post_metadata_filters['cuisine']:
                                 final_recs.append(cand)
                                 used_cuisine = True
                                 print("Used just Cuisine filter!", file=sys.stderr)
@@ -160,13 +162,7 @@ def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbedding
                         print("Used just reservation availability.", file=sys.stderr)
             # If no filters, just get top 3 candidates
             else:
-                j = 0
-                while j < len(available_candidates) and len(final_recs) < 3:
-                    cand = available_candidates[j]
-                    if cand['resto_name'] not in final_recs_names:
-                        final_recs.append(cand)
-                        final_recs_names.append(cand['resto_name'])
-                    j += 1
+                final_recs = available_candidates[0:3]
                 print(f"No filters provided. Got top {len(final_recs)} recs.", file=sys.stderr)
         # If no available candidates on Resy, then do non-reservation mode search as last resort
         else:
