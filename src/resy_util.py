@@ -108,8 +108,8 @@ def get_top_available_candidates(candidates: list, res_date: str, res_time: str,
         else:
             print(f"Error: {response.status_code}")
         i += 1
-        sleep_time = random.randint(1, 3)
-        print(f"Sleeping for {sleep_time} secs.... Let... Him.. Cook.", file=sys.stderr)
-        time.sleep(sleep_time)
+        # sleep_time = random.randint(1, 3)
+        # print(f"Sleeping for {sleep_time} secs.... Let... Him.. Cook.", file=sys.stderr)
+        # time.sleep(sleep_time)
     print(f"Returning {len(available_candidates)} final candidates.", file=sys.stderr)
     return available_candidates

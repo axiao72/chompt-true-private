@@ -58,9 +58,10 @@ def chat(vision: IdealMeal):
         # print(f"Returned rec #{count}: \n{rec}")
         insert_recs[f'restaurant{count+1}_name'] = rec['resto_name']
         insert_recs[f'restaurant{count+1}_score'] = rec['score']
+        print(f"Processing {rec['resto_name']} in {rec['neighborhood']}")
         full_review_doc = list(full_reviews.find({
-                                    'resto_name': rec['resto_name'].title(), 
-                                    'neighborhood': rec['neighborhood'].title()
+                                    'resto_name': rec['resto_name'].lower(), 
+                                    'neighborhood': rec['neighborhood']
                                  }))
         full_review = full_review_doc[0]['text']
         restos_list.append({
