@@ -116,6 +116,8 @@ def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbedding
         print(f"Stage 1: Searching vector database for reservation data candidates..." , file=sys.stderr)
         # add {'hasResy': True} to vector search filter and remove from filters
         pipeline[0]['$vectorSearch']['filter'] = {'hasResy': post_metadata_filters.pop('hasResy')}
+        if not post_metadata_filters:
+            post
         candidates = list(mongo_reviews.aggregate(pipeline))
         print(f"Stage 1: Generated {len(candidates)} candidates..")
         for candidate in candidates:
@@ -166,7 +168,7 @@ def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbedding
                 print(f"No filters provided. Got top {len(final_recs)} recs.", file=sys.stderr)
         # If no available candidates on Resy, then do non-reservation mode search as last resort
         else:
-            final_recs, used_neighborhood_and_cuisine, used_neighborhood, used_cuisine = get_recs_mongo_non_res_mode(vision, embed_model, mongo_reviews, post_metadata_filters)
+            final_recs, used_neighborhood_and_cuisine, used_neighborhood, used_cuisine = get_recs_mongo_non_res_mode(vision, embed_model, mongo_reviews, collection_name, post_metadata_filters)
             used_reservations = False
             print("Did not use reservation mode.")
         for i in final_recs:
