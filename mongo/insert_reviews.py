@@ -63,7 +63,7 @@ for i, resto in enumerate(tqdm(resto_reviews)):
         print(f"Chunking and preparing review #{i}...")
         # Clean up review data
         cleaned_review = resto['review'].replace('&apos;', "'").replace("&amp;", "&").replace('&quot;', '"').replace("&quot", '"')
-        cleaned_resto_name = resto['resto_name'].replace("&amp;", "&").replace('&apos;', "'").replace('&quot;', '"').replace("&quot", '"')
+        cleaned_resto_name = resto['resto_name'].replace("&amp;", "&").replace('&apos;', "'").replace('&quot;', '"').replace("&quot", '"').lower()
         cleaned_resto_tags = resto['perfect_for_tags'].replace("&amp;", "&").replace('&apos;', "'").lower()
         review_date = resto['review_date'].split('T')[0]
         neighborhood = resto['resto_neighborhood'].split('/')[-1].replace('-', ' ').lower()
@@ -93,7 +93,7 @@ for i, resto in enumerate(tqdm(resto_reviews)):
         original_chunks = review_chunks
         # Add other text to review chunk that we want to be included in the embedding
         review_chunks = [f"Perfect for: {cleaned_resto_tags}. Serves {cuisine}. Located in the {neighborhood} neighborhood. " + j for j in review_chunks]
-        print(f"Character count of review chunk: {len(review_chunks[0])}")
+        print(f"Character count of {cleaned_resto_name} review chunk: {len(review_chunks[0])}")
         # Create metadata dicts for each chunk
         chunk_datas = [{
             "chunk": j, "text": text, **review_data

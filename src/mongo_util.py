@@ -51,8 +51,8 @@ def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbed
             # Loop through each available candidate applying appropriate filters to get final recs (can be less than 3)
             while not final_recs and filter_cnt < 4:
                 i = 0
-                while i < len(candidates) and len(final_recs) < 3 and filter_cnt < 3:
-                    cand = candidates[i]
+                while i < len(unique_cands) and len(final_recs) < 3 and filter_cnt < 3:
+                    cand = unique_cands[i]
                     # Filter on both neighborhood and cuisine for final 3 recs
                     if filter_cnt == 0:
                         if ('cuisine' in post_metadata_filters and 'neighborhood' in post_metadata_filters) and (cand['cuisine'] in post_metadata_filters['cuisine'] and cand['neighborhood'] in post_metadata_filters['neighborhood']):
@@ -75,11 +75,11 @@ def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbed
                 filter_cnt += 1
                 # If filter_cnt == 3, we exhausted all filters. Just take top 3 available restos
                 if filter_cnt == 3:
-                    final_recs = candidates[0:3]
+                    final_recs = unique_cands[0:3]
                     print("Used just query.")
         # If no filters, just get top 3 candidates
         else:
-            final_recs = candidates[0:3]
+            final_recs = unique_cands[0:3]
             print(f'No filters provided. Got top {len(final_recs)} recs.')
         for i in final_recs:
             print(f"{i['resto_name']} similarity search score: {i['score']}\n")

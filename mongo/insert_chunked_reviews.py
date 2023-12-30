@@ -93,7 +93,7 @@ for i, resto in enumerate(tqdm(resto_reviews)):
         original_chunks = review_chunks
         # Add other text to review chunk that we want to be included in the embedding
         review_chunks = [f"Perfect for: {cleaned_resto_tags}. Serves {cuisine}. Located in the {neighborhood} neighborhood. " + j for j in review_chunks]
-        print(f"Character count of review chunk: {len(review_chunks[0])}")
+        print(f"Character count of {cleaned_resto_name} review chunk: {len(review_chunks[0])}")
         # Create metadata dicts for each chunk
         chunk_datas = [{
             "chunk": j, "text": text, **review_data
