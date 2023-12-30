@@ -90,10 +90,10 @@ def get_top_available_candidates(candidates: list, res_date: str, res_time: str,
     headers = get_resy_search_headers()
     # Loop through candidates until find 3 available on Resy or exhaust all candidates
     i = 0
-    print(f"{len(candidates)} candidates.")
+    print(f"{len(candidates)} candidates.", file=sys.stderr)
     while i < len(candidates):
         cand = candidates[i]
-        print(f"Checking candidate #{i+1} {cand['resy_venue_name']} availability")
+        print(f"Checking candidate #{i+1} {cand['resy_venue_name']} availability", file=sys.stderr)
         data['query'] = cand['resy_venue_name']
         response = requests.post(
             url,
@@ -104,12 +104,12 @@ def get_top_available_candidates(candidates: list, res_date: str, res_time: str,
             resy_json = json.loads(response.text)
             if resy_json['search']['hits'] and (len(resy_json['search']['hits'][0]['availability']['slots'])) > 0:
                 available_candidates.append(cand)
-                print(f"Found available candidate! Candidate #{i+1}")
+                print(f"Found available candidate! Candidate #{i+1}", file=sys.stderr)
         else:
             print(f"Error: {response.status_code}")
         i += 1
         sleep_time = random.randint(1, 3)
-        print(f"Sleeping for {sleep_time} secs.... Let... Him.. Cook.")
+        print(f"Sleeping for {sleep_time} secs.... Let... Him.. Cook.", file=sys.stderr)
         time.sleep(sleep_time)
-    print(f"Returning {len(available_candidates)} final candidates.")
+    print(f"Returning {len(available_candidates)} final candidates.", file=sys.stderr)
     return available_candidates

@@ -18,7 +18,7 @@ def connect_to_mongo():
 
 
 # Post-filter searches
-def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbeddings, mongo_reviews, post_metadata_filters):
+def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbeddings, mongo_reviews, collection_name, post_metadata_filters):
     query = vision.description
     embedded_query = embed_model.embed_query(query)
     final_recs = []
@@ -27,11 +27,16 @@ def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbed
     used_neighborhood_and_cuisine = False
     used_neighborhood = False
     used_cuisine = False
+    if collection_name == 'reviews':
+        index = 'reviews_content_index'
+    elif collection_name == 'chunked_reviews':
+        index= 'chunked_reviews_content_index'
     try:
         # Prepare mongo vector search pipeline
-        pipeline = get_search_pipeline(embedded_query=embedded_query, num_candidates=45, limit=45)
+        pipeline = get_search_pipeline(index, embedded_query=embedded_query, num_candidates=45, limit=45)
         print(f"Stage 1: Searching vector database for candidates with just User's query..." , file=sys.stderr)
         candidates = list(mongo_reviews.aggregate(pipeline))
+        print(f"Stage 1: Generated {len(candidates)} candidates..")
         print(f"Final Stage: Filtering further by cuisine and neighborhood if possible...")
         # If filters were extracted, apply them in prioritized order
         if post_metadata_filters:
@@ -79,6 +84,7 @@ def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbed
                 if cand['resto_name'] not in final_recs_names:
                     final_recs.append(cand)
                     final_recs_names.append(cand['resto_name'])
+                j += 1
             print(f'No filters provided. Got top {len(final_recs)} recs.')
         for i in final_recs:
             print(f"{i['resto_name']} similarity search score: {i['score']}\n")
@@ -90,7 +96,7 @@ def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbed
 
 # Post-filter searches
 # When Reservation Mode is on, reservation availability is top priority!!! If user turned it on, this means they don't want to deal with walk-ins!
-def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbeddings, mongo_reviews, post_metadata_filters):
+def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbeddings, mongo_reviews, collection_name, post_metadata_filters):
     res_mode_on = vision.res_mode_on
     query = vision.description
     embedded_query = embed_model.embed_query(query)
@@ -110,13 +116,14 @@ def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbedding
         # add {'hasResy': True} to vector search filter and remove from filters
         pipeline[0]['$vectorSearch']['filter'] = {'hasResy': post_metadata_filters.pop('hasResy')}
         candidates = list(mongo_reviews.aggregate(pipeline))
-        print(f"Stage 2: Generated Candidates. Filtering based on Resy availability...")
+        print(f"Stage 1: Generated {len(candidates)} candidates..")
+        print(f"Stage 2: Filtering based on Resy availability...", file=sys.stderr)
         available_candidates = get_top_available_candidates(candidates, vision.res_date, vision.res_time, vision.party_size)
         # If there are any available candidates, do final filtering stage
         if available_candidates:
             # If filters were extracted, apply them in prioritized order
             if post_metadata_filters:
-                print(f"Final Stage: Filtering further by cuisine and neighborhood if possible...")
+                print(f"Final Stage: Filtering further by cuisine and neighborhood if possible...", file=sys.stderr)
                 filter_cnt = 0  # To keep track of which filter i'm using
                 # Loop through each available candidate applying appropriate filters to get final recs (can be less than 3)
                 while not final_recs and filter_cnt < 4:
@@ -128,25 +135,25 @@ def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbedding
                             if ('cuisine' in post_metadata_filters and 'neighborhood' in post_metadata_filters) and (cand['cuisine'] in post_metadata_filters['cuisine'] and cand['neighborhood'] in post_metadata_filters['neighborhood']) and cand['resto_name'] not in final_recs_names:
                                 final_recs.append(cand)
                                 used_neighborhood_and_cuisine = True
-                                print("Used both Neighborhood and Cuisine filters!")
+                                print("Used both Neighborhood and Cuisine filters!", file=sys.stderr)
                         # Filter on neighborhood for final 3 recs if no recs with both neighborhood AND cuisine (prioritize neighborhood)
                         elif filter_cnt == 1:
                             if 'neighborhood' in post_metadata_filters and cand['neighborhood'] in post_metadata_filters['neighborhood'] and cand['resto_name'] not in final_recs_names:
                                 final_recs.append(cand)
                                 used_neighborhood = True
-                                print("Used just Neighborhood filter!")
+                                print("Used just Neighborhood filter!", file=sys.stderr)
                         # Filter on cuisine for final 3 recs if no recs with just neighborhood
                         elif filter_cnt == 2:
                             if 'cuisine' in post_metadata_filters and cand['cuisine'] in post_metadata_filters['cuisine'] and cand['resto_name'] not in final_recs_names:
                                 final_recs.append(cand)
                                 used_cuisine = True
-                                print("Used just Cuisine filter!")
+                                print("Used just Cuisine filter!", file=sys.stderr)
                         i += 1
                     filter_cnt += 1
                     # If filter_cnt == 3, we exhausted all filters. Just take top 3 available restos
                     if filter_cnt == 3:
                         final_recs = available_candidates[0:3]
-                        print("Used just reservation availability.")
+                        print("Used just reservation availability.", file=sys.stderr)
             # If no filters, just get top 3 candidates
             else:
                 j = 0
@@ -155,25 +162,26 @@ def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbedding
                     if cand['resto_name'] not in final_recs_names:
                         final_recs.append(cand)
                         final_recs_names.append(cand['resto_name'])
-                print(f"No filters provided. Got top {len(final_recs)} recs.")
+                    j += 1
+                print(f"No filters provided. Got top {len(final_recs)} recs.", file=sys.stderr)
         # If no available candidates on Resy, then do non-reservation mode search as last resort
         else:
             final_recs, used_neighborhood_and_cuisine, used_neighborhood, used_cuisine = get_recs_mongo_non_res_mode(vision, embed_model, mongo_reviews, post_metadata_filters)
             used_reservations = False
             print("Did not use reservation mode.")
         for i in final_recs:
-            print(f"{i['resto_name']} similarity search score: {i['score']}\n")
+            print(f"{i['resto_name']} similarity search score: {i['score']}\n", file=sys.stderr)
     except Exception as e:
-        print(f"Exception occured while vector searching Mongo: {e}") 
+        print(f"Exception occured while vector searching Mongo: {e}", file=sys.stderr) 
         final_recs = [] 
     return final_recs, used_reservations, used_neighborhood_and_cuisine, used_neighborhood, used_cuisine  
 
 
-def get_search_pipeline(embedded_query, num_candidates: int, limit: int):
+def get_search_pipeline(index: str, embedded_query, num_candidates: int, limit: int):
     pipeline = [
         {
             '$vectorSearch': {
-                'index': 'reviews_content_index',
+                'index': index,
                 'path': 'content_embedding',
                 'queryVector': embedded_query,
                 'numCandidates': num_candidates,

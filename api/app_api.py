@@ -20,7 +20,8 @@ EMBED_MODEL = instantiate_embed_model("intfloat/e5-large-v2", 'HF')
 def chat(vision: IdealMeal):   
     # Connect to Mongo
     DB = connect_to_mongo()
-    mongo_reviews = DB["reviews"]
+    collection_name = "chunked_reviews"
+    mongo_reviews = DB[collection_name]
     # mongo_reviews = DB["chunked_reviews"]
     # vision_dict = vision.model_dump()
     print(f"Getting recommendations for the query: '{vision.description}'....", file=sys.stderr)
@@ -37,11 +38,11 @@ def chat(vision: IdealMeal):
         )
         post_metadata_filters['hasResy'] = True
         # Post-filter search
-        resto_recs, used_reservations, used_neighborhood_and_cuisine, used_neighborhood, used_cuisine = get_recs_mongo_res_mode(vision, EMBED_MODEL, mongo_reviews, post_metadata_filters)
+        resto_recs, used_reservations, used_neighborhood_and_cuisine, used_neighborhood, used_cuisine = get_recs_mongo_res_mode(vision, EMBED_MODEL, mongo_reviews, collection_name, post_metadata_filters)
     else:
         print("Reservation mode off.")
         used_reservations = False
-        resto_recs, used_neighborhood_and_cuisine, used_neighborhood, used_cuisine = get_recs_mongo_non_res_mode(vision, EMBED_MODEL, mongo_reviews, post_metadata_filters) 
+        resto_recs, used_neighborhood_and_cuisine, used_neighborhood, used_cuisine = get_recs_mongo_non_res_mode(vision, EMBED_MODEL, mongo_reviews, collection_name, post_metadata_filters) 
     print(f"Broncos Country... Let's Ride!!!", file=sys.stderr)
     print(f"Got {len(resto_recs)} recs.", file=sys.stderr)
     # Insert recommended restaurants into Mongo
@@ -52,13 +53,19 @@ def chat(vision: IdealMeal):
         'reservation_mode': vision.res_mode_on
     }
     restos_list = []        
+    full_reviews = DB['reviews']
     for count, rec in enumerate(resto_recs):
         # print(f"Returned rec #{count}: \n{rec}")
         insert_recs[f'restaurant{count+1}_name'] = rec['resto_name']
         insert_recs[f'restaurant{count+1}_score'] = rec['score']
+        full_review_doc = list(full_reviews.find({
+                                    'resto_name': rec['resto_name'].title(), 
+                                    'neighborhood': rec['neighborhood'].title()
+                                 }))
+        full_review = full_review_doc[0]['text']
         restos_list.append({
-            'resto_name': rec['resto_name'],
-            'review': rec['text'],
+            'resto_name': rec['resto_name'].title(),
+            'review': full_review,
             'perfect_for': rec['perfect_for_tags'],
             'price_range': rec['price_range'],
             'image_url': rec['image_url'],

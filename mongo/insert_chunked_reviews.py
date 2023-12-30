@@ -33,7 +33,7 @@ except pymongo.errors.ConfigurationError:
 
 # Connect to Chompt db and reviews collection
 db = client.chompt 
-mongo_reviews = db["reviews"]
+mongo_chunked_reviews = db["chunked_reviews"]
 # mongo_chunked_reviews = db["chunked_reviews"]
 # CAREFUL only delete if you want to restart a collection fresh
 # deleted = mongo_chunked_reviews.delete_many({})
@@ -44,8 +44,8 @@ with open('../docker_webscraping/infatuation_reviews_v6.json', 'r') as file:
     resto_reviews = json.load(file)
 print("Read reviews from file.")
 
-text_splitter = RecursiveCharacterTextSplitter(chunk_size=3500,
-                                 chunk_overlap=1000,
+text_splitter = RecursiveCharacterTextSplitter(chunk_size=700,
+                                 chunk_overlap=150,
                                  length_function=len)
 
 batch_limit = 30
@@ -63,14 +63,14 @@ for i, resto in enumerate(tqdm(resto_reviews)):
         print(f"Chunking and preparing review #{i}...")
         # Clean up review data
         cleaned_review = resto['review'].replace('&apos;', "'").replace("&amp;", "&").replace('&quot;', '"').replace("&quot", '"')
-        cleaned_resto_name = resto['resto_name'].replace("&amp;", "&").replace('&apos;', "'").replace('&quot;', '"').replace("&quot", '"')
+        cleaned_resto_name = resto['resto_name'].replace("&amp;", "&").replace('&apos;', "'").replace('&quot;', '"').replace("&quot", '"').lower()
         cleaned_resto_tags = resto['perfect_for_tags'].replace("&amp;", "&").replace('&apos;', "'").lower()
         review_date = resto['review_date'].split('T')[0]
         neighborhood = resto['resto_neighborhood'].split('/')[-1].replace('-', ' ').lower()
         cuisine = resto['cuisine'].lower()
 
         # Check if the restaurant is already in Mongo. If it is, skip. (Unless adding updated reviews)
-        check_mongo = list(mongo_reviews.find({"$and": [{"resto_name": cleaned_resto_name}, {"neighborhood": neighborhood}, {"review_date": review_date}]}))
+        check_mongo = list(mongo_chunked_reviews.find({"$and": [{"resto_name": cleaned_resto_name}, {"neighborhood": neighborhood}, {"review_date": review_date}]}))
         if check_mongo:
             print(f"Mongo already has a review for {cleaned_resto_name} from {review_date}! Skipping...")
             continue
@@ -113,7 +113,7 @@ for i, resto in enumerate(tqdm(resto_reviews)):
                 data['content_embedding'] = embeddings[h]
             print(f"Inserting dangerwich batch #{batch_count}...")
             # Insert the review data to Mongo
-            insert_result = mongo_reviews.insert_many(insert_datas)
+            insert_result = mongo_chunked_reviews.insert_many(insert_datas)
             print(f"Finished inserting dangerwich batch #{batch_count}!!!")
             batch_count += 1
             insert_chunks = []
@@ -127,7 +127,7 @@ if len(insert_datas) > 0:
     embeddings = embeddings_model.embed_documents(insert_chunks)
     for h, data in enumerate(insert_datas):
         data['content_embedding'] = embeddings[h]
-    insert_result = mongo_reviews.insert_many(insert_datas)
+    insert_result = mongo_chunked_reviews.insert_many(insert_datas)
 print("Finished inserting all dangerwiches... BRONCOS COUNTRY. LET'S RIDE!!!")
 
 end_time = datetime.now()
