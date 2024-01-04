@@ -13,7 +13,7 @@ import type {User, RestoRec, Message} from '../pages';
 import { useCallback } from 'react';
 
 const Container = styled('div', ({$theme}) => ({
-  padding: '4px 10px',
+  padding: '6px 10px',
   // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
   display: 'flex',
   alignItems: 'center',
