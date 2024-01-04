@@ -37,7 +37,10 @@ export const PrimerModal = ({
       <ModalHeader>Welcome to Chompt! </ModalHeader>
       <ModalBody>
         <ParagraphMedium color={theme.colors.contentSecondary}>
-          Beyond excited to have you 🤩 To get started, type in as detailed of a meal description as you'd like 
+          Beyond excited to have you 🤩
+        </ParagraphMedium>
+        <ParagraphMedium color={theme.colors.contentSecondary}>
+          To get started, type in as detailed of a meal description as you'd like 
           and you'll receive 3 restaurant recommendations.
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
