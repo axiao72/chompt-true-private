@@ -1,7 +1,7 @@
 import {styled, useStyletron} from 'baseui';
 import {ParagraphSmall} from 'baseui/typography';
 import {NAV_HEIGHT, type Document, RestoRec} from '../pages';
-import {useEffect, useRef} from 'react';
+import {useState, useEffect, useRef} from 'react';
 import * as React from 'react';
 import {
     Card,
@@ -24,14 +24,15 @@ const Container = styled('div', ({$theme}) => ({
 }));
 
 const EmptyContainer = styled('div', {
-  flex: 1,
+  // flex: 1,
   display: 'flex',
   flexDirection: 'row',
   gap: '12px',
   overflowY: 'auto',
   padding: '16px',
   alignItems: 'center',
-  justifyContent: 'center'
+  justifyContent: 'center',
+  height: '490px'
 });
 
 const RecContainer = styled('div', ({$theme}) => ({
@@ -49,6 +50,7 @@ const RecContainer = styled('div', ({$theme}) => ({
   WebkitBoxOrient: 'vertical',
   WebkitBoxDirection: 'normal',
   WebkitBoxAlign: 'center',
+  height: '515px'
   
 }));
 
@@ -58,7 +60,9 @@ const FooterContainer = styled('div', ({$theme}) => ({
   borderTop: `1px solid ${$theme.colors.borderOpaque}`,
   // paddingTop: '16px',
   padding: '12px',
-  justifyContent: 'center'
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '20px'
 }));
 
 
@@ -133,6 +137,7 @@ export const RestaurantsView = ({
 }) => {
   const [, theme] = useStyletron();
   const containerRef = useRef();
+  const [changedModes, setChangedModes] = useState(true);
 
   const clickResMode = () => {
     // Move this to an Apply button within the Modal so Res Mode only gets activated when user clicks "Apply". This should be when resMode get's changed
@@ -140,11 +145,12 @@ export const RestaurantsView = ({
     // If Res Mode is on, clicking the checkbox should just turn Res Mode off 
    
     if (!resMode) {
-      setResModalIsOpen(true)
+      setResModalIsOpen(true);
     }
     else {
       setResMode(false);
     }
+    setChangedModes(true);
   };
 
   // const openResPage = ({
@@ -157,6 +163,8 @@ export const RestaurantsView = ({
   console.log(usedReservations);
 
   useEffect(() => {
+    setChangedModes(false)
+
     if (restoRecs.length >= 1) {
       (containerRef.current as HTMLDivElement).scrollTo({
         //Add some padding to the scroll
@@ -172,7 +180,7 @@ export const RestaurantsView = ({
 
   return (
     <Container>
-      {resMode && !usedReservations && 
+      {resMode && !usedReservations && !changedModes &&
       <Notification 
         closeable
         kind={NotiKIND.warning}

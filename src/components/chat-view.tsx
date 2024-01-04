@@ -14,12 +14,13 @@ const Container = styled('div', ({$theme}) => ({
 }));
 
 const MessagesContainer = styled('div', {
-  flex: 1,
+  // flex: 1,
   display: 'flex',
   flexDirection: 'column',
   gap: '12px',
   overflowY: 'auto',
   padding: '16px',
+  height: '460px'
 });
 
 const InputContainer = styled('div', ({$theme}) => ({
@@ -28,6 +29,7 @@ const InputContainer = styled('div', ({$theme}) => ({
   borderTop: `1px solid ${$theme.colors.borderOpaque}`,
   paddingTop: '16px',
   padding: '16px',
+  height: '55px'
 }));
 
 const Message = ({
@@ -107,14 +109,29 @@ export const ChatView = ({
         <Input
           value={input}
           placeholder="Envision your perfect meal... (think cuisine, vibe, occasion, etc.)"
-          onChange={(e) => setInput(e.target.value)}
+          onChange={(event) => setInput(event.currentTarget.value)}
           onKeyDown={(evt) => {
             if (evt.key === 'Enter') {
               sendQuery();
             }
           }}
+          overrides={{
+            Root: {
+                style: ({ $theme }) => ({
+                  borderRadius:'8px',
+                })
+            }
+          }}
         />
-        <Button type="submit" onClick={sendQuery}>
+        <Button type="submit" onClick={sendQuery}
+          overrides={{
+            BaseButton: {
+                style: ({ $theme }) => ({
+                    borderRadius:'8px',
+                })
+            }
+        }}
+        >
           Let's Ride
         </Button>
       </InputContainer>

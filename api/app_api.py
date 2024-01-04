@@ -1,4 +1,4 @@
-from fastapi import Body, FastAPI
+from fastapi import Body, FastAPI, Response
 from pydantic import BaseModel
 from typing import Optional
 from typing import Annotated
@@ -9,11 +9,76 @@ from src.resy_util import *
 from src.mongo_util import *
 from src.llm_util import *
 from api.pydantic_models import *
+from src.users import *
+from passlib.context import CryptContext
+from passlib.hash import bcrypt
+import requests
 
 
 app = FastAPI()
 
 EMBED_MODEL = instantiate_embed_model("intfloat/e5-large-v2", 'HF')
+
+
+@app.post("/api/signup")
+async def signup(user: User):
+    try:
+        new_user = await signup_user(user)
+        return {
+            'username': new_user['username'],
+            'firstName': new_user['firstName'],
+            'lastName': new_user['lastName'],
+            'inputs': new_user['inputs'],
+            'resyClicks': new_user['resyClicks'],
+            'success': True
+        }
+    except Exception as e:
+        # Implement exception
+        return {
+            'success': False,
+            'error': e
+        }
+
+
+@app.post("/api/login")
+async def login(credentials: LoginCredentials, response: Response):
+    try:
+        user = await login_user(credentials)
+        print(f"User from app_api: {user}")
+        # Add user to session cookies
+        response.set_cookie(key='chompt_username', value=user['username'])
+        return {
+            'username': user['username'],
+            'firstName': user['firstName'],
+            'lastName': user['lastName'],
+            'inputs': user['inputs'],
+            'resyClicks': user['resyClicks'],
+            'success': True
+        }
+    except Exception as e:
+        return {
+            'success': False,
+            'error': e
+        }
+
+
+@app.post("/api/get_mongo_user/{username}")
+async def get_mongo_user_by_username(username: str):
+    try:
+        user = await find_user_by_username(username)
+        return {
+            'username': user['username'],
+            'firstName': user['firstName'],
+            'lastName': user['lastName'],
+            'inputs': user['inputs'],
+            'resyClicks': user['resyClicks'],
+            'success': True
+        }
+    except Exception as e:
+        return {
+            'success': False,
+            'error': e
+        }
 
 
 @app.post("/api/chat")
@@ -48,6 +113,7 @@ def chat(vision: IdealMeal):
     # Insert recommended restaurants into Mongo
     mongo_recs = DB["recommendations"]
     insert_recs = {
+        'username': vision.username,
         'date': datetime.today().strftime('%Y-%m-%d'),
         'user_input': vision.description,
         'reservation_mode': vision.res_mode_on
@@ -80,6 +146,7 @@ def chat(vision: IdealMeal):
                 restos_list[count]['resy_url'] = rec['resy_venue_url']
         # print(f"Final rec formatted for UI: \n{restos_list[count]}")
     
+    # Insert input + recs into Mongo
     try:
         insert_result = mongo_recs.insert_one(insert_recs)
         print(f"Inserted recommendation to Mongo: {insert_result}")

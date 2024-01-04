@@ -1,11 +1,22 @@
-import {useState, useCallback} from 'react';
+import {useState, useCallback, useEffect} from 'react';
 import Head from 'next/head';
 import {styled} from 'baseui';
 import {Header} from '../components/header';
 import {RestaurantsView} from '../components/restaurants-view';
 import {ChatView} from '../components/chat-view';
 import {AboutModal} from '../components/about-modal';
+import {LoginModal} from '../components/login-modal';
+import {SignupModal} from '../components/signup-modal';
 import {ResModal} from '../components/res-modal';
+import {
+  Tabs,
+  Tab,
+  FILL,
+  StyledTabList,
+  StyledTabPanel,
+} from 'baseui/tabs-motion';
+import {Grid, Cell} from 'baseui/layout-grid';
+
 
 const Page = styled('div', ({$theme}) => ({
   position: 'absolute',
@@ -54,8 +65,42 @@ export type ReservationCriteria = {
   partySize: number;
 } | null;
 
+export type User = {
+  username: string;
+  firstName: string;
+  lastName: string;
+}
+
+const TabsOverrides = {
+  TabList: {
+    component: function TabsListOverride(props: any) {
+      return (
+        <Grid>
+          <Cell span={12}>
+            <StyledTabList {...props} />
+          </Cell>
+        </Grid>
+      );
+    },
+  },
+};
+
+const TabOverrides = {
+  TabPanel: {
+    component: function TabPanelOverride(props: any) {
+      return (
+        <Grid>
+          <Cell span={12}>
+            <StyledTabPanel {...props} />
+          </Cell>
+        </Grid>
+      );
+    },
+  },
+};
+
+
 const Index = () => {
-  const [uploadModalIsOpen, setUploadModalIsOpen] = useState(false);
   const [aboutModalIsOpen, setAboutModalIsOpen] = useState(false);
   const [activeDocument, setActiveDocument] = useState<Document>(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -64,6 +109,8 @@ const Index = () => {
   const [restoRecs, setRestoRecs] = useState<RestoRec[]>([]);
   const [resMode, setResMode] = useState<boolean>(false);
   const [resModalIsOpen, setResModalIsOpen] = useState(false);
+  const [loginModalIsOpen, setLoginModalIsOpen] = useState(false);
+  const [signupModalIsOpen, setSignupModalIsOpen] = useState(false);
   // Set the defaults to today's date and a time!
   // const currentDate = new Date();
   // const [resDate, setResDate] = useState(currentDate);
@@ -74,6 +121,48 @@ const Index = () => {
   const [usedBoth, setUsedBoth] = useState(true);
   const [usedNeighborhood, setUsedNeighborhood] = useState(true);
   const [usedCuisine, setUsedCuisine] = useState(true);
+  const [activeUser, setActiveUser] = useState<User>(null);
+  const [activeKey, setActiveKey] = useState<React.Key>(0);
+
+  const getUser = async (username) => {
+    console.log("Getting user from cookies: ", username);
+    // Log user in using username and password
+    const response = await fetch(`/api/get_mongo_user/${username}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-type': 'application/json'
+        }
+    });
+    const responseJson = await response.json();
+    if (responseJson.success) {
+        const loggedInUser: User = {
+            username: responseJson.username,
+            firstName: responseJson.firstName,
+            lastName: responseJson.lastName
+        };
+        console.log(loggedInUser.username);
+        setActiveUser(loggedInUser);
+    }
+    else {
+        console.log(responseJson.error);
+    }
+};
+
+  // const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  // console.log(isMobile ? 'Mobile' : 'Desktop');
+
+  // Get username from cookies on initial render ! Then get User from Mongo
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const cookie_username = document.cookie.replace(/(?:(?:^|.*;\s*)chompt_username\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+      console.log('Cookie Username: ', cookie_username, ' !!!');
+      if (cookie_username !== '') {
+        getUser(cookie_username);
+      }
+      console.log('No username in cookies :(');
+    }
+  }, []);
 
   const sendQuery = useCallback(async () => {
     if (!restoRecs) {
@@ -106,14 +195,16 @@ const Index = () => {
         "res_mode_on": resMode,
         "res_date": resCriteria.date,
         "res_time": resCriteria.time,
-        "party_size": resCriteria.partySize
+        "party_size": resCriteria.partySize,
+        "username": activeUser.username
       };
     }
     // Otherwise, don't include those field (they're optional on the FastAPI side)
     else {
       idealMealData = {
         "description": input,
-        "res_mode_on": resMode
+        "res_mode_on": resMode,
+        "username": activeUser.username
       };
     }
     const response = await fetch('/api/chat', {
@@ -143,6 +234,7 @@ const Index = () => {
         return restoRec;
       });
       setRestoRecs(responseRestoRecs);
+      setActiveKey(1);
     }
     setMessages((prev) => [
       ...prev.slice(0, prev.length - 1),
@@ -164,6 +256,22 @@ const Index = () => {
         <title>CHOMPT</title>
       </Head>
       <AboutModal isOpen={aboutModalIsOpen} setIsOpen={setAboutModalIsOpen} />
+      <LoginModal 
+        isOpen={loginModalIsOpen} 
+        signupModalIsOpen={signupModalIsOpen}
+        setIsOpen={setLoginModalIsOpen}
+        setSignupModalIsOpen={setSignupModalIsOpen}
+        activeUser={activeUser}
+        setActiveUser={setActiveUser}
+      >
+      </LoginModal>
+      <SignupModal 
+        isOpen={signupModalIsOpen} 
+        setIsOpen={setSignupModalIsOpen}
+        activeUser={activeUser}
+        setActiveUser={setActiveUser}
+      >
+      </SignupModal>
       <ResModal
         isOpen={resModalIsOpen}
         setIsOpen={setResModalIsOpen}
@@ -176,9 +284,67 @@ const Index = () => {
       <Header
         setRestoRecs={setRestoRecs}
         setAboutModalIsOpen={setAboutModalIsOpen}
+        setLoginModalIsOpen={setLoginModalIsOpen}
+        setSignupModalIsOpen={setSignupModalIsOpen}
         setMessages={setMessages}
+        activeUser={activeUser}
+        setActiveUser={setActiveUser}
       />
-      <Container>
+      {/* <RestaurantsView
+          restoRecs={restoRecs}
+          resMode={resMode}
+          resModalIsOpen={resModalIsOpen}
+          setResMode={setResMode}
+          setResModalIsOpen={setResModalIsOpen}
+          usedReservations={usedReservations}
+          usedBoth={usedBoth}
+          usedNeighborhood={usedNeighborhood}
+          usedCuisine={usedCuisine}
+      /> */}
+      {/* <ChatView
+          messages={messages}
+          input={input}
+          setInput={setInput}
+          sendQuery={sendQuery}
+          restoRecs={restoRecs}
+      /> */}
+      <Tabs
+        activeKey={activeKey}
+        onChange={({ activeKey }) => {
+          setActiveKey(activeKey);
+        }}
+        fill={FILL.fixed}
+        activateOnFocus
+        // overrides={TabsOverrides}
+      >
+        <Tab title="Chat" 
+          // overrides={TabOverrides}
+        >
+          <ChatView
+            messages={messages}
+            input={input}
+            setInput={setInput}
+            sendQuery={sendQuery}
+            restoRecs={restoRecs}
+          />
+        </Tab>
+        <Tab title="Recs" 
+          // overrides={TabOverrides}
+        >
+          <RestaurantsView
+            restoRecs={restoRecs}
+            resMode={resMode}
+            resModalIsOpen={resModalIsOpen}
+            setResMode={setResMode}
+            setResModalIsOpen={setResModalIsOpen}
+            usedReservations={usedReservations}
+            usedBoth={usedBoth}
+            usedNeighborhood={usedNeighborhood}
+            usedCuisine={usedCuisine}
+          />
+        </Tab>
+      </Tabs>
+      {/* <Container>
         <RestaurantsView
           restoRecs={restoRecs}
           resMode={resMode}
@@ -197,7 +363,7 @@ const Index = () => {
           sendQuery={sendQuery}
           restoRecs={restoRecs}
         />
-      </Container>
+      </Container> */}
     </Page>
   );
 };

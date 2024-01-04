@@ -8,3 +8,15 @@ class IdealMeal(BaseModel):
     res_date: str = None  # 'YYYY-MM-DD'
     res_time: str = None  # eg. '19:00' (7:00 pm)
     party_size: int = None
+    # Optional, defaults to 'guest'
+    username: str = 'guest'
+
+class User(BaseModel):
+    username: str
+    password: str
+    first_name: str
+    last_name: str
+
+class LoginCredentials(BaseModel):
+    username: str
+    password: str

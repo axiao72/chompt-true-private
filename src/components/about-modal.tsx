@@ -16,7 +16,7 @@ export const AboutModal = ({
   };
   return (
     <Modal onClose={handleClose} closeable isOpen={isOpen} animate autoFocus>
-      <ModalHeader>CHOMPT - The only restaurant chooser you'll ever need</ModalHeader>
+      <ModalHeader>CHOMPT - an AI restaurant chooser. </ModalHeader>
       <ModalBody>
         <ParagraphMedium color={theme.colors.contentSecondary}>
           This application takes in a description of a restaurant, meal, night out, 

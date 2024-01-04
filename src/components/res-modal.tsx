@@ -61,6 +61,19 @@ export const ResModal = ({
                     formatString='yyyy-MM-dd'
                     placeholder="YYYY-MM-DD"
                     autoFocusCalendar={false}
+                    overrides={{
+                        Input: {
+                          props: {
+                            overrides: {
+                              Root: {
+                                style: ({ $theme }) => ({
+                                    borderRadius:'8px',
+                                  })
+                              }
+                            }
+                          }
+                        }
+                    }}
                 />
             </FormControl>
             <FormControl label="Time">
@@ -69,6 +82,19 @@ export const ResModal = ({
                     // onChange={date => console.log(date)}
                     onChange={date => setResTime(date)}
                     minTime={new Date("2023-12-26T05:00:00.000Z")}
+                    overrides={{
+                        Select: {
+                          props: {
+                            overrides: {
+                                ControlContainer: {
+                                    style: ({ $theme }) => ({
+                                        borderRadius:'8px',
+                                    })
+                                }
+                            }
+                          }
+                        }
+                    }}
                 />
             </FormControl>
             <FormControl label="Party size">
@@ -107,14 +133,39 @@ export const ResModal = ({
                     placeholder="Select party size"
                     // onChange={params => console.log(params.value)}
                     onChange={params => setResPartySize(params.value)}
+                    overrides={{
+                        ControlContainer: {
+                            style: ({ $theme }) => ({
+                                borderRadius:'8px',
+                            })
+                        }
+                    }}
                 />
             </FormControl>
         </ModalBody>
         <ModalFooter>
-            <ModalButton kind="tertiary" onClick={handleClose}>
+            <ModalButton kind="tertiary" onClick={handleClose}
+                overrides={{
+                    BaseButton: {
+                        style: ({ $theme }) => ({
+                            borderRadius:'8px',
+                        })
+                    }
+                }}
+            >
                 Cancel
             </ModalButton>
-            <ModalButton onClick={handleApply}>Apply</ModalButton>
+            <ModalButton onClick={handleApply}
+                overrides={{
+                    BaseButton: {
+                        style: ({ $theme }) => ({
+                            borderRadius:'8px',
+                        })
+                    }
+                }}
+            >
+                Apply
+            </ModalButton>
         </ModalFooter>
       </Modal>
     );
