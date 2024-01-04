@@ -13,6 +13,7 @@ from src.users import *
 from passlib.context import CryptContext
 from passlib.hash import bcrypt
 import requests
+import uuid
 
 
 app = FastAPI()
@@ -21,9 +22,12 @@ EMBED_MODEL = instantiate_embed_model("intfloat/e5-large-v2", 'HF')
 
 
 @app.post("/api/signup")
-async def signup(user: User):
+async def signup(user: User, response: Response):
     try:
         new_user = await signup_user(user)
+        # Generate uuid for session and add to session cookies
+        generated_uuid = uuid.uuid4()
+        response.set_cookie(key='session_uuid', value=generated_uuid)
         return {
             'username': new_user['username'],
             'firstName': new_user['firstName'],
@@ -45,8 +49,9 @@ async def login(credentials: LoginCredentials, response: Response):
     try:
         user = await login_user(credentials)
         print(f"User from app_api: {user}")
-        # Add user to session cookies
-        response.set_cookie(key='chompt_username', value=user['username'])
+        # Generate uuid for session and add to session cookies
+        generated_uuid = uuid.uuid4()
+        response.set_cookie(key='session_uuid', value=generated_uuid)
         return {
             'username': user['username'],
             'firstName': user['firstName'],

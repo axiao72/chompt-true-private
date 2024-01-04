@@ -13,7 +13,7 @@ import type {User, RestoRec, Message} from '../pages';
 import { useCallback } from 'react';
 
 const Container = styled('div', ({$theme}) => ({
-  padding: '4px 32px',
+  padding: '4px 10px',
   // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
   display: 'flex',
   alignItems: 'center',
@@ -24,14 +24,14 @@ const Group = styled('div', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: '6px',
+  gap: '2px',
 });
 
 const TitleGroup = styled('div', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: '20px',
+  gap: '4px',
 });
 
 export const Header = ({
