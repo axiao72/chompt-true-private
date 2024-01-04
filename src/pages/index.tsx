@@ -196,7 +196,6 @@ const Index = () => {
         "res_date": resCriteria.date,
         "res_time": resCriteria.time,
         "party_size": resCriteria.partySize,
-        "username": activeUser.username
       };
     }
     // Otherwise, don't include those field (they're optional on the FastAPI side)
@@ -204,8 +203,10 @@ const Index = () => {
       idealMealData = {
         "description": input,
         "res_mode_on": resMode,
-        "username": activeUser.username
       };
+    }
+    if (activeUser) {
+      idealMealData['username'] = activeUser.username;
     }
     const response = await fetch('/api/chat', {
       method: 'POST',
