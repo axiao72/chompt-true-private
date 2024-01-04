@@ -1,10 +1,11 @@
 import {styled, useStyletron} from 'baseui';
 import {ParagraphSmall} from 'baseui/typography';
 import {Input} from 'baseui/input';
-import {Button} from 'baseui/button';
+import {Button, KIND, SIZE, SHAPE} from 'baseui/button';
 import {Skeleton} from 'baseui/skeleton';
 import {ReactNode, useEffect, useRef} from 'react';
 import {Document, Message, RestoRec} from '../pages';
+import {StyledLink} from 'baseui/link';
 
 const Container = styled('div', ({$theme}) => ({
   background: $theme.colors.backgroundPrimary,
@@ -13,7 +14,22 @@ const Container = styled('div', ({$theme}) => ({
   flexDirection: 'column',
 }));
 
+const EmptyContainer = styled('div', {
+  // flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px',
+  overflowY: 'auto',
+  padding: '16px',
+  height: '460px',
+  alignItems: 'center',
+  justifyContent: 'center'
+});
+
 const MessagesContainer = styled('div', {
+  // flexGrow: 5,
+  // flexBasis: '90%',
+  // flexShrink: 0,
   // flex: 1,
   display: 'flex',
   flexDirection: 'column',
@@ -24,6 +40,9 @@ const MessagesContainer = styled('div', {
 });
 
 const InputContainer = styled('div', ({$theme}) => ({
+  // flexGrow: 1,
+  // flexBasis: '10%',
+  // flexShrink: 2,
   display: 'flex',
   gap: '16px',
   borderTop: `1px solid ${$theme.colors.borderOpaque}`,
@@ -31,6 +50,62 @@ const InputContainer = styled('div', ({$theme}) => ({
   padding: '16px',
   height: '55px'
 }));
+
+const HeaderContainer = styled('div', ({$theme}) => ({
+  display: 'flex',
+  gap: '8px',
+  // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
+  // paddingTop: '16px',
+  paddingTop: '12px',
+  paddingBottom:'20px',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '10px'
+}));
+
+const EmptyState = ({input, setInput, sendQuery}) => {
+  const [, theme] = useStyletron();
+  return (
+    <Container>
+      <EmptyContainer>
+        <ParagraphSmall color={theme.colors.contentTertiary}>
+          To get a quick rundown, click the &quot;About&quot; button in the top
+          right!
+        </ParagraphSmall>
+      </EmptyContainer>
+      <InputContainer>
+        <Input
+          value={input}
+          placeholder="Envision your perfect meal"
+          onChange={(event) => setInput(event.currentTarget.value)}
+          onKeyDown={(evt) => {
+            if (evt.key === 'Enter') {
+              sendQuery();
+            }
+          }}
+          overrides={{
+            Root: {
+                style: ({ $theme }) => ({
+                  borderRadius:'8px',
+                })
+            }
+          }}
+        />
+        <Button type="submit" onClick={sendQuery}
+          overrides={{
+            BaseButton: {
+                style: ({ $theme }) => ({
+                    borderRadius:'8px',
+                })
+            }
+        }}
+        >
+          Let's Ride
+        </Button>
+      </InputContainer>
+    </Container>
+  );
+};
 
 const Message = ({
   children,
@@ -68,17 +143,22 @@ const Message = ({
 };
 export const ChatView = ({
   messages,
+  setMessages,
   input,
   setInput,
   sendQuery,
   restoRecs,
+  setRestoRecs,
 }: {
   messages: Message[];
+  setMessages: (messageArray: Message[]) => void;
   input: string;
   setInput: (text: string) => void;
   sendQuery: () => void;
   restoRecs: RestoRec[];
+  setRestoRecs: (recs: RestoRec[]) => void;
 }) => {
+  const [, theme] = useStyletron();
   const ref = useRef<HTMLDivElement | undefined>();
 
   useEffect(() => {
@@ -87,10 +167,41 @@ export const ChatView = ({
       // @ts-ignore
       ref.current.scrollTo(0, ref.current.offsetHeight);
     }
+
   }, [messages]);
+
+  if (messages.length === 0) {
+    return <EmptyState input={input} setInput={setInput} sendQuery={sendQuery}/>;
+  }
+
+  const handleReset = () => {
+    // Reset resto recs to empty
+    setRestoRecs([]);
+    // Reset chat messages to empty
+    setMessages([]);
+  };
 
   return (
     <Container>
+      <HeaderContainer>
+        {/* <StyledLink 
+          href="#"
+          onClick={handleReset}
+          style={{fontSize: '15px'}}
+          // animateUnderline
+          // target='_blank'
+        >
+          Reset
+        </StyledLink> */}
+        <Button
+          size={SIZE.compact}
+          kind={KIND.secondary}
+          onClick={handleReset}
+          shape={SHAPE.pill}
+        >
+          Reset
+        </Button>
+      </HeaderContainer>
       <MessagesContainer ref={ref}>
         {messages.map(({role, content, isLoading}, index) => {
           return (
@@ -102,13 +213,12 @@ export const ChatView = ({
               {content}
             </Message>
           );
-        })}
+      })}
       </MessagesContainer>
-
       <InputContainer>
         <Input
           value={input}
-          placeholder="Envision your perfect meal... (think cuisine, vibe, occasion, etc.)"
+          placeholder="Envision your perfect meal"
           onChange={(event) => setInput(event.currentTarget.value)}
           onKeyDown={(evt) => {
             if (evt.key === 'Enter') {

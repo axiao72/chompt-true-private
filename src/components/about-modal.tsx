@@ -30,36 +30,24 @@ export const AboutModal = ({
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
           To get started, type in as detailed of a meal description as you'd like 
-          and you will receive your 3 recommendations on the left hand side of the 
-          screen. 
+          and you will receive your 3 restaurant recommendations.
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
           If you need some inspiration, think about something like 
           "Getting dinner on a Friday night with a group of friends and 
           we want Italian food. We are also going out after so we want a 
-          place with good music and drinks." Have fun with it.
+          place with good music and drinks." Please, have fun with it.
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
-          Some notable disclaimers:
-          <ul>
-            <li>In the overall scheme of NYC restaurants, the pool of restaurants in my database is pretty small. Keep that in mind while using the app,
-              and I'll be working on getting more and more restaurants!
-            </li>
-            <li>The "Book Reservation" button will go directly to the restaurant's Resy page IF available. I currently only have a small 
-              subset of restaurants linked to a Resy page, so if there's no Resy link available the button will go to the restaurant's 
-              home page. (Sometimes it will go to the wrong restaurant's Resy page, sorry!!! Working on this 👨🏻‍💻) </li>
-            <li>Recommendation Priorities: When you specify a neighborhood and cuisine in your input, I will prioritize neighborhood over cuisine if I can't 
-              find restaurants that fit both. If I can't find recs in the neighborhood, then I will go to cuisine. If all else fails, I won't consider 
-              either cuisine or neighborhood in an explicit filter and fully rely on semantic search, which may or may not capture those specifications. 
-              (Please let me know your thoughts on these priorities! It's all about you guys)</li>
-            <li>Some recommended restaurants might be outdated or permanently closed, my data source includes old reviews 
-              and I'm not currently checking for restaurant status (not my top priority rn but will address eventually!). </li>
-            <li>Like everything else in this app, the interaction framework and flow is in progress. Stay tuned, more to come 😁 </li>
-          </ul>
-        </ParagraphMedium>
-        <ParagraphMedium color={theme.colors.contentSecondary}>
-          Made by Arthur Xiao (with some lovely initial help from the unknown Dylan Babbs). Please don't hesitate to reach
-          out at axiao72@gmail.com with any feedback! Would love to hear both good and bad.
+          Made by Arthur Xiao. Feel free to check out the {' '}
+          <StyledLink 
+            href="https://github.com/axiao72/chompt-webapp-private"
+            target='_blank'
+          >
+            GitHub
+          </StyledLink>
+          {' '}for a more detailed description of the mission, and please don't hesitate to reach
+          out at <b>axiao72@gmail.com</b> with any feedback! Would love to hear both good and bad.
         </ParagraphMedium>
         {/* <ParagraphSmall color={theme.colors.contentSecondary}>
           <StyledLink 

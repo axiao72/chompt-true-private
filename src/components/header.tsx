@@ -39,6 +39,7 @@ export const Header = ({
   setAboutModalIsOpen,
   setLoginModalIsOpen,
   setSignupModalIsOpen,
+  messages,
   setMessages,
   activeUser,
   setActiveUser
@@ -47,6 +48,7 @@ export const Header = ({
   setAboutModalIsOpen: (isOpen: boolean) => void;
   setLoginModalIsOpen: (isOpen: boolean) => void;
   setSignupModalIsOpen: (isOpen: boolean) => void;
+  messages: Message[];
   setMessages: (messageArray: Message[]) => void;
   activeUser: User;
   setActiveUser: (user: User) => void;
@@ -83,15 +85,15 @@ export const Header = ({
         </Button>
       </TitleGroup>
       <Group>
-        <Button
+        {/* <Button
           // startEnhancer={<Upload />}
-          size={SIZE.compact}
+          size={SIZE.mini}
           kind={KIND.tertiary}
           onClick={handleReset}
           shape={SHAPE.pill}
         >
           Reset
-        </Button>
+        </Button> */}
         {!activeUser && <Button
           // startEnhancer={<Upload />}
           size={SIZE.compact}

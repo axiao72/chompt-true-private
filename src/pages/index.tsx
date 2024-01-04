@@ -5,6 +5,7 @@ import {Header} from '../components/header';
 import {RestaurantsView} from '../components/restaurants-view';
 import {ChatView} from '../components/chat-view';
 import {AboutModal} from '../components/about-modal';
+import {PrimerModal} from '../components/primer-modal';
 import {LoginModal} from '../components/login-modal';
 import {SignupModal} from '../components/signup-modal';
 import {ResModal} from '../components/res-modal';
@@ -16,7 +17,6 @@ import {
   StyledTabPanel,
 } from 'baseui/tabs-motion';
 import {Grid, Cell} from 'baseui/layout-grid';
-
 
 const Page = styled('div', ({$theme}) => ({
   position: 'absolute',
@@ -31,6 +31,7 @@ const Page = styled('div', ({$theme}) => ({
 export const NAV_HEIGHT = 53;
 const Container = styled('div', ({$theme}) => ({
   display: 'grid',
+  // gridTemplateColumns: '1fr',
   gridTemplateColumns: '1fr 1fr',
   background: $theme.colors.borderOpaque,
   gap: '1px',
@@ -111,6 +112,7 @@ const Index = () => {
   const [resModalIsOpen, setResModalIsOpen] = useState(false);
   const [loginModalIsOpen, setLoginModalIsOpen] = useState(false);
   const [signupModalIsOpen, setSignupModalIsOpen] = useState(false);
+  const [primerModalIsOpen, setPrimerModalIsOpen] = useState(false);
   // Set the defaults to today's date and a time!
   // const currentDate = new Date();
   // const [resDate, setResDate] = useState(currentDate);
@@ -152,7 +154,9 @@ const Index = () => {
   // const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   // console.log(isMobile ? 'Mobile' : 'Desktop');
 
-  // Get username from cookies on initial render ! Then get User from Mongo
+  // On initial render:
+  // Get username from cookies and get User from Mongo
+  // Open primer modal
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const cookie_username = document.cookie.replace(/(?:(?:^|.*;\s*)chompt_username\s*\=\s*([^;]*).*$)|^.*$/, "$1");
@@ -162,6 +166,7 @@ const Index = () => {
       }
       console.log('No username in cookies :(');
     }
+    setPrimerModalIsOpen(true)
   }, []);
 
   const sendQuery = useCallback(async () => {
@@ -254,8 +259,14 @@ const Index = () => {
   return (
     <Page>
       <Head>
-        <title>CHOMPT</title>
+        <title>chompt</title>
       </Head>
+      <PrimerModal 
+        isOpen={primerModalIsOpen} 
+        setIsOpen={setPrimerModalIsOpen} 
+        setSignupModalIsOpen={setSignupModalIsOpen}
+        setLoginModalIsOpen={setLoginModalIsOpen}
+      />
       <AboutModal isOpen={aboutModalIsOpen} setIsOpen={setAboutModalIsOpen} />
       <LoginModal 
         isOpen={loginModalIsOpen} 
@@ -287,6 +298,7 @@ const Index = () => {
         setAboutModalIsOpen={setAboutModalIsOpen}
         setLoginModalIsOpen={setLoginModalIsOpen}
         setSignupModalIsOpen={setSignupModalIsOpen}
+        messages={messages}
         setMessages={setMessages}
         activeUser={activeUser}
         setActiveUser={setActiveUser}
@@ -323,10 +335,12 @@ const Index = () => {
         >
           <ChatView
             messages={messages}
+            setMessages={setMessages}
             input={input}
             setInput={setInput}
             sendQuery={sendQuery}
             restoRecs={restoRecs}
+            setRestoRecs={setRestoRecs}
           />
         </Tab>
         <Tab title="Recs" 

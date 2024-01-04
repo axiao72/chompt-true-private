@@ -36,6 +36,7 @@ const EmptyContainer = styled('div', {
 });
 
 const RecContainer = styled('div', ({$theme}) => ({
+  // display: 'flex',
   background: $theme.colors.backgroundPrimary,
 //   minHeight: '1000px',
   padding: '8px 16px',
