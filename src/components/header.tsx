@@ -13,7 +13,7 @@ import type {User, RestoRec, Message} from '../pages';
 import { useCallback } from 'react';
 
 const Container = styled('div', ({$theme}) => ({
-  padding: '6px 10px',
+  padding: '6px 20px',
   // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
   display: 'flex',
   alignItems: 'center',
@@ -72,16 +72,19 @@ export const Header = ({
   return (
     <Container>
       <TitleGroup>
-        <HeadingSmall margin='scale100'>
+        {/* <HeadingSmall margin='scale100'>
           chompt
-        </HeadingSmall>
+        </HeadingSmall> */}
         <Button
-          size={SIZE.compact}
+          size={SIZE.mini}
           kind={KIND.tertiary}
           onClick={() => setAboutModalIsOpen(true)}
           shape={SHAPE.pill}
         >
-          About
+          <HeadingSmall margin='scale100'>
+            chompt
+          </HeadingSmall>
+          {/* About */}
         </Button>
       </TitleGroup>
       <Group>

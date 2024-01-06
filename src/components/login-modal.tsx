@@ -24,6 +24,7 @@ export const LoginModal = ({
     const [, theme] = useStyletron();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleClose = () => {
       setIsOpen(false);
@@ -34,6 +35,7 @@ export const LoginModal = ({
       };
     
     const handleLogin = useCallback(async () => {
+        setIsLoading(true);
         console.log(username)
         console.log(password)
         // Log user in using username and password
@@ -62,6 +64,7 @@ export const LoginModal = ({
         else {
             console.log(responseJson.error);
         }
+        setIsLoading(false);
     }, [activeUser, username, password, setIsOpen]);
 
     return (
@@ -115,6 +118,7 @@ export const LoginModal = ({
             <ModalButton 
                 onClick={handleLogin} 
                 shape={SHAPE.default}
+                isLoading={isLoading}
                 overrides={{
                     BaseButton: {
                         style: ({ $theme }) => ({

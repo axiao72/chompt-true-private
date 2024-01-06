@@ -72,34 +72,6 @@ export type User = {
   lastName: string;
 }
 
-const TabsOverrides = {
-  TabList: {
-    component: function TabsListOverride(props: any) {
-      return (
-        <Grid>
-          <Cell span={12}>
-            <StyledTabList {...props} />
-          </Cell>
-        </Grid>
-      );
-    },
-  },
-};
-
-const TabOverrides = {
-  TabPanel: {
-    component: function TabPanelOverride(props: any) {
-      return (
-        <Grid>
-          <Cell span={12}>
-            <StyledTabPanel {...props} />
-          </Cell>
-        </Grid>
-      );
-    },
-  },
-};
-
 
 const Index = () => {
   const [aboutModalIsOpen, setAboutModalIsOpen] = useState(false);
@@ -115,9 +87,6 @@ const Index = () => {
   const [primerModalIsOpen, setPrimerModalIsOpen] = useState(false);
   // Set the defaults to today's date and a time!
   // const currentDate = new Date();
-  // const [resDate, setResDate] = useState(currentDate);
-  // const [resTime, setResTime] = useState(null);
-  // const [resPartySize, setResPartySize] = useState(null);
   const [resCriteria, setResCriteria] = useState<ReservationCriteria>(null);
   const [usedReservations, setUsedReservations] = useState(true);
   const [usedBoth, setUsedBoth] = useState(true);
@@ -125,6 +94,7 @@ const Index = () => {
   const [usedCuisine, setUsedCuisine] = useState(true);
   const [activeUser, setActiveUser] = useState<User>(null);
   const [activeKey, setActiveKey] = useState<React.Key>(0);
+  const [chatIsLoading, setChatIsLoading] = useState(false);
 
   const getUser = async (username) => {
     console.log("Getting user from cookies: ", username);
@@ -173,6 +143,7 @@ const Index = () => {
     if (!restoRecs) {
       return;
     }
+    setChatIsLoading(true);
     setUsedReservations(true);
     setUsedBoth(true);
     setUsedNeighborhood(true);
@@ -254,6 +225,7 @@ const Index = () => {
     console.log("Used both filters: ", usedBoth);
     console.log("Used neighborhood filter:", usedNeighborhood);
     console.log("Used cuisine filter:", usedCuisine);
+    setChatIsLoading(false);
   }, [input, restoRecs]);
 
   return (
@@ -303,24 +275,6 @@ const Index = () => {
         activeUser={activeUser}
         setActiveUser={setActiveUser}
       />
-      {/* <RestaurantsView
-          restoRecs={restoRecs}
-          resMode={resMode}
-          resModalIsOpen={resModalIsOpen}
-          setResMode={setResMode}
-          setResModalIsOpen={setResModalIsOpen}
-          usedReservations={usedReservations}
-          usedBoth={usedBoth}
-          usedNeighborhood={usedNeighborhood}
-          usedCuisine={usedCuisine}
-      /> */}
-      {/* <ChatView
-          messages={messages}
-          input={input}
-          setInput={setInput}
-          sendQuery={sendQuery}
-          restoRecs={restoRecs}
-      /> */}
       <Tabs
         activeKey={activeKey}
         onChange={({ activeKey }) => {
@@ -328,10 +282,8 @@ const Index = () => {
         }}
         fill={FILL.fixed}
         activateOnFocus
-        // overrides={TabsOverrides}
       >
-        <Tab title="Chat" 
-          // overrides={TabOverrides}
+        <Tab title="Mr. Unlimited" 
         >
           <ChatView
             messages={messages}
@@ -341,10 +293,11 @@ const Index = () => {
             sendQuery={sendQuery}
             restoRecs={restoRecs}
             setRestoRecs={setRestoRecs}
+            chatIsLoading={chatIsLoading}
+            // setChatIsLoading={setChatIsLoading}
           />
         </Tab>
         <Tab title="Recs" 
-          // overrides={TabOverrides}
         >
           <RestaurantsView
             restoRecs={restoRecs}
@@ -359,26 +312,6 @@ const Index = () => {
           />
         </Tab>
       </Tabs>
-      {/* <Container>
-        <RestaurantsView
-          restoRecs={restoRecs}
-          resMode={resMode}
-          resModalIsOpen={resModalIsOpen}
-          setResMode={setResMode}
-          setResModalIsOpen={setResModalIsOpen}
-          usedReservations={usedReservations}
-          usedBoth={usedBoth}
-          usedNeighborhood={usedNeighborhood}
-          usedCuisine={usedCuisine}
-        />
-        <ChatView
-          messages={messages}
-          input={input}
-          setInput={setInput}
-          sendQuery={sendQuery}
-          restoRecs={restoRecs}
-        />
-      </Container> */}
     </Page>
   );
 };

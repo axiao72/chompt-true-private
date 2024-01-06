@@ -3,7 +3,7 @@ import {ParagraphSmall} from 'baseui/typography';
 import {Input} from 'baseui/input';
 import {Button, KIND, SIZE, SHAPE} from 'baseui/button';
 import {Skeleton} from 'baseui/skeleton';
-import {ReactNode, useEffect, useRef} from 'react';
+import {ReactNode, useEffect, useRef, useState} from 'react';
 import {Document, Message, RestoRec} from '../pages';
 import {StyledLink} from 'baseui/link';
 
@@ -36,7 +36,7 @@ const MessagesContainer = styled('div', {
   gap: '12px',
   overflowY: 'auto',
   padding: '16px',
-  height: '460px'
+  height: '420px'
 });
 
 const InputContainer = styled('div', ({$theme}) => ({
@@ -63,17 +63,10 @@ const HeaderContainer = styled('div', ({$theme}) => ({
   height: '10px'
 }));
 
-const EmptyState = ({input, setInput, sendQuery}) => {
+const InputBar = ({input, setInput, sendQuery}) => {
   const [, theme] = useStyletron();
   return (
-    <Container>
-      <EmptyContainer>
-        <ParagraphSmall color={theme.colors.contentTertiary}>
-          To get a quick rundown, click the &quot;About&quot; button in the top
-          right!
-        </ParagraphSmall>
-      </EmptyContainer>
-      <InputContainer>
+    <InputContainer>
         <Input
           value={input}
           placeholder="Envision your perfect meal"
@@ -103,6 +96,19 @@ const EmptyState = ({input, setInput, sendQuery}) => {
           Let's Ride
         </Button>
       </InputContainer>
+  );
+};
+
+const EmptyState = ({input, setInput, sendQuery}) => {
+  const [, theme] = useStyletron();
+  return (
+    <Container>
+      <EmptyContainer>
+        <ParagraphSmall color={theme.colors.contentTertiary}>
+          Can't pick a spot? Tell me what's on your mind, I got you.
+        </ParagraphSmall>
+      </EmptyContainer>
+      <InputBar input={input} setInput={setInput} sendQuery={sendQuery}/>
     </Container>
   );
 };
@@ -149,6 +155,8 @@ export const ChatView = ({
   sendQuery,
   restoRecs,
   setRestoRecs,
+  chatIsLoading,
+  // setChatIsLoading
 }: {
   messages: Message[];
   setMessages: (messageArray: Message[]) => void;
@@ -157,6 +165,8 @@ export const ChatView = ({
   sendQuery: () => void;
   restoRecs: RestoRec[];
   setRestoRecs: (recs: RestoRec[]) => void;
+  chatIsLoading: boolean;
+  // setChatIsLoading: (isLoading: boolean) => void;
 }) => {
   const [, theme] = useStyletron();
   const ref = useRef<HTMLDivElement | undefined>();
@@ -169,7 +179,8 @@ export const ChatView = ({
     }
 
   }, [messages]);
-
+  
+  // Render an Empty state component which displays a helpful message
   if (messages.length === 0) {
     return <EmptyState input={input} setInput={setInput} sendQuery={sendQuery}/>;
   }
@@ -184,15 +195,6 @@ export const ChatView = ({
   return (
     <Container>
       <HeaderContainer>
-        {/* <StyledLink 
-          href="#"
-          onClick={handleReset}
-          style={{fontSize: '15px'}}
-          // animateUnderline
-          // target='_blank'
-        >
-          Reset
-        </StyledLink> */}
         <Button
           size={SIZE.compact}
           kind={KIND.secondary}
@@ -215,36 +217,7 @@ export const ChatView = ({
           );
       })}
       </MessagesContainer>
-      <InputContainer>
-        <Input
-          value={input}
-          placeholder="Envision your perfect meal"
-          onChange={(event) => setInput(event.currentTarget.value)}
-          onKeyDown={(evt) => {
-            if (evt.key === 'Enter') {
-              sendQuery();
-            }
-          }}
-          overrides={{
-            Root: {
-                style: ({ $theme }) => ({
-                  borderRadius:'8px',
-                })
-            }
-          }}
-        />
-        <Button type="submit" onClick={sendQuery}
-          overrides={{
-            BaseButton: {
-                style: ({ $theme }) => ({
-                    borderRadius:'8px',
-                })
-            }
-        }}
-        >
-          Let's Ride
-        </Button>
-      </InputContainer>
+      <InputBar input={input} setInput={setInput} sendQuery={sendQuery}/>
     </Container>
   );
 };

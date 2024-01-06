@@ -66,6 +66,45 @@ const FooterContainer = styled('div', ({$theme}) => ({
   height: '20px'
 }));
 
+const Footer = ({resMode, clickResMode, setResModalIsOpen}) => {
+  const [, theme] = useStyletron();
+  return (
+    <FooterContainer>
+      <Checkbox
+        checked={resMode}
+        onChange={clickResMode}
+      >
+        Reservation Mode
+      </Checkbox>
+      <StatefulTooltip
+        content={() => (
+          <Block width={'250px'}>
+            When Reservation Mode is enabled, only restaurants with available reservations for your desired date, 
+            time, and party size will be recommended.
+          </Block>
+        )}
+        returnFocus
+        autoFocus
+      >
+        <Image
+          src={infoIcon}
+          width={15}
+          height={15}
+          alt="Information icon"
+          style={{ margin: '5px 0' }}
+        />
+      </StatefulTooltip>
+      <Button
+        onClick={() => setResModalIsOpen(true)}
+        size={SIZE.mini}
+        kind={ButtonKIND.tertiary}
+      >
+        Edit Filters
+      </Button>
+    </FooterContainer>
+  );
+};
+
 
 const EmptyState = ({resMode, clickResMode, setResModalIsOpen}) => {
   const [, theme] = useStyletron();
@@ -73,43 +112,11 @@ const EmptyState = ({resMode, clickResMode, setResModalIsOpen}) => {
     <Container>
       <EmptyContainer>
         <ParagraphSmall color={theme.colors.contentTertiary}>
-          To get a quick rundown, click the &quot;About&quot; button in the top
-          right!
+          To get a quick rundown, click the <b>chompt</b> logo in the top
+          left!
         </ParagraphSmall>
       </EmptyContainer>
-      <FooterContainer>
-        <Checkbox
-          checked={resMode}
-          onChange={clickResMode}
-        >
-          Reservation Mode
-        </Checkbox>
-        <StatefulTooltip
-          content={() => (
-            <Block width={'500px'}>
-              When Reservation Mode is enabled, only restaurants with available reservations for your desired date, 
-              time, and party size will be recommended.
-            </Block>
-          )}
-          returnFocus
-          autoFocus
-        >
-          <Image
-            src={infoIcon}
-            width={15}
-            height={15}
-            alt="Information icon"
-            style={{ margin: '5px 0' }}
-          />
-        </StatefulTooltip>
-        <Button
-          onClick={() => setResModalIsOpen(true)}
-          size={SIZE.mini}
-          kind={ButtonKIND.tertiary}
-        >
-          Edit Filters
-        </Button>
-      </FooterContainer>
+      <Footer resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen}/>
     </Container>
     
   );
@@ -142,25 +149,19 @@ export const RestaurantsView = ({
 
   const clickResMode = () => {
     // Move this to an Apply button within the Modal so Res Mode only gets activated when user clicks "Apply". This should be when resMode get's changed
+    
     // If Res Mode is off, then clicking the checkbox should just open the modal    
     // If Res Mode is on, clicking the checkbox should just turn Res Mode off 
-   
     if (!resMode) {
       setResModalIsOpen(true);
     }
     else {
       setResMode(false);
     }
+    // To keep track of res mode notification
     setChangedModes(true);
   };
 
-  // const openResPage = ({
-  //   url,
-  // }: {
-  //   url: string;
-  // }) => {
-  //   window.open(url, '_blank');
-  // };
   console.log(usedReservations);
 
   useEffect(() => {
@@ -176,6 +177,7 @@ export const RestaurantsView = ({
   }, [restoRecs]);
 
   if (restoRecs.length === 0) {
+    // Render an Empty state which displays helpful message
     return <EmptyState resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen}/>;
   }
 
@@ -197,13 +199,11 @@ export const RestaurantsView = ({
             <Card
               overrides={{Root: {style: {
                   width: '100%', 
-                  // display:'webkit-box', 
                   flexDirection: 'column', 
                   alignItems: 'center',
                   WebkitBoxOrient: 'vertical', 
                   WebkitBoxDirection: 'normal',
                   WebkitBoxAlign: 'center',
-                  // overflow: 'auto',
               }}}}
               headerImage={resto.imageUrl}
               title={resto.restoName}
@@ -214,7 +214,8 @@ export const RestaurantsView = ({
               </StyledBody>
               <StyledBody>
                   {resto.nbrhood}&nbsp;&nbsp;|&nbsp;&nbsp;{resto.priceRange}&nbsp;&nbsp; 
-                  {/* <a href={resto.websiteUrl} target="_blank">
+                  {/* Put Maps link here!
+                  <a href={resto.websiteUrl} target="_blank">
                     {resto.restoName} Website
                   </a> */}
               </StyledBody>
@@ -231,39 +232,7 @@ export const RestaurantsView = ({
           );
         })}
       </RecContainer>
-      <FooterContainer>
-        <Checkbox
-          checked={resMode}
-          onChange={clickResMode}
-        >
-          Reservation Mode
-        </Checkbox>
-        <StatefulTooltip
-          content={() => (
-            <Block width={'500px'}>
-              When Reservation Mode is enabled, only restaurants with available reservations for your desired date, 
-              time, and party size will be recommended.
-            </Block>
-          )}
-          returnFocus
-          autoFocus
-        >
-          <Image
-            src={infoIcon}
-            width={15}
-            height={15}
-            alt="Information icon"
-            style={{ margin: '5px 0' }}
-          />
-        </StatefulTooltip>
-        <Button
-          onClick={() => setResModalIsOpen(true)}
-          size={SIZE.mini}
-          kind={ButtonKIND.tertiary}
-        >
-          Edit Filters
-        </Button>
-      </FooterContainer>
+      <Footer resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen}/>
     </Container>
     
   );

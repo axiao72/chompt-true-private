@@ -22,12 +22,14 @@ export const SignupModal = ({
     const [password, setPassword] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleClose = () => {
       setIsOpen(false);
     };
     
     const handleSignup = useCallback(async () => {
+        setIsLoading(true);
         console.log(username);
         console.log(password);
         console.log(firstName);
@@ -62,6 +64,7 @@ export const SignupModal = ({
         else {
             console.log(responseJson.error);
         }
+        setIsLoading(false);
     }, [activeUser, username, password, firstName, lastName, setIsOpen]);
 
     return (
@@ -148,6 +151,7 @@ export const SignupModal = ({
             <ModalButton 
                 onClick={handleSignup} 
                 shape={SHAPE.default}
+                isLoading={isLoading}
                 overrides={{
                     BaseButton: {
                         style: ({ $theme }) => ({

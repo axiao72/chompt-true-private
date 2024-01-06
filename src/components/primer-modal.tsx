@@ -40,14 +40,14 @@ export const PrimerModal = ({
           Beyond excited to have you 🤩
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
-          To get started, type in as detailed of a meal description as you'd like 
+          To get started, type in as detailed of a dining description as you'd like 
           and you'll receive 3 restaurant recommendations.
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
           If you need some inspiration, think about something like 
           "Getting dinner on a Friday night with a group of friends and 
           we want Italian food. We are also going out after so we want a 
-          place with good music and drinks." Please, have fun with it.
+          place with good music and drinks." Let your imagination free and have fun with it.
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
           Feel free to {' '}
@@ -70,7 +70,7 @@ export const PrimerModal = ({
           >
             sign up
           </StyledLink>
-          {' '} to join the party, and we'll get more and more personalized as we go 🫡
+          {' '} to join the party, we'll be getting more and more personalized as we go 🫡
         </ParagraphMedium>
       </ModalBody>
       <ModalFooter>
