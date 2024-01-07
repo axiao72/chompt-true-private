@@ -12,6 +12,7 @@ const Container = styled('div', ({$theme}) => ({
   overflow: 'auto',
   display: 'flex',
   flexDirection: 'column',
+  height: '65vh'
 }));
 
 const EmptyContainer = styled('div', {
@@ -21,7 +22,7 @@ const EmptyContainer = styled('div', {
   gap: '12px',
   overflowY: 'auto',
   padding: '16px',
-  height: '460px',
+  height: '80vh',
   alignItems: 'center',
   justifyContent: 'center'
 });
@@ -36,7 +37,7 @@ const MessagesContainer = styled('div', {
   gap: '12px',
   overflowY: 'auto',
   padding: '16px',
-  height: '420px'
+  height: '80vh'
 });
 
 const InputContainer = styled('div', ({$theme}) => ({
@@ -47,8 +48,8 @@ const InputContainer = styled('div', ({$theme}) => ({
   gap: '16px',
   borderTop: `1px solid ${$theme.colors.borderOpaque}`,
   paddingTop: '16px',
-  padding: '16px',
-  height: '55px'
+  // padding: '16px',
+  height: '10vh'
 }));
 
 const HeaderContainer = styled('div', ({$theme}) => ({

@@ -75,10 +75,8 @@ export type User = {
 
 const Index = () => {
   const [aboutModalIsOpen, setAboutModalIsOpen] = useState(false);
-  const [activeDocument, setActiveDocument] = useState<Document>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
-  const [highlightedText, setHighlightedText] = useState<string | null>(null);
   const [restoRecs, setRestoRecs] = useState<RestoRec[]>([]);
   const [resMode, setResMode] = useState<boolean>(false);
   const [resModalIsOpen, setResModalIsOpen] = useState(false);
@@ -282,6 +280,13 @@ const Index = () => {
         }}
         fill={FILL.fixed}
         activateOnFocus
+        // overrides={{
+        //   Root: {
+        //     style: ({ $theme }) => ({
+        //       height: "90%"
+        //     })
+        //   }
+        // }}
       >
         <Tab title="Mr. Unlimited" 
         >

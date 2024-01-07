@@ -21,6 +21,7 @@ const Container = styled('div', ({$theme}) => ({
   overflow: 'auto',
   display: 'flex',
   flexDirection: 'column',
+  height: '65vh'
 }));
 
 const EmptyContainer = styled('div', {
@@ -32,7 +33,7 @@ const EmptyContainer = styled('div', {
   padding: '16px',
   alignItems: 'center',
   justifyContent: 'center',
-  height: '490px'
+  height: '80vh'
 });
 
 const RecContainer = styled('div', ({$theme}) => ({
@@ -51,7 +52,7 @@ const RecContainer = styled('div', ({$theme}) => ({
   WebkitBoxOrient: 'vertical',
   WebkitBoxDirection: 'normal',
   WebkitBoxAlign: 'center',
-  height: '515px'
+  height: '80vh'
   
 }));
 
@@ -63,7 +64,7 @@ const FooterContainer = styled('div', ({$theme}) => ({
   padding: '12px',
   justifyContent: 'center',
   alignItems: 'center',
-  height: '20px'
+  height: '5vh'
 }));
 
 const Footer = ({resMode, clickResMode, setResModalIsOpen}) => {
