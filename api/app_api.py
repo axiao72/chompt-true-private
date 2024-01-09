@@ -130,11 +130,13 @@ def chat(vision: IdealMeal):
         insert_recs[f'restaurant{count+1}_name'] = rec['resto_name']
         insert_recs[f'restaurant{count+1}_score'] = rec['score']
         print(f"Processing {rec['resto_name']} in {rec['neighborhood']}")
+        # Get summarized review to display on frontend under each rec
         full_review_doc = list(full_reviews.find({
                                     'resto_name': rec['resto_name'].lower(), 
                                     'neighborhood': rec['neighborhood']
                                  }))
-        full_review = full_review_doc[0]['text']
+        full_review = full_review_doc[0]['summarized_review']
+        # Add desired fields to return to frontend
         restos_list.append({
             'resto_name': rec['resto_name'].title(),
             'review': full_review,
