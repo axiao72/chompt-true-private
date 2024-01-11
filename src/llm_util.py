@@ -41,9 +41,9 @@ def instantiate_embed_model(model_name: str, model_type: str):
 def extract_entities(query: str, openai_api_key):
     # Extract cuisine and/or neighborhood to use as metadata filters
     llm = OpenAI(
-    openai_api_key=openai_api_key,
-    temperature=0, 
-    model="text-davinci-003"
+        openai_api_key=openai_api_key,
+        temperature=0, 
+        model="gpt-3.5-turbo-instruct"
     )
 
     parser = PydanticOutputParser(pydantic_object=Restaurant)

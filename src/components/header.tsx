@@ -11,9 +11,11 @@ import { Avatar } from "baseui/avatar";
 import {styled} from 'baseui';
 import type {User, RestoRec, Message} from '../pages';
 import { useCallback } from 'react';
+import locationIcon from './icons/location.png';
+import Image from "next/image";
 
 const Container = styled('div', ({$theme}) => ({
-  padding: '6px 20px',
+  padding: '6px 16px',
   // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
   display: 'flex',
   alignItems: 'center',
@@ -31,7 +33,7 @@ const TitleGroup = styled('div', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
-  gap: '4px',
+  gap: '2px',
 });
 
 export const Header = ({
@@ -39,19 +41,25 @@ export const Header = ({
   setAboutModalIsOpen,
   setLoginModalIsOpen,
   setSignupModalIsOpen,
+  setCityModalIsOpen,
   messages,
   setMessages,
   activeUser,
-  setActiveUser
+  setActiveUser,
+  userCity,
+  setUserCity
 }: {
   setRestoRecs: (recs: RestoRec[]) => void;
   setAboutModalIsOpen: (isOpen: boolean) => void;
   setLoginModalIsOpen: (isOpen: boolean) => void;
   setSignupModalIsOpen: (isOpen: boolean) => void;
+  setCityModalIsOpen: (isOpen: boolean) => void;
   messages: Message[];
   setMessages: (messageArray: Message[]) => void;
   activeUser: User;
   setActiveUser: (user: User) => void;
+  userCity: string;
+  setUserCity: (city: string) => void;
 }) => {
   const handleReset = () => {
     // Reset resto recs to empty
@@ -85,6 +93,29 @@ export const Header = ({
             chompt
           </HeadingSmall>
           {/* About */}
+        </Button>
+        <Button 
+          size={SIZE.mini}
+          kind={KIND.tertiary}
+          onClick={() => setCityModalIsOpen(true)}
+          shape={SHAPE.pill}
+          overrides={{
+            BaseButton: {
+              style: ({ $theme }) => ({
+                color: $theme.colors.contentTertiary, // Set the desired text color
+              }),
+            },
+          }}
+        >
+          <Image
+            src={locationIcon}
+            width={15}
+            height={15}
+            alt="Location icon designed by Freepik"
+            style={{ margin: '5px 0' }}
+            color='#6B6B6B'
+          />
+          {userCity !== null ? <span>&nbsp;{userCity}</span> : <span>&nbsp;Choose City</span>}
         </Button>
       </TitleGroup>
       <Group>

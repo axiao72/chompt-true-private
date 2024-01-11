@@ -9,6 +9,7 @@ import {PrimerModal} from '../components/primer-modal';
 import {LoginModal} from '../components/login-modal';
 import {SignupModal} from '../components/signup-modal';
 import {ResModal} from '../components/res-modal';
+import {CityModal} from '../components/city-modal';
 import {
   Tabs,
   Tab,
@@ -83,6 +84,7 @@ const Index = () => {
   const [loginModalIsOpen, setLoginModalIsOpen] = useState(false);
   const [signupModalIsOpen, setSignupModalIsOpen] = useState(false);
   const [primerModalIsOpen, setPrimerModalIsOpen] = useState(false);
+  const [cityModalIsOpen, setCityModalIsOpen] = useState(false);
   // Set the defaults to today's date and a time!
   // const currentDate = new Date();
   const [resCriteria, setResCriteria] = useState<ReservationCriteria>(null);
@@ -93,6 +95,8 @@ const Index = () => {
   const [activeUser, setActiveUser] = useState<User>(null);
   const [activeKey, setActiveKey] = useState<React.Key>(0);
   const [chatIsLoading, setChatIsLoading] = useState(false);
+  const [userCoordinates, setUserCoordinates] = useState(null);
+  const [userCity, setUserCity] = useState('New York');
 
   const getUser = async (username) => {
     console.log("Getting user from cookies: ", username);
@@ -126,16 +130,63 @@ const Index = () => {
   // Get username from cookies and get User from Mongo
   // Open primer modal
   useEffect(() => {
+    // Get username from cookies if available
     if (typeof window !== 'undefined') {
       const cookie_username = document.cookie.replace(/(?:(?:^|.*;\s*)chompt_username\s*\=\s*([^;]*).*$)|^.*$/, "$1");
       console.log('Cookie Username: ', cookie_username, ' !!!');
       if (cookie_username !== '') {
         getUser(cookie_username);
       }
-      console.log('No username in cookies :(');
+      else {
+        console.log('No username in cookies :(');
+      }
     }
-    setPrimerModalIsOpen(true)
+
+    // Get user's location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          // Success callback
+          const { latitude, longitude } = position.coords;
+          setUserCoordinates({latitude, longitude});
+          console.log('Got coordinates from browser: ', latitude, ' ', longitude);
+
+          // Use latitude and longitude to get city location through OpenCage
+          // const opencageApiKey = process.env.REACT_APP_OPENCAGE_API_KEY;
+          const opencageApiKey = '615ffe469cda4821adb01bd362b5692e';
+          const opencageApiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${opencageApiKey}`;
+
+          try {
+            const opencageResponse = await fetch(opencageApiUrl);
+            const cityData = await opencageResponse.json();
+
+            if (cityData.results && cityData.results.length > 0) {
+              const city = cityData.results[0].components.city;
+              setUserCity(city);
+              console.log('Opencage got city: ', city);
+            }
+          } catch (error) {
+            console.error('Error getting city from coordinates using OpenCage: ', error.message);
+          }
+          
+        },
+        (error) => {
+          // Error callback
+          console.error('Error getting user location:', error.message);
+        }
+      );
+    } else {
+      console.error("Geolocation is not supported by user's browser");
+    }
+
+    // Open primer modal to give user rundown if not already an active user
+    if (activeUser === null) {
+      setPrimerModalIsOpen(true)
+    }
   }, []);
+
+  console.log(`User coordinates set to: ${userCoordinates}`);
+  console.log(`User city set to: ${userCity}`);
 
   const sendQuery = useCallback(async () => {
     if (!restoRecs) {
@@ -166,6 +217,7 @@ const Index = () => {
     if (resMode) {
       idealMealData = {
         "description": input,
+        "city": userCity.toLowerCase(),
         "res_mode_on": resMode,
         "res_date": resCriteria.date,
         "res_time": resCriteria.time,
@@ -176,6 +228,7 @@ const Index = () => {
     else {
       idealMealData = {
         "description": input,
+        "city": userCity.toLowerCase(),
         "res_mode_on": resMode,
       };
     }
@@ -267,6 +320,13 @@ const Index = () => {
         setActiveUser={setActiveUser}
       >
       </SignupModal>
+      <CityModal
+        isOpen={cityModalIsOpen}
+        setIsOpen={setCityModalIsOpen}
+        userCity={userCity}
+        setUserCity={setUserCity}
+      >
+      </CityModal>
       <ResModal
         isOpen={resModalIsOpen}
         setIsOpen={setResModalIsOpen}
@@ -281,10 +341,13 @@ const Index = () => {
         setAboutModalIsOpen={setAboutModalIsOpen}
         setLoginModalIsOpen={setLoginModalIsOpen}
         setSignupModalIsOpen={setSignupModalIsOpen}
+        setCityModalIsOpen={setCityModalIsOpen}
         messages={messages}
         setMessages={setMessages}
         activeUser={activeUser}
         setActiveUser={setActiveUser}
+        userCity={userCity}
+        setUserCity={setUserCity}
       />
       <Tabs
         activeKey={activeKey}

@@ -36,6 +36,8 @@ def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbed
     try:
         # Prepare mongo vector search pipeline
         pipeline = get_search_pipeline(index, embedded_query=embedded_query, num_candidates=45, limit=45)
+        # Add city to filter
+        pipeline[0]['$vectorSearch']['filter'] = {'city': vision.city}
         print(f"Stage 1: Searching vector database for candidates with just User's query..." , file=sys.stderr)
         candidates = list(mongo_reviews.aggregate(pipeline))
         print(f"Stage 1: Generated {len(candidates)} candidates..")
@@ -114,8 +116,8 @@ def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbedding
         pipeline = get_search_pipeline(index, embedded_query=embedded_query, num_candidates=45, limit=45)
         # Initial Candidate generation
         print(f"Stage 1: Searching vector database for reservation data candidates..." , file=sys.stderr)
-        # add {'hasResy': True} to vector search filter and remove from filters
-        pipeline[0]['$vectorSearch']['filter'] = {'hasResy': post_metadata_filters.pop('hasResy')}
+        # add city and {'hasResy': True} to vector search filter and remove from filters
+        pipeline[0]['$vectorSearch']['filter'] = {'city': vision.city, 'hasResy': post_metadata_filters.pop('hasResy')}
         # if not post_metadata_filters:
         #     post
         candidates = list(mongo_reviews.aggregate(pipeline))

@@ -32,7 +32,7 @@ export const LoginModal = ({
     const handleSignup = () => {
         setIsOpen(false);
         setSignupModalIsOpen(true);
-      };
+    };
     
     const handleLogin = useCallback(async () => {
         setIsLoading(true);

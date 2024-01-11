@@ -91,7 +91,7 @@ const Footer = ({resMode, clickResMode, setResModalIsOpen}) => {
           src={infoIcon}
           width={15}
           height={15}
-          alt="Information icon"
+          alt="Information icon designed by Freepik"
           style={{ margin: '5px 0' }}
         />
       </StatefulTooltip>

@@ -176,7 +176,8 @@ export const ChatView = ({
     //Ensure the most recent messages are visible
     if (ref.current) {
       // @ts-ignore
-      ref.current.scrollTo(0, ref.current.offsetHeight);
+      // ref.current.scrollTo(0, ref.current.offsetHeight);
+      ref.current.scrollTop = ref.current.scrollHeight;
     }
 
   }, [messages]);

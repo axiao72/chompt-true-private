@@ -94,7 +94,7 @@ def chat(vision: IdealMeal):
     mongo_reviews = DB[collection_name]
     # mongo_reviews = DB["chunked_reviews"]
     # vision_dict = vision.model_dump()
-    print(f"Getting recommendations for the query: '{vision.description}'....", file=sys.stderr)
+    print(f"Getting recommendations in {vision.city} for the query: '{vision.description}'....", file=sys.stderr)
     # Extract cuisine and neighborhood for metadata filter. Keeping these as post filters just for extra layer of re-ranking/validation
     pre_metadata_filters, post_metadata_filters = extract_entities(vision.description, os.getenv('OPENAI_API_KEY'))
     # pre_metadata_filters, post_metadata_filters = {'$and': []}, {} # Searching on little chunks, point is to not need explicit filters
@@ -131,14 +131,23 @@ def chat(vision: IdealMeal):
         insert_recs[f'restaurant{count+1}_score'] = rec['score']
         print(f"Processing {rec['resto_name']} in {rec['neighborhood']}")
         # Get summarized review to display on frontend under each rec
-        full_review_doc = list(full_reviews.find({
-                                    'resto_name': rec['resto_name'].lower(), 
-                                    'neighborhood': rec['neighborhood']
-                                 }))
-        full_review = full_review_doc[0]['summarized_review']
+        if vision.city == 'new york':   
+            # Only have full reviews and summaries for New York reviews
+            full_review_doc = list(full_reviews.find({
+                                        'resto_name': rec['resto_name'].lower(), 
+                                        'neighborhood': rec['neighborhood']
+                                    }))
+            # Only do this while we're still generating/adding summaries
+            if 'summarized_review' in full_review_doc[0]:
+                full_review = full_review_doc[0]['summarized_review']
+            else:
+                full_review = full_review_doc[0]['text']
+        else:
+            # Once insert review summaries for all cities, remove this if-else statement
+            full_review = rec['text']
         # Add desired fields to return to frontend
         restos_list.append({
-            'resto_name': rec['resto_name'].title(),
+            'resto_name': rec['resto_name'].title().replace("'S", "'s"),
             'review': full_review,
             'perfect_for': rec['perfect_for_tags'],
             'price_range': rec['price_range'],

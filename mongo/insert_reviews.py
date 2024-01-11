@@ -42,10 +42,11 @@ mongo_reviews = db["reviews"]
 # Read infatuation reviews from file for each city and insert them to Mongo
 cities = ['pittsburgh', 'philadelphia', 'denver', 'washington-dc', 'los-angeles', 'boston', 'chicago']
 start_time = datetime.now()
+print(f"Embeddings start time: {start_time}")
 for city in cities:
     with open(f'../docker_webscraping/infatuation_reviews_v6_{city}.json', 'r') as file:
         resto_reviews = json.load(file)
-    print(f"Read reviews from file for {city}.")
+    print(f"Read {len(resto_reviews)}  reviews from file for {city}. Generating and storing embeddings now...")
 
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=3500,
                                     chunk_overlap=1000,
@@ -60,10 +61,9 @@ for city in cities:
     total_word_cnt = 0
 
 
-    print(f"Embeddings start time: {start_time}")
     for i, resto in enumerate(tqdm(resto_reviews)):
         try:
-            print(f"Chunking and preparing review #{i}...")
+            # print(f"Chunking and preparing review #{i}...")
             # Clean up review data
             cleaned_review = resto['review'].replace('&apos;', "'").replace("&amp;", "&").replace('&quot;', '"').replace("&quot", '"')
             cleaned_resto_name = resto['resto_name'].replace("&amp;", "&").replace('&apos;', "'").replace('&quot;', '"').replace("&quot", '"').lower()
@@ -98,7 +98,7 @@ for city in cities:
             original_chunks = review_chunks
             # Add other text to review chunk that we want to be included in the embedding
             review_chunks = [f"Perfect for: {cleaned_resto_tags}. Serves {cuisine}. Located in the {neighborhood} neighborhood. " + j for j in review_chunks]
-            print(f"Character count of {cleaned_resto_name} review chunk: {len(review_chunks[0])}")
+            # print(f"Character count of {cleaned_resto_name} review chunk: {len(review_chunks[0])}")
             # Create metadata dicts for each chunk
             chunk_datas = [{
                 "chunk": j, "text": text, **review_data
@@ -133,7 +133,7 @@ for city in cities:
         for h, data in enumerate(insert_datas):
             data['content_embedding'] = embeddings[h]
         insert_result = mongo_reviews.insert_many(insert_datas)
-    print("Finished inserting all dangerwiches... BRONCOS COUNTRY. LET'S RIDE!!!")
+    print(f"Finished inserting all dangerwiches for city {city}... BRONCOS COUNTRY. LET'S RIDE!!!")
 
 end_time = datetime.now()
 print(f"End time: {end_time}")

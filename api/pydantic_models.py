@@ -3,6 +3,7 @@ from pydantic import BaseModel
 
 class IdealMeal(BaseModel):
     description: str
+    city: str
     # Optional fields, only used when reservation mode is on
     res_mode_on: bool = False
     res_date: str = None  # 'YYYY-MM-DD'
