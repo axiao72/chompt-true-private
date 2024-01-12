@@ -8,6 +8,7 @@ import {
     StyledBody,
     StyledAction
   } from "baseui/card";
+import {Accordion, Panel} from 'baseui/accordion';
 import { Button, SIZE, KIND as ButtonKIND } from "baseui/button";
 import { StatefulTooltip } from "baseui/tooltip";
 import { Checkbox } from "baseui/checkbox";
@@ -147,6 +148,7 @@ export const RestaurantsView = ({
   const [, theme] = useStyletron();
   const containerRef = useRef();
   const [changedModes, setChangedModes] = useState(true);
+  const [css] = useStyletron();
 
   const clickResMode = () => {
     // Move this to an Apply button within the Modal so Res Mode only gets activated when user clicks "Apply". This should be when resMode get's changed
@@ -230,6 +232,45 @@ export const RestaurantsView = ({
                   </Button>
               </StyledAction>
             </Card>
+            // <Accordion>
+            //   <Panel
+            //     title={
+            //       <Card
+            //         // overrides={{Root: {style: {
+            //         //     width: '100%', 
+            //         //     flexDirection: 'column', 
+            //         //     alignItems: 'center',
+            //         //     WebkitBoxOrient: 'vertical', 
+            //         //     WebkitBoxDirection: 'normal',
+            //         //     WebkitBoxAlign: 'center',
+            //         // }}}}
+            //         headerImage={resto.imageUrl}
+            //         title={resto.restoName}
+            //         key={`resto-${index}`}
+            //       />
+            //     }
+            //   >
+            //     <StyledBody>
+            //       {resto.review}
+            //     </StyledBody>
+            //     <StyledBody>
+            //         {resto.nbrhood}&nbsp;&nbsp;|&nbsp;&nbsp;{resto.priceRange}&nbsp;&nbsp; 
+            //         {/* Put Maps link here!
+            //         <a href={resto.websiteUrl} target="_blank">
+            //           {resto.restoName} Website
+            //         </a> */}
+            //     </StyledBody>
+            //     <StyledAction>
+            //         <Button
+            //           overrides={{BaseButton: {style: {width: '100%'}}}} 
+            //           onClick={resto.resyUrl ? () => window.open(resto.resyUrl, '_blank') : () => window.open(resto.websiteUrl, '_blank')}
+            //           disabled={!resto.resyUrl && !resto.websiteUrl}
+            //         >
+            //             Book Reservation
+            //         </Button>
+            //     </StyledAction>
+            //   </Panel>
+            // </Accordion>
           );
         })}
       </RecContainer>

@@ -245,37 +245,44 @@ const Index = () => {
     });
 
     const responseJson = await response.json();
-    const responseRestos = responseJson.restos;
-
-    if (responseRestos.length > 0) {
-      const responseRestoRecs: RestoRec[] = responseRestos.map((resto) => {
-        const restoRec: RestoRec = {
-          restoName: resto.resto_name,
-          review: resto.review,
-          perfectFor: resto.perfect_for,
-          priceRange: resto.price_range,
-          imageUrl: resto.image_url,
-          websiteUrl: resto.website,
-          nbrhood: resto.neighborhood,
-          resyUrl: resto.resy_url
-        };
-        return restoRec;
-      });
-      setRestoRecs(responseRestoRecs);
-      setActiveKey(1);
+    if (responseJson.success) {
+      const responseRestos = responseJson.restos;
+      if (responseRestos.length > 0) {
+        const responseRestoRecs: RestoRec[] = responseRestos.map((resto) => {
+          const restoRec: RestoRec = {
+            restoName: resto.resto_name,
+            review: resto.review,
+            perfectFor: resto.perfect_for,
+            priceRange: resto.price_range,
+            imageUrl: resto.image_url,
+            websiteUrl: resto.website,
+            nbrhood: resto.neighborhood,
+            resyUrl: resto.resy_url
+          };
+          return restoRec;
+        });
+        setRestoRecs(responseRestoRecs);
+        setActiveKey(1);
+      }
+      setMessages((prev) => [
+        ...prev.slice(0, prev.length - 1),
+        {role: 'assistant', content: responseJson.pitch},
+      ]);
+      setUsedReservations(responseJson.usedReservations);
+      setUsedBoth(responseJson.usedBoth);
+      setUsedNeighborhood(responseJson.usedNeighborhood);
+      setUsedCuisine(responseJson.usedCuisine);
+      console.log("Used Reservation Mode: ", usedReservations);
+      console.log("Used both filters: ", usedBoth);
+      console.log("Used neighborhood filter:", usedNeighborhood);
+      console.log("Used cuisine filter:", usedCuisine);
     }
-    setMessages((prev) => [
-      ...prev.slice(0, prev.length - 1),
-      {role: 'assistant', content: responseJson.pitch},
-    ]);
-    setUsedReservations(responseJson.usedReservations);
-    setUsedBoth(responseJson.usedBoth);
-    setUsedNeighborhood(responseJson.usedNeighborhood);
-    setUsedCuisine(responseJson.usedCuisine);
-    console.log("Used Reservation Mode: ", usedReservations);
-    console.log("Used both filters: ", usedBoth);
-    console.log("Used neighborhood filter:", usedNeighborhood);
-    console.log("Used cuisine filter:", usedCuisine);
+    else {
+      setMessages((prev) => [
+        ...prev.slice(0, prev.length - 1),
+        {role: 'assistant', content: responseJson.error},
+      ]);
+    }
     setChatIsLoading(false);
   }, [input, restoRecs]);
 

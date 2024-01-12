@@ -28,6 +28,9 @@ const nextConfig = {
   experimental: {
     proxyTimeout: 3000000
   },
+  images: {
+    domains: ['res.cloudinary.com'],
+  },
   async redirects() {
     return [
       

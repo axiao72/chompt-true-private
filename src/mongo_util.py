@@ -195,6 +195,7 @@ def get_search_pipeline(index: str, embedded_query, num_candidates: int, limit: 
             '$project': {
                 '_id': 0,
                 'text': 1,
+                'review_date': 1,
                 'resto_name': 1,
                 'cuisine': 1,
                 'perfect_for_tags': 1,
@@ -205,6 +206,7 @@ def get_search_pipeline(index: str, embedded_query, num_candidates: int, limit: 
                 'resy_venue_id': 1,
                 'resy_venue_name': 1,
                 'resy_venue_url': 1,
+                'city': 1,
                 'score': {
                     '$meta': 'vectorSearchScore'
                 }
