@@ -11,7 +11,7 @@ import {
 import {Accordion, Panel} from 'baseui/accordion';
 import { Button, SIZE, KIND as ButtonKIND } from "baseui/button";
 import { StatefulTooltip } from "baseui/tooltip";
-import { Checkbox } from "baseui/checkbox";
+import { Checkbox, STYLE_TYPE, LABEL_PLACEMENT } from "baseui/checkbox";
 import Image from "next/image";
 import infoIcon from './icons/info_icon_1.png';
 import {Block} from 'baseui/block';
@@ -68,13 +68,21 @@ const FooterContainer = styled('div', ({$theme}) => ({
   height: '5vh'
 }));
 
-const Footer = ({resMode, clickResMode, setResModalIsOpen}) => {
+const notNYC = (city: string) => {
+  return city !== 'New York'
+}
+
+const Footer = ({resMode, clickResMode, setResModalIsOpen, userCity}) => {
   const [, theme] = useStyletron();
   return (
     <FooterContainer>
       <Checkbox
         checked={resMode}
+        checkmarkType={STYLE_TYPE.toggle}
         onChange={clickResMode}
+        disabled={notNYC(userCity)}
+        // disabled={false}
+        labelPlacement={LABEL_PLACEMENT.right}
       >
         Reservation Mode
       </Checkbox>
@@ -82,7 +90,7 @@ const Footer = ({resMode, clickResMode, setResModalIsOpen}) => {
         content={() => (
           <Block width={'250px'}>
             When Reservation Mode is enabled, only restaurants with available reservations for your desired date, 
-            time, and party size will be recommended.
+            time, and party size will be recommended. <br></br><br></br>Reservation Mode only available in NYC (for now).
           </Block>
         )}
         returnFocus
@@ -108,7 +116,7 @@ const Footer = ({resMode, clickResMode, setResModalIsOpen}) => {
 };
 
 
-const EmptyState = ({resMode, clickResMode, setResModalIsOpen}) => {
+const EmptyState = ({resMode, clickResMode, setResModalIsOpen, userCity}) => {
   const [, theme] = useStyletron();
   return (
     <Container>
@@ -118,7 +126,7 @@ const EmptyState = ({resMode, clickResMode, setResModalIsOpen}) => {
           left!
         </ParagraphSmall>
       </EmptyContainer>
-      <Footer resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen}/>
+      <Footer resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen} userCity={userCity}/>
     </Container>
     
   );
@@ -133,7 +141,8 @@ export const RestaurantsView = ({
   usedReservations,
   usedBoth,
   usedNeighborhood,
-  usedCuisine
+  usedCuisine,
+  userCity
 }: {
   restoRecs: Array<RestoRec>;
   resMode: boolean;
@@ -144,6 +153,7 @@ export const RestaurantsView = ({
   usedBoth: boolean;
   usedNeighborhood: boolean;
   usedCuisine: boolean;
+  userCity: string;
 }) => {
   const [, theme] = useStyletron();
   const containerRef = useRef();
@@ -181,7 +191,7 @@ export const RestaurantsView = ({
 
   if (restoRecs.length === 0) {
     // Render an Empty state which displays helpful message
-    return <EmptyState resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen}/>;
+    return <EmptyState resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen} userCity={userCity}/>;
   }
 
   return (
@@ -274,7 +284,7 @@ export const RestaurantsView = ({
           );
         })}
       </RecContainer>
-      <Footer resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen}/>
+      <Footer resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen} userCity={userCity}/>
     </Container>
     
   );

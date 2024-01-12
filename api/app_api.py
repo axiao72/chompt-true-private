@@ -10,6 +10,7 @@ from src.mongo_util import *
 from src.llm_util import *
 from api.pydantic_models import *
 from src.users import *
+from src.helpers import *
 from passlib.context import CryptContext
 from passlib.hash import bcrypt
 import requests
@@ -145,7 +146,7 @@ def chat(vision: IdealMeal):
                 full_review = full_review_doc[0]['text']
             # Add desired fields to return to frontend
             restos_list.append({
-                'resto_name': rec['resto_name'].title().replace("'S", "'s"),
+                'resto_name': capitalize_resto_name(rec['resto_name']),
                 'review': full_review,
                 'perfect_for': rec['perfect_for_tags'],
                 'price_range': rec['price_range'],

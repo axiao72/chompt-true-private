@@ -24,31 +24,38 @@ export const ResModal = ({
     setResCriteria: (resCriterida: ReservationCriteria) => void;
   }) => {
     const [, theme] = useStyletron();
+    const [resDate, setResDate] = useState(new Date());
+    const [resTime, setResTime] = useState(null);
+    const [resPartySize, setResPartySize] = useState(null);
+    const [partySizeNotSelected, setPartySizeNotSelected] = useState(false);
     const handleClose = () => {
       setIsOpen(false);
     };
     const handleApply = () => {
         // When user hits Apply, set resCriteria to the specified filters, set resMode to True, and close the modal
-        const year = resDate.getFullYear();
-        const month = (resDate.getMonth() + 1).toString().padStart(2, '0');
-        const day = resDate.getDate().toString().padStart(2, '0');
-        const formattedDate = `${year}-${month}-${day}`;
-        const hours = resTime.getHours().toString().padStart(2, '0');
-        const minutes = resTime.getMinutes().toString().padStart(2, '0');
-        const timeString = `${hours}:${minutes}`;
-        const criteria: ReservationCriteria = {
-            date: formattedDate,
-            time: timeString,
-            partySize: resPartySize[0].id,
+        if (resPartySize !== null) {
+            const year = resDate.getFullYear();
+            const month = (resDate.getMonth() + 1).toString().padStart(2, '0');
+            const day = resDate.getDate().toString().padStart(2, '0');
+            const formattedDate = `${year}-${month}-${day}`;
+            const hours = resTime.getHours().toString().padStart(2, '0');
+            const minutes = resTime.getMinutes().toString().padStart(2, '0');
+            const timeString = `${hours}:${minutes}`;
+            const criteria: ReservationCriteria = {
+                date: formattedDate,
+                time: timeString,
+                partySize: resPartySize[0].id,
+            }
+            setResCriteria(criteria);
+            setResMode(true);
+            setIsOpen(false);
+            console.log('Reservation Criteria: ', resCriteria)
         }
-        setResCriteria(criteria);
-        setResMode(true);
-        setIsOpen(false);
-        console.log('Reservation Criteria: ', resCriteria)
+        else {
+            setPartySizeNotSelected(true);
+        }
     };
-    const [resDate, setResDate] = useState(new Date());
-    const [resTime, setResTime] = useState(null);
-    const [resPartySize, setResPartySize] = useState(null);
+    
     return (
       <Modal onClose={handleClose} closeable isOpen={isOpen} animate autoFocus={false}>
         <ModalHeader>Tell me about your reservation</ModalHeader>
@@ -81,7 +88,7 @@ export const ResModal = ({
                     value={resTime}
                     // onChange={date => console.log(date)}
                     onChange={date => setResTime(date)}
-                    minTime={new Date("2023-12-26T05:00:00.000Z")}
+                    // minTime={new Date()}
                     overrides={{
                         Select: {
                           props: {
@@ -97,7 +104,14 @@ export const ResModal = ({
                     }}
                 />
             </FormControl>
-            <FormControl label="Party size">
+            <FormControl 
+                label="Party size" 
+                error={
+                    partySizeNotSelected
+                        ? 'Please choose a party size'
+                        : null
+                }
+            >
                 <Select
                     options={[
                         {
@@ -131,8 +145,10 @@ export const ResModal = ({
                     ]}
                     value={resPartySize}
                     placeholder="Select party size"
+                    error={partySizeNotSelected}
+                    clearable={false}
                     // onChange={params => console.log(params.value)}
-                    onChange={params => setResPartySize(params.value)}
+                    onChange={params => {setResPartySize(params.value); setPartySizeNotSelected(false);}}
                     overrides={{
                         ControlContainer: {
                             style: ({ $theme }) => ({

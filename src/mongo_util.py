@@ -117,7 +117,7 @@ def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbedding
         # Initial Candidate generation
         print(f"Stage 1: Searching vector database for reservation data candidates..." , file=sys.stderr)
         # add city and {'hasResy': True} to vector search filter and remove from filters
-        pipeline[0]['$vectorSearch']['filter'] = {'city': vision.city, 'hasResy': post_metadata_filters.pop('hasResy')}
+        pipeline[0]['$vectorSearch']['filter'] = {'$and': [{'city': vision.city}, {'hasResy': post_metadata_filters.pop('hasResy')}]}
         # if not post_metadata_filters:
         #     post
         candidates = list(mongo_reviews.aggregate(pipeline))

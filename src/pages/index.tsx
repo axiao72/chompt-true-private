@@ -397,6 +397,7 @@ const Index = () => {
             usedBoth={usedBoth}
             usedNeighborhood={usedNeighborhood}
             usedCuisine={usedCuisine}
+            userCity={userCity}
           />
         </Tab>
       </Tabs>
