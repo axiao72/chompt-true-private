@@ -18,11 +18,43 @@ import {Block} from 'baseui/block';
 import {Notification, KIND as NotiKIND} from 'baseui/notification';
 
 const Container = styled('div', ({$theme}) => ({
-  background: $theme.colors.backgroundPrimary,
-  overflow: 'auto',
-  display: 'flex',
-  flexDirection: 'column',
-  height: '65vh'
+  // background: $theme.colors.backgroundPrimary,
+  // overflow: 'auto',
+  // display: 'flex',
+  // flexDirection: 'column',
+  // height: '65vh'
+  
+  '@media only screen and (max-width: 650px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '65vh'
+  },
+
+  '@media only screen and (min-width: 651px) and (max-width: 1024px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '70vh'
+  },
+
+  '@media only screen and (min-width: 1025px) and (max-width: 1400px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '75vh'
+  },
+  
+  '@media only screen and (min-width: 1401px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '79vh'
+  },
 }));
 
 const EmptyContainer = styled('div', {
@@ -72,17 +104,24 @@ const notNYC = (city: string) => {
   return city !== 'New York'
 }
 
-const Footer = ({resMode, clickResMode, setResModalIsOpen, userCity}) => {
+const Footer = ({resMode, clickResMode, setResModalIsOpen, userCity, resModeToggleColor}) => {
   const [, theme] = useStyletron();
   return (
     <FooterContainer>
       <Checkbox
         checked={resMode}
-        checkmarkType={STYLE_TYPE.toggle}
+        checkmarkType={STYLE_TYPE.toggle_round}
         onChange={clickResMode}
         disabled={notNYC(userCity)}
         // disabled={false}
         labelPlacement={LABEL_PLACEMENT.right}
+        overrides={{
+          Toggle: {
+            style: ({ $theme }) => ({
+              backgroundColor: resModeToggleColor
+            })
+          }
+        }}
       >
         Reservation Mode
       </Checkbox>
@@ -116,7 +155,7 @@ const Footer = ({resMode, clickResMode, setResModalIsOpen, userCity}) => {
 };
 
 
-const EmptyState = ({resMode, clickResMode, setResModalIsOpen, userCity}) => {
+const EmptyState = ({resMode, clickResMode, setResModalIsOpen, userCity, resModeToggleColor}) => {
   const [, theme] = useStyletron();
   return (
     <Container>
@@ -126,7 +165,13 @@ const EmptyState = ({resMode, clickResMode, setResModalIsOpen, userCity}) => {
           left!
         </ParagraphSmall>
       </EmptyContainer>
-      <Footer resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen} userCity={userCity}/>
+      <Footer 
+        resMode={resMode} 
+        clickResMode={clickResMode} 
+        setResModalIsOpen={setResModalIsOpen} 
+        userCity={userCity} 
+        resModeToggleColor={resModeToggleColor}
+      />
     </Container>
     
   );
@@ -142,7 +187,9 @@ export const RestaurantsView = ({
   usedBoth,
   usedNeighborhood,
   usedCuisine,
-  userCity
+  userCity,
+  resModeToggleColor,
+  setResModeToggleColor
 }: {
   restoRecs: Array<RestoRec>;
   resMode: boolean;
@@ -154,6 +201,8 @@ export const RestaurantsView = ({
   usedNeighborhood: boolean;
   usedCuisine: boolean;
   userCity: string;
+  resModeToggleColor: string;
+  setResModeToggleColor: (color: string) => void;
 }) => {
   const [, theme] = useStyletron();
   const containerRef = useRef();
@@ -170,6 +219,7 @@ export const RestaurantsView = ({
     }
     else {
       setResMode(false);
+      setResModeToggleColor('#FFFFFF');
     }
     // To keep track of res mode notification
     setChangedModes(true);
@@ -191,7 +241,13 @@ export const RestaurantsView = ({
 
   if (restoRecs.length === 0) {
     // Render an Empty state which displays helpful message
-    return <EmptyState resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen} userCity={userCity}/>;
+    return <EmptyState 
+            resMode={resMode} 
+            clickResMode={clickResMode} 
+            setResModalIsOpen={setResModalIsOpen} 
+            userCity={userCity}
+            resModeToggleColor={resModeToggleColor}
+          />;
   }
 
   return (
@@ -244,47 +300,53 @@ export const RestaurantsView = ({
             </Card>
             // <Accordion>
             //   <Panel
-            //     title={
-            //       <Card
-            //         // overrides={{Root: {style: {
-            //         //     width: '100%', 
-            //         //     flexDirection: 'column', 
-            //         //     alignItems: 'center',
-            //         //     WebkitBoxOrient: 'vertical', 
-            //         //     WebkitBoxDirection: 'normal',
-            //         //     WebkitBoxAlign: 'center',
-            //         // }}}}
-            //         headerImage={resto.imageUrl}
-            //         title={resto.restoName}
-            //         key={`resto-${index}`}
-            //       />
-            //     }
+            //     title={resto.restoName}
             //   >
-            //     <StyledBody>
-            //       {resto.review}
-            //     </StyledBody>
-            //     <StyledBody>
-            //         {resto.nbrhood}&nbsp;&nbsp;|&nbsp;&nbsp;{resto.priceRange}&nbsp;&nbsp; 
-            //         {/* Put Maps link here!
-            //         <a href={resto.websiteUrl} target="_blank">
-            //           {resto.restoName} Website
-            //         </a> */}
-            //     </StyledBody>
-            //     <StyledAction>
-            //         <Button
-            //           overrides={{BaseButton: {style: {width: '100%'}}}} 
-            //           onClick={resto.resyUrl ? () => window.open(resto.resyUrl, '_blank') : () => window.open(resto.websiteUrl, '_blank')}
-            //           disabled={!resto.resyUrl && !resto.websiteUrl}
-            //         >
-            //             Book Reservation
-            //         </Button>
-            //     </StyledAction>
+            //     <Card
+            //       overrides={{Root: {style: {
+            //           width: '100%', 
+            //           flexDirection: 'column', 
+            //           alignItems: 'center',
+            //           WebkitBoxOrient: 'vertical', 
+            //           WebkitBoxDirection: 'normal',
+            //           WebkitBoxAlign: 'center',
+            //       }}}}
+            //       headerImage={resto.imageUrl}
+            //       title={resto.restoName}
+            //       key={`resto-${index}`}
+            //     >
+            //       <StyledBody>
+            //           {resto.review}
+            //       </StyledBody>
+            //       <StyledBody>
+            //           {resto.nbrhood}&nbsp;&nbsp;|&nbsp;&nbsp;{resto.priceRange}&nbsp;&nbsp; 
+            //           {/* Put Maps link here!
+            //           <a href={resto.websiteUrl} target="_blank">
+            //             {resto.restoName} Website
+            //           </a> */}
+            //       </StyledBody>
+            //       <StyledAction>
+            //           <Button
+            //             overrides={{BaseButton: {style: {width: '100%'}}}} 
+            //             onClick={resto.resyUrl ? () => window.open(resto.resyUrl, '_blank') : () => window.open(resto.websiteUrl, '_blank')}
+            //             disabled={!resto.resyUrl && !resto.websiteUrl}
+            //           >
+            //               Book Reservation
+            //           </Button>
+            //       </StyledAction>
+            //     </Card>
             //   </Panel>
             // </Accordion>
           );
         })}
       </RecContainer>
-      <Footer resMode={resMode} clickResMode={clickResMode} setResModalIsOpen={setResModalIsOpen} userCity={userCity}/>
+      <Footer 
+        resMode={resMode} 
+        clickResMode={clickResMode} 
+        setResModalIsOpen={setResModalIsOpen} 
+        userCity={userCity} 
+        resModeToggleColor={resModeToggleColor}
+      />
     </Container>
     
   );

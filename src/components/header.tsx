@@ -12,28 +12,69 @@ import {styled} from 'baseui';
 import type {User, RestoRec, Message} from '../pages';
 import { useCallback } from 'react';
 import locationIcon from './icons/location.png';
+import locationIcon2 from './icons/placeholder.png';
 import Image from "next/image";
 
 const Container = styled('div', ({$theme}) => ({
-  padding: '6px 16px',
-  // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
+  // padding: '6px 16px',
+  // // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
+  // display: 'flex',
+  // alignItems: 'center',
+  // justifyContent: 'space-between',
+
+  '@media only screen and (max-width: 650px)': {
+    padding: '6px 16px',
+    // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  '@media only screen and (min-width: 651px)': {
+    padding: '6px 28px',
+    // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
 }));
 
 const Group = styled('div', {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '2px',
+  // display: 'flex',
+  // alignItems: 'center',
+  // justifyContent: 'space-between',
+  // gap: '2px',
+  '@media only screen and (max-width: 650px)': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '2px',
+  },
+
+  '@media only screen and (min-width: 651px)': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+  },
 });
 
 const TitleGroup = styled('div', {
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-  gap: '2px',
+  '@media only screen and (max-width: 650px)': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '2px',
+  },
+
+  '@media only screen and (min-width: 651px)': {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+  },
+  
 });
 
 export const Header = ({
@@ -102,18 +143,20 @@ export const Header = ({
           overrides={{
             BaseButton: {
               style: ({ $theme }) => ({
-                color: $theme.colors.contentTertiary, // Set the desired text color
+                // color: $theme.colors.contentTertiary, // Set the desired text color
+                color: $theme.colors.accent300,
               }),
             },
           }}
         >
           <Image
-            src={locationIcon}
+            src={locationIcon2}
             width={15}
             height={15}
             alt="Location icon designed by Freepik"
             style={{ margin: '5px 0' }}
-            color='#6B6B6B'
+            // color='#6B6B6B'
+            color='#5B91F5'
           />
           {userCity !== null ? <span>&nbsp;{userCity}</span> : <span>&nbsp;Choose City</span>}
         </Button>

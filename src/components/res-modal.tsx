@@ -14,7 +14,9 @@ export const ResModal = ({
     resMode,
     setResMode,
     resCriteria,
-    setResCriteria
+    setResCriteria,
+    resModeToggleColor,
+    setResModeToggleColor
   }: {
     isOpen: boolean;
     setIsOpen: (isOpen: boolean) => void;
@@ -22,6 +24,8 @@ export const ResModal = ({
     resCriteria: ReservationCriteria;
     setResMode: (resModeOn: boolean) => void;
     setResCriteria: (resCriterida: ReservationCriteria) => void;
+    resModeToggleColor: string;
+    setResModeToggleColor: (color: string) => void;
   }) => {
     const [, theme] = useStyletron();
     const [resDate, setResDate] = useState(new Date());
@@ -48,6 +52,9 @@ export const ResModal = ({
             }
             setResCriteria(criteria);
             setResMode(true);
+            // setResModeToggleColor('#276EF1');
+            setResModeToggleColor('#5B91F5');
+            // setResModeToggleColor('#000000');
             setIsOpen(false);
             console.log('Reservation Criteria: ', resCriteria)
         }

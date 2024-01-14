@@ -4,15 +4,44 @@ import {Input} from 'baseui/input';
 import {Button, KIND, SIZE, SHAPE} from 'baseui/button';
 import {Skeleton} from 'baseui/skeleton';
 import {ReactNode, useEffect, useRef, useState} from 'react';
+import React from 'react';
 import {Document, Message, RestoRec} from '../pages';
 import {StyledLink} from 'baseui/link';
 
 const Container = styled('div', ({$theme}) => ({
-  background: $theme.colors.backgroundPrimary,
-  overflow: 'auto',
-  display: 'flex',
-  flexDirection: 'column',
-  height: '65vh'
+
+  '@media only screen and (max-width: 650px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '65vh'
+  },
+
+  '@media only screen and (min-width: 651px) and (max-width: 1024px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '70vh'
+  },
+
+  '@media only screen and (min-width: 1025px) and (max-width: 1400px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '75vh'
+  },
+  
+  '@media only screen and (min-width: 1401px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '79vh'
+  },
+  
 }));
 
 const EmptyContainer = styled('div', {
@@ -175,8 +204,6 @@ export const ChatView = ({
   useEffect(() => {
     //Ensure the most recent messages are visible
     if (ref.current) {
-      // @ts-ignore
-      // ref.current.scrollTo(0, ref.current.offsetHeight);
       ref.current.scrollTop = ref.current.scrollHeight;
     }
 

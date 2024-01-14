@@ -81,6 +81,7 @@ const Index = () => {
   const [restoRecs, setRestoRecs] = useState<RestoRec[]>([]);
   const [resMode, setResMode] = useState<boolean>(false);
   const [resModalIsOpen, setResModalIsOpen] = useState(false);
+  const [resModeToggleColor, setResModeToggleColor] = useState('#FFFFFF');
   const [loginModalIsOpen, setLoginModalIsOpen] = useState(false);
   const [signupModalIsOpen, setSignupModalIsOpen] = useState(false);
   const [primerModalIsOpen, setPrimerModalIsOpen] = useState(false);
@@ -341,6 +342,8 @@ const Index = () => {
         setResMode={setResMode}
         resCriteria={resCriteria}
         setResCriteria={setResCriteria}
+        resModeToggleColor={resModeToggleColor}
+        setResModeToggleColor={setResModeToggleColor}
       >
       </ResModal>
       <Header
@@ -398,6 +401,8 @@ const Index = () => {
             usedNeighborhood={usedNeighborhood}
             usedCuisine={usedCuisine}
             userCity={userCity}
+            resModeToggleColor={resModeToggleColor}
+            setResModeToggleColor={setResModeToggleColor}
           />
         </Tab>
       </Tabs>
