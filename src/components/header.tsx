@@ -14,6 +14,8 @@ import { useCallback } from 'react';
 import locationIcon from './icons/location.png';
 import locationIcon2 from './icons/placeholder.png';
 import Image from "next/image";
+import { ArrowDown } from "baseui/icon";
+import {ChevronDown} from 'baseui/icon';
 
 const Container = styled('div', ({$theme}) => ({
   // padding: '6px 16px',
@@ -140,6 +142,7 @@ export const Header = ({
           kind={KIND.tertiary}
           onClick={() => setCityModalIsOpen(true)}
           shape={SHAPE.pill}
+          // endEnhancer={<ChevronDown size={20} />}
           overrides={{
             BaseButton: {
               style: ({ $theme }) => ({
@@ -159,6 +162,8 @@ export const Header = ({
             color='#5B91F5'
           />
           {userCity !== null ? <span>&nbsp;{userCity}</span> : <span>&nbsp;Choose City</span>}
+          &nbsp;
+          <ChevronDown size={20} />
         </Button>
       </TitleGroup>
       <Group>
