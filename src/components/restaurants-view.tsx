@@ -287,6 +287,8 @@ export const RestaurantsView = ({
                   <a href={resto.websiteUrl} target="_blank">
                     {resto.restoName} Website
                   </a> */}
+                  {/* <a href="https://maps.apple.com/?q=Hunan+Slurp+112+1st+Ave,+New+York,+NY+10009" target="_blank">Open in Apple Maps</a>
+                  <a href="https://www.google.com/maps/search/?api=1&query=Hunan%20Slurp+112%201st%20Ave,%20New%20York,%20NY%2010009" target="_blank">Open in Google Maps</a> */}
               </StyledBody>
               <StyledAction>
                   <Button

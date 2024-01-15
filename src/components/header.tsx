@@ -216,7 +216,7 @@ export const Header = ({
         {activeUser && <Button
           // startEnhancer={<Upload />}
           size={SIZE.compact}
-          kind={KIND.primary}
+          kind={KIND.secondary}
           onClick={handleLogout}
           shape={SHAPE.pill}
         >

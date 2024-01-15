@@ -41,7 +41,7 @@ const Container = styled('div', ({$theme}) => ({
     flexDirection: 'column',
     height: '79vh'
   },
-  
+
 }));
 
 const EmptyContainer = styled('div', {
@@ -167,7 +167,7 @@ const Message = ({
       })}
     >
       <ParagraphSmall margin="0" color={theme.colors.contentTertiary}>
-        {role === 'user' ? 'Me:' : 'Mr. Unlimited:'}
+        {role === 'user' ? 'Me:' : 'Guru:'}
       </ParagraphSmall>
       {isLoading ? (
         <Skeleton width="300px" height="20px" animation />

@@ -12,24 +12,9 @@ import random
 cities = ['new-york', 'pittsburgh', 'philadelphia', 'denver', 'washington-dc', 'los-angeles', 'boston', 'chicago']
 for city in cities:
     print(f"Getting reviews for {city}!")
-    review_urls = []
-    for i in range(1, 150):
-        try:
-            url = f"https://www.theinfatuation.com/{city}/reviews?page={i}"
-            page = urlopen(url)
-            html = page.read().decode("utf-8")
-            soup = BeautifulSoup(html, "html.parser")
-            review_urls += [link['href'] for link in soup.html.select('a') if "/reviews/" in link['href']]
-            print(f"Got review URL for page {i}")
-            sleep_time = random.randint(1, 3)
-            print(f"Sleeping for {sleep_time} secs.... Let... Him.. Cook.")
-            time.sleep(sleep_time)
-        except Exception as e:
-            print(f"Exception while scraping infatuation! {e}")
-
-    already_scraped_urls = []
-    # with open('already_scraped_urls.txt', 'r') as file:
-    #     already_scraped_urls = file.read().splitlines()
+    
+    with open(f'already_scraped_urls_{city}.txt', 'r') as file:
+        review_urls = file.read().splitlines()
 
     # with open('already_scraped_urls.pkl', 'rb') as file:
     #     already_scraped_urls = pickle.load(file)
@@ -39,10 +24,6 @@ for city in cities:
     url_prefix = "https://www.theinfatuation.com"
     for count, url in enumerate(tqdm(review_urls)):
         try:
-            # Check if url was already scraped
-            if url in already_scraped_urls:
-                print("Already scraped restaurant from {url}")
-                continue
             review_page = urlopen(f"https://www.theinfatuation.com{url}")
             html = review_page.read().decode("utf-8")
             soup = BeautifulSoup(html, 'lxml')
@@ -130,7 +111,6 @@ for city in cities:
                 }
             )
 
-            already_scraped_urls.append(url)
             print(f"Got review for {resto_name}! Parsed {count + 1} restaurants so far.")
             sleep_time = random.randint(1, 3)
             print(f"Sleeping for {sleep_time} secs.... Let... Him.. Cook.")
@@ -138,13 +118,8 @@ for city in cities:
         except Exception as e:
             print(f"Exception while processing URL {url}: {e}")
         
-    with open(f'already_scraped_urls_{city}.txt', 'w') as file:
-        for item in already_scraped_urls:
-            file.write(str(item) + '\n')
-    # with open('already_scraped_urls.pkl', 'wb') as file:
-    #     pickle.dump(already_scraped_urls, file, protocol=pickle.HIGHEST_PROTOCOL)
 
-    output_file_name = f'infatuation_reviews_v6_{city}'
+    output_file_name = f'infatuation_reviews_v7_{city}'
     # Write infatuation restaurant reviews to pkl and json file
     with open(f'{output_file_name}.pkl', 'wb') as file:
         pickle.dump(resto_reviews, file, protocol=pickle.HIGHEST_PROTOCOL)
