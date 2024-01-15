@@ -177,6 +177,8 @@ const Message = ({
     </div>
   );
 };
+
+
 export const ChatView = ({
   messages,
   setMessages,

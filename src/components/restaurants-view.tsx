@@ -8,6 +8,7 @@ import {
     StyledBody,
     StyledAction
   } from "baseui/card";
+import { StyledLink } from 'baseui/link';
 import {Accordion, Panel} from 'baseui/accordion';
 import { Button, SIZE, KIND as ButtonKIND } from "baseui/button";
 import { StatefulTooltip } from "baseui/tooltip";
@@ -16,6 +17,7 @@ import Image from "next/image";
 import infoIcon from './icons/info_icon_1.png';
 import {Block} from 'baseui/block';
 import {Notification, KIND as NotiKIND} from 'baseui/notification';
+import { ArrowRight, ChevronRight } from 'baseui/icon';
 
 const Container = styled('div', ({$theme}) => ({
   // background: $theme.colors.backgroundPrimary,
@@ -89,6 +91,22 @@ const RecContainer = styled('div', ({$theme}) => ({
   
 }));
 
+const FeatureContainer = styled('div', ({$theme}) => ({
+  padding: '0 0 6px 0',
+  // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+}));
+
+const FeatureGroup = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: '2px',
+  fontWeight: 600 
+});
+
 const FooterContainer = styled('div', ({$theme}) => ({
   display: 'flex',
   gap: '8px',
@@ -99,6 +117,7 @@ const FooterContainer = styled('div', ({$theme}) => ({
   alignItems: 'center',
   height: '5vh'
 }));
+
 
 const notNYC = (city: string) => {
   return city !== 'New York'
@@ -176,6 +195,34 @@ const EmptyState = ({resMode, clickResMode, setResModalIsOpen, userCity, resMode
     
   );
 };
+
+const getMapsUrl = (restoName: string, address: string) => {
+  const isAppleMobileDevice = /iPad|iPhone|iPod/.test(navigator.userAgent);
+  console.log('Apple Device: ', isAppleMobileDevice);
+  // If Apple device, return Apple Maps URL
+  if (isAppleMobileDevice) {
+    return getAppleMapsURL(restoName, address)
+  }
+  // If not, return Google Maps URL
+  else {
+    return getGoogleMapsURL(restoName, address)
+  }
+}
+
+const getAppleMapsURL = (restoName: string, address: string) => {
+  const encodedName = encodeURIComponent(restoName);
+  const encodedAddress = encodeURIComponent(address);
+  const appleMapsUrl = `https://maps.apple.com/?q=${encodedName}+${encodedAddress}`
+  return appleMapsUrl
+  // return 'https://maps.apple.com/?q=Hunan%20Slurp%20112%201st%20Ave,%20New%20York,%20NY%2010009'
+}
+
+const getGoogleMapsURL = (restoName: string, address: string) => {
+  const encodedName = encodeURIComponent(restoName);
+  const encodedAddress = encodeURIComponent(address);
+  const googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodedName}+${encodedAddress}`
+  return googleMapsUrl
+}
 
 export const RestaurantsView = ({
   restoRecs,
@@ -282,17 +329,31 @@ export const RestaurantsView = ({
                   {resto.review}
               </StyledBody>
               <StyledBody>
-                  {resto.nbrhood}&nbsp;&nbsp;|&nbsp;&nbsp;{resto.priceRange}&nbsp;&nbsp; 
-                  {/* Put Maps link here!
-                  <a href={resto.websiteUrl} target="_blank">
-                    {resto.restoName} Website
-                  </a> */}
-                  {/* <a href="https://maps.apple.com/?q=Hunan+Slurp+112+1st+Ave,+New+York,+NY+10009" target="_blank">Open in Apple Maps</a>
-                  <a href="https://www.google.com/maps/search/?api=1&query=Hunan%20Slurp+112%201st%20Ave,%20New%20York,%20NY%2010009" target="_blank">Open in Google Maps</a> */}
+                <FeatureContainer>
+                  <FeatureGroup>
+                    {resto.nbrhood}&nbsp;&nbsp;|&nbsp;&nbsp;{resto.priceRange}&nbsp;&nbsp;
+                  </FeatureGroup>
+                  <FeatureGroup>
+                    <StyledLink 
+                      as="a"
+                      href={getMapsUrl(resto.restoName, resto.address)} 
+                      target="_blank"
+                      style={{ 
+                        color: '#5B91F5', 
+                        fontWeight: 700, 
+                        display: 'flex',
+                        alignItems: 'center' }}
+                    >
+                      Maps {<ChevronRight size={18} />}
+                    </StyledLink>
+                  </FeatureGroup>
+                </FeatureContainer>
+                  {/* <a href="https://maps.apple.com/?q=Hunan%20Slurp%20112%201st%20Ave,%20New%20York,%20NY%2010009" target="_blank">Open in Apple Maps</a> */}
+                  {/* <a href="https://www.google.com/maps/search/?api=1&query=Ray%27s+177%20Chrystie%20St,%20NY,%20New%20York%2010002" target="_blank">Open in Google Maps</a> */}
               </StyledBody>
               <StyledAction>
                   <Button
-                    overrides={{BaseButton: {style: {width: '100%'}}}} 
+                    overrides={{BaseButton: {style: {width: '100%', borderRadius:'8px'}}}} 
                     onClick={resto.resyUrl ? () => window.open(resto.resyUrl, '_blank') : () => window.open(resto.websiteUrl, '_blank')}
                     disabled={!resto.resyUrl && !resto.websiteUrl}
                   >

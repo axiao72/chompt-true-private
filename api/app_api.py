@@ -139,11 +139,16 @@ def chat(vision: IdealMeal):
                                         'review_date': rec['review_date'],
                                         'city': rec['city']
                                     }))
-            # Only do this while we're still generating/adding summaries
+            # If-else in case we're in process of adding/generating more summaries
             if 'summarized_review' in full_review_doc[0]:
                 full_review = full_review_doc[0]['summarized_review']
             else:
                 full_review = full_review_doc[0]['text']
+            # Get location data to format Maps url on frontend as well
+            if 'geo' in full_review_doc[0]:
+                full_address = full_review_doc[0]['geo']['fullAddress']
+            else:
+                full_address = ''
             # Add desired fields to return to frontend
             restos_list.append({
                 'resto_name': capitalize_resto_name(rec['resto_name']),
@@ -152,7 +157,8 @@ def chat(vision: IdealMeal):
                 'price_range': rec['price_range'],
                 'image_url': rec['image_url'],
                 'website': rec['resto_website'],
-                'neighborhood': rec['neighborhood'].title()
+                'neighborhood': rec['neighborhood'].title(),
+                'full_address': full_address
             })
             if 'resy_venue_url' in rec:
                 if vision.res_mode_on:
