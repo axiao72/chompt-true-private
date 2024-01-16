@@ -26,12 +26,28 @@ const Container = styled('div', ({$theme}) => ({
   // flexDirection: 'column',
   // height: '65vh'
   
-  '@media only screen and (max-width: 650px)': {
+  // '@media only screen and (max-width: 650px)': {
+  //   background: $theme.colors.backgroundPrimary,
+  //   overflow: 'auto',
+  //   display: 'flex',
+  //   flexDirection: 'column',
+  //   height: '65vh'
+  // },
+
+  '@media only screen and (max-width: 650px) and (max-height: 719px)': {
     background: $theme.colors.backgroundPrimary,
     overflow: 'auto',
     display: 'flex',
     flexDirection: 'column',
     height: '65vh'
+  },
+
+  '@media only screen and (max-width: 650px) and (min-height: 720px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '68vh'
   },
 
   '@media only screen and (min-width: 651px) and (max-width: 1024px)': {
