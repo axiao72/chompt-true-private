@@ -9,7 +9,16 @@ from tqdm.auto import tqdm
 from lxml import html
 import random
 
-cities = ['new-york', 'pittsburgh', 'philadelphia', 'denver', 'washington-dc', 'los-angeles', 'boston', 'chicago']
+cities = [
+    # 'new-york', 
+    # 'pittsburgh', 
+    # 'philadelphia', 
+    # 'denver', 
+    # 'washington-dc', 
+    'los-angeles', 
+    'boston', 
+    'chicago'
+    ]
 for city in cities:
     print(f"Getting reviews for {city}!")
     
