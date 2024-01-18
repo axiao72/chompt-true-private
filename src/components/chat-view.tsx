@@ -8,6 +8,7 @@ import React from 'react';
 import {Document, Message, RestoRec} from '../pages';
 import {StyledLink} from 'baseui/link';
 
+
 const Container = styled('div', ({$theme}) => ({
 
   // '@media only screen and (max-width: 650px)': {
@@ -109,7 +110,7 @@ const HeaderContainer = styled('div', ({$theme}) => ({
   height: '10px'
 }));
 
-const InputBar = ({input, setInput, sendQuery}) => {
+const InputBar = ({input, setInput, sendQuery, chatIsLoading}) => {
   const [, theme] = useStyletron();
   return (
     <InputContainer>
@@ -130,7 +131,7 @@ const InputBar = ({input, setInput, sendQuery}) => {
             }
           }}
         />
-        <Button type="submit" onClick={sendQuery}
+        <Button type="submit" onClick={sendQuery} isLoading={chatIsLoading}
           overrides={{
             BaseButton: {
                 style: ({ $theme }) => ({
@@ -145,7 +146,7 @@ const InputBar = ({input, setInput, sendQuery}) => {
   );
 };
 
-const EmptyState = ({input, setInput, sendQuery}) => {
+const EmptyState = ({input, setInput, sendQuery, chatIsLoading}) => {
   const [, theme] = useStyletron();
   return (
     <Container>
@@ -154,7 +155,12 @@ const EmptyState = ({input, setInput, sendQuery}) => {
           Can't pick a spot? Tell me what's on your mind, I got you.
         </ParagraphSmall>
       </EmptyContainer>
-      <InputBar input={input} setInput={setInput} sendQuery={sendQuery}/>
+      <InputBar 
+        input={input} 
+        setInput={setInput} 
+        sendQuery={sendQuery} 
+        chatIsLoading={chatIsLoading}
+      />
     </Container>
   );
 };
@@ -229,7 +235,12 @@ export const ChatView = ({
   
   // Render an Empty state component which displays a helpful message
   if (messages.length === 0) {
-    return <EmptyState input={input} setInput={setInput} sendQuery={sendQuery}/>;
+    return <EmptyState 
+      input={input} 
+      setInput={setInput} 
+      sendQuery={sendQuery}
+      chatIsLoading={chatIsLoading}
+    />;
   }
 
   const handleReset = () => {
@@ -264,7 +275,12 @@ export const ChatView = ({
           );
       })}
       </MessagesContainer>
-      <InputBar input={input} setInput={setInput} sendQuery={sendQuery}/>
+      <InputBar 
+        input={input} 
+        setInput={setInput} 
+        sendQuery={sendQuery}
+        chatIsLoading={chatIsLoading}
+      />
     </Container>
   );
 };

@@ -80,8 +80,21 @@ async def find_user_by_username(username: str):
     mongo_users = DB['users']
     user = mongo_users.find_one({'username': username})
     if not user:
+        print(f"Error in find_user_by_username", file=sys.stderr)
         raise Exception("Username not found.")
     else:
         print(f"User {username} found!", file=sys.stderr)
         return user
+    
+
+async def find_user_by_uuid(uuid: str):
+    DB = connect_to_mongo()
+    mongo_sessions = DB['sessions']
+    user_session = mongo_sessions.find_one({'uuid': uuid})
+    if not user_session:
+        print(f"Error in find_user_by_uuid", file=sys.stderr)
+        raise Exception(f"User session not found with UUID: {uuid}.")
+    else:
+        print(f"Session for {user_session['username']} found!", file=sys.stderr)
+        return user_session
         

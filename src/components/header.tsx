@@ -85,6 +85,7 @@ export const Header = ({
   setLoginModalIsOpen,
   setSignupModalIsOpen,
   setCityModalIsOpen,
+  setProfileModalIsOpen,
   messages,
   setMessages,
   activeUser,
@@ -97,6 +98,7 @@ export const Header = ({
   setLoginModalIsOpen: (isOpen: boolean) => void;
   setSignupModalIsOpen: (isOpen: boolean) => void;
   setCityModalIsOpen: (isOpen: boolean) => void;
+  setProfileModalIsOpen: (isOpen: boolean) => void;
   messages: Message[];
   setMessages: (messageArray: Message[]) => void;
   activeUser: User;
@@ -113,11 +115,12 @@ export const Header = ({
 
   const handleLogout = () => {
     // Log user out (Finish implementing!)
-    setActiveUser(null);
+    setActiveUser({'username': 'chompt_guest'});
   };
 
   const handleAvatarClick = () => {
     console.log('clicked avatar!')
+    setProfileModalIsOpen(true);
   }
 
   return (
@@ -176,7 +179,7 @@ export const Header = ({
         >
           Reset
         </Button> */}
-        {!activeUser && <Button
+        {activeUser.username === 'chompt_guest' && <Button
           // startEnhancer={<Upload />}
           size={SIZE.compact}
           kind={KIND.tertiary}
@@ -185,7 +188,7 @@ export const Header = ({
         >
           Log in
         </Button>}
-        {!activeUser && <Button
+        {activeUser.username === 'chompt_guest' && <Button
           // startEnhancer={<Upload />}
           size={SIZE.compact}
           kind={KIND.primary}
@@ -194,7 +197,7 @@ export const Header = ({
         >
           Sign up
         </Button>}
-        {activeUser && <Button onClick={handleAvatarClick} kind={KIND.tertiary} size={SIZE.default} shape={SHAPE.circle} overrides={{
+        {activeUser.username !== 'chompt_guest' && <Button onClick={handleAvatarClick} kind={KIND.tertiary} size={SIZE.default} shape={SHAPE.circle} overrides={{
             BaseButton: {
               style: ({ $theme }) => ({
                 border: 'none',
@@ -213,7 +216,7 @@ export const Header = ({
           />
         </Button>
         }
-        {activeUser && <Button
+        {activeUser.username !== 'chompt_guest' && <Button
           // startEnhancer={<Upload />}
           size={SIZE.compact}
           kind={KIND.secondary}

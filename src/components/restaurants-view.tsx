@@ -1,7 +1,7 @@
 import {styled, useStyletron} from 'baseui';
 import {ParagraphSmall} from 'baseui/typography';
-import {NAV_HEIGHT, type Document, RestoRec} from '../pages';
-import {useState, useEffect, useRef} from 'react';
+import {NAV_HEIGHT, type Document, RestoRec, User} from '../pages';
+import {useState, useEffect, useRef, useCallback} from 'react';
 import * as React from 'react';
 import {
     Card,
@@ -18,6 +18,8 @@ import infoIcon from './icons/info_icon_1.png';
 import {Block} from 'baseui/block';
 import {Notification, KIND as NotiKIND} from 'baseui/notification';
 import { ArrowRight, ChevronRight } from 'baseui/icon';
+import ReactGA from 'react-ga';
+
 
 const Container = styled('div', ({$theme}) => ({
   // background: $theme.colors.backgroundPrimary,
@@ -250,6 +252,7 @@ export const RestaurantsView = ({
   usedBoth,
   usedNeighborhood,
   usedCuisine,
+  activeUser,
   userCity,
   resModeToggleColor,
   setResModeToggleColor
@@ -263,6 +266,7 @@ export const RestaurantsView = ({
   usedBoth: boolean;
   usedNeighborhood: boolean;
   usedCuisine: boolean;
+  activeUser: User;
   userCity: string;
   resModeToggleColor: string;
   setResModeToggleColor: (color: string) => void;
@@ -287,6 +291,65 @@ export const RestaurantsView = ({
     // To keep track of res mode notification
     setChangedModes(true);
   };
+
+  const clickBookRes = useCallback(async (resto: RestoRec) => {
+    const currentDate = new Date();
+    const dateString = currentDate.toISOString();
+    if (resto.resyUrl) {
+      window.open(resto.resyUrl, '_blank')
+      ReactGA.event({
+        category: 'button_click',
+        action: 'clicked_book_reservation',
+        label: resto.resyUrl
+      });
+      const eventData = {
+        'event': 'button_click',
+        'name': 'book_reservation',
+        'value': resto.resyUrl,
+        'date': dateString,
+        'username': activeUser.username,
+        'user_city': userCity.toLowerCase()
+      };
+      console.log('Event Data: ', eventData);
+      const mongoResp = await fetch('/api/track_event', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(eventData)
+      });
+      const mongoRespJson = await mongoResp.json();
+      console.log('Logged event in Mongo: ', mongoRespJson.success)
+    }
+    else {
+      window.open(resto.websiteUrl, '_blank')
+      ReactGA.event({
+        category: 'button_click',
+        action: 'clicked_book_reservation',
+        label: resto.websiteUrl
+      });
+      const eventData = {
+        'event': 'button_click',
+        'name': 'book_reservation',
+        'value': resto.websiteUrl,
+        'date': dateString,
+        'username': activeUser.username,
+        'user_city': userCity.toLowerCase()
+      };
+      console.log('Event Data: ', eventData);
+      const mongoResp = await fetch('/api/track_event', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-type': 'application/json'
+        },
+        body: JSON.stringify(eventData)
+      });
+      const mongoRespJson = await mongoResp.json();
+      console.log('Logged event in Mongo: ', mongoRespJson.success)
+    }
+  }, [restoRecs]);
 
   console.log(usedReservations);
 
@@ -370,7 +433,7 @@ export const RestaurantsView = ({
               <StyledAction>
                   <Button
                     overrides={{BaseButton: {style: {width: '100%', borderRadius:'8px'}}}} 
-                    onClick={resto.resyUrl ? () => window.open(resto.resyUrl, '_blank') : () => window.open(resto.websiteUrl, '_blank')}
+                    onClick={() => clickBookRes(resto)}
                     disabled={!resto.resyUrl && !resto.websiteUrl}
                   >
                       Book Reservation

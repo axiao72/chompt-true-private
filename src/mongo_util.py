@@ -214,3 +214,18 @@ def get_search_pipeline(index: str, embedded_query, num_candidates: int, limit: 
         }
     ]
     return pipeline
+
+
+async def add_session(uuid: str, username: str):
+    try:
+        DB = connect_to_mongo()
+        mongo_sessions = DB['sessions']
+        session = {
+            'uuid': uuid,
+            'username': username
+        }
+        insert_result = mongo_sessions.insert_one(session)
+        print(f'Created new session for {username}', file=sys.stderr)
+        return insert_result
+    except Exception as e:
+        raise(e)

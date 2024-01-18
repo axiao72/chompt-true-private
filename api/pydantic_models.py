@@ -10,7 +10,7 @@ class IdealMeal(BaseModel):
     res_time: str = None  # eg. '19:00' (7:00 pm)
     party_size: int = None
     # Optional, defaults to 'guest'
-    username: str = 'guest'
+    username: str = 'chompt_guest'
 
 class User(BaseModel):
     username: str
@@ -21,3 +21,12 @@ class User(BaseModel):
 class LoginCredentials(BaseModel):
     username: str
     password: str
+
+
+class Event(BaseModel):
+    event: str
+    name: str
+    value: str
+    date: str
+    username: str
+    user_city: str

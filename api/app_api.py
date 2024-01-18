@@ -27,8 +27,9 @@ async def signup(user: User, response: Response):
     try:
         new_user = await signup_user(user)
         # Generate uuid for session and add to session cookies
-        generated_uuid = uuid.uuid4()
+        generated_uuid = str(uuid.uuid4())
         response.set_cookie(key='session_uuid', value=generated_uuid)
+        session = await add_session(generated_uuid, new_user['username'])
         return {
             'username': new_user['username'],
             'firstName': new_user['firstName'],
@@ -41,7 +42,7 @@ async def signup(user: User, response: Response):
         # Implement exception
         return {
             'success': False,
-            'error': e
+            'error': str(e)
         }
 
 
@@ -51,8 +52,10 @@ async def login(credentials: LoginCredentials, response: Response):
         user = await login_user(credentials)
         print(f"User from app_api: {user}")
         # Generate uuid for session and add to session cookies
-        generated_uuid = uuid.uuid4()
+        generated_uuid = str(uuid.uuid4())
         response.set_cookie(key='session_uuid', value=generated_uuid)
+        print(f"Generated session uuid: {generated_uuid}", file=sys.stderr)
+        session = await add_session(generated_uuid, user['username'])
         return {
             'username': user['username'],
             'firstName': user['firstName'],
@@ -64,11 +67,11 @@ async def login(credentials: LoginCredentials, response: Response):
     except Exception as e:
         return {
             'success': False,
-            'error': e
+            'error': str(e)
         }
 
 
-@app.post("/api/get_mongo_user/{username}")
+@app.post("/api/get_mongo_user_by_username/{username}")
 async def get_mongo_user_by_username(username: str):
     try:
         user = await find_user_by_username(username)
@@ -78,6 +81,44 @@ async def get_mongo_user_by_username(username: str):
             'lastName': user['lastName'],
             'inputs': user['inputs'],
             'resyClicks': user['resyClicks'],
+            'success': True
+        }
+    except Exception as e:
+        return {
+            'success': False,
+            'error': str(e)
+        }
+    
+
+@app.post("/api/get_mongo_user_from_uuid/{uuid}")
+async def get_mongo_user_by_uuid(uuid: str):
+    try:
+        user_session = await find_user_by_uuid(uuid)
+        user = await find_user_by_username(user_session['username'])
+        return {
+            'username': user['username'],
+            'firstName': user['firstName'],
+            'lastName': user['lastName'],
+            'inputs': user['inputs'],
+            'resyClicks': user['resyClicks'],
+            'success': True
+        }
+    except Exception as e:
+        return {
+            'success': False,
+            'error': str(e)
+        }
+    
+
+@app.post("/api/track_event")
+async def track_activity(event: Event):
+    try:
+        DB = connect_to_mongo()
+        mongo_events = DB['events']
+        event_data = dict(event)
+        print(event_data, file=sys.stderr)
+        mongo_events.insert_one(event_data)
+        return {
             'success': True
         }
     except Exception as e:

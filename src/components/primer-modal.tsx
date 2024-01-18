@@ -33,21 +33,27 @@ export const PrimerModal = ({
     setIsOpen(false);
   };
   return (
-    <Modal onClose={handleClose} closeable isOpen={isOpen} animate autoFocus={false}>
+    <Modal 
+      onClose={handleClose} 
+      closeable={false} 
+      isOpen={isOpen} 
+      animate 
+      autoFocus={false}
+    >
       <ModalHeader>Welcome to Chompt! </ModalHeader>
       <ModalBody>
         <ParagraphMedium color={theme.colors.contentSecondary}>
-          Beyond excited to have you 🤩
+          So glad you could make it.
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
-          To get started, type in as detailed of a dining description as you'd like 
-          and you'll receive 3 restaurant recommendations.
+          Once you're logged in, type in as detailed of a dining description as you'd like 
+          and you will receive up to 3 restaurant recommendations.
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
           If you need some inspiration, think about something like 
           "Getting dinner on a Friday night with a group of friends and 
           we want Italian food. We are also going out after so we want a 
-          place with good music and drinks." Let your imagination free and have fun with it.
+          place with good music and drinks." Please - have fun with it.
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
           Feel free to {' '}
@@ -70,7 +76,7 @@ export const PrimerModal = ({
           >
             sign up
           </StyledLink>
-          {' '} to join the party, we'll be getting more and more personalized as we go 🫡
+          {' '} to join the party, we'll be getting more and more personalized as we go.
         </ParagraphMedium>
       </ModalBody>
       <ModalFooter>
@@ -90,6 +96,39 @@ export const PrimerModal = ({
             >
                 Continue as guest
             </Button>
+            {/* <Button
+                size={SIZE.default}
+                kind="primary"  
+                onClick={handleLogin} 
+                shape={SHAPE.default}
+                // endEnhancer={<ArrowRight/>}
+                overrides={{
+                    BaseButton: {
+                        style: ({ $theme }) => ({
+                            borderRadius:'8px',
+                        })
+                    }
+                }}
+            >
+                Log in
+            </Button>
+            &nbsp;&nbsp; or &nbsp;&nbsp;
+            <Button
+                size={SIZE.default}
+                kind="secondary"  
+                onClick={handleSignup} 
+                shape={SHAPE.default}
+                // endEnhancer={<ArrowRight/>}
+                overrides={{
+                    BaseButton: {
+                        style: ({ $theme }) => ({
+                            borderRadius:'8px',
+                        })
+                    }
+                }}
+            >
+                Join the party
+            </Button> */}
         </ModalFooter>
     </Modal>
   );

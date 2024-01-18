@@ -10,6 +10,7 @@ import {LoginModal} from '../components/login-modal';
 import {SignupModal} from '../components/signup-modal';
 import {ResModal} from '../components/res-modal';
 import {CityModal} from '../components/city-modal';
+import {ProfileModal} from '../components/profile-modal';
 import {
   Tabs,
   Tab,
@@ -18,6 +19,10 @@ import {
   StyledTabPanel,
 } from 'baseui/tabs-motion';
 import {Grid, Cell} from 'baseui/layout-grid';
+import ReactGA from 'react-ga4';
+
+ReactGA.initialize('G-0DKDCC3XSH');
+
 
 const Page = styled('div', ({$theme}) => ({
   position: 'absolute',
@@ -70,9 +75,9 @@ export type ReservationCriteria = {
 
 export type User = {
   username: string;
-  firstName: string;
-  lastName: string;
-}
+  firstName ? : string;
+  lastName ? : string;
+};
 
 
 const Index = () => {
@@ -87,6 +92,7 @@ const Index = () => {
   const [signupModalIsOpen, setSignupModalIsOpen] = useState(false);
   const [primerModalIsOpen, setPrimerModalIsOpen] = useState(false);
   const [cityModalIsOpen, setCityModalIsOpen] = useState(false);
+  const [profileModalIsOpen, setProfileModalIsOpen] = useState(false);
   // Set the defaults to today's date and a time!
   // const currentDate = new Date();
   const [resCriteria, setResCriteria] = useState<ReservationCriteria>(null);
@@ -94,16 +100,16 @@ const Index = () => {
   const [usedBoth, setUsedBoth] = useState(true);
   const [usedNeighborhood, setUsedNeighborhood] = useState(true);
   const [usedCuisine, setUsedCuisine] = useState(true);
-  const [activeUser, setActiveUser] = useState<User>(null);
+  const [activeUser, setActiveUser] = useState<User>({username: 'chompt_guest'});
   const [activeKey, setActiveKey] = useState<React.Key>(0);
   const [chatIsLoading, setChatIsLoading] = useState(false);
   const [userCoordinates, setUserCoordinates] = useState(null);
   const [userCity, setUserCity] = useState('New York');
 
-  const getUser = async (username) => {
-    console.log("Getting user from cookies: ", username);
+  const getUserFromUUID = async (uuid) => {
+    console.log("Getting user from cookies session uuid: ", uuid);
     // Log user in using username and password
-    const response = await fetch(`/api/get_mongo_user/${username}`, {
+    const response = await fetch(`/api/get_mongo_user_from_uuid/${uuid}`, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
@@ -134,13 +140,14 @@ const Index = () => {
   useEffect(() => {
     // Get username from cookies if available
     if (typeof window !== 'undefined') {
-      const cookie_username = document.cookie.replace(/(?:(?:^|.*;\s*)chompt_username\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-      console.log('Cookie Username: ', cookie_username, ' !!!');
-      if (cookie_username !== '') {
-        getUser(cookie_username);
+      const cookie_uuid = document.cookie.replace(/(?:(?:^|.*;\s*)session_uuid\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+      console.log('Cookie Username: ', cookie_uuid, ' !!!');
+      if (cookie_uuid !== '') {
+        getUserFromUUID(cookie_uuid);
       }
       else {
-        console.log('No username in cookies :(');
+        console.log('No username in cookies, user staysssss chompt_guest');
+        // setActiveUser("chompt_guest"); Don't think i need this, setting activeUser default value as 'chompt_guest'
       }
     }
 
@@ -182,7 +189,7 @@ const Index = () => {
     }
 
     // Open primer modal to give user rundown if not already an active user
-    if (activeUser === null) {
+    if (activeUser.username === 'chompt_guest') {
       setPrimerModalIsOpen(true)
     }
   }, []);
@@ -191,9 +198,16 @@ const Index = () => {
   console.log(`User city set to: ${userCity}`);
 
   const sendQuery = useCallback(async () => {
+    const currentDate = new Date();
+    const dateString = currentDate.toISOString();
     if (!restoRecs) {
       return;
     }
+    ReactGA.event({
+      category: 'button_click',
+      action: 'sent_query',
+      label: input
+    });
     setChatIsLoading(true);
     setUsedReservations(true);
     setUsedBoth(true);
@@ -210,10 +224,26 @@ const Index = () => {
       },
     ]);
     console.log(input)
-    // console.log('Date: ', resCriteria.date)
-    // console.log('Time: ', resCriteria.time)
-    // console.log('Party Size: ', resCriteria.partySize)  
     console.log('Reservation Criteria: ', resCriteria)
+    const eventData = {
+      'event': 'button_click',
+      'name': 'sent_query',
+      'value': input,
+      'date': dateString,
+      'username': activeUser.username,
+      'user_city': userCity.toLowerCase()
+    };
+    console.log('Event Data: ', eventData);
+    const mongoResp = await fetch('/api/track_event', {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify(eventData)
+    });
+    const mongoRespJson = await mongoResp.json();
+    console.log('Logged event in Mongo: ', mongoRespJson.success)
     let idealMealData = {}
     // If Reservation Mode is on, add the criteria to request payload object
     if (resMode) {
@@ -234,9 +264,8 @@ const Index = () => {
         "res_mode_on": resMode,
       };
     }
-    if (activeUser) {
-      idealMealData['username'] = activeUser.username;
-    }
+    idealMealData['username'] = activeUser.username;
+    
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
@@ -337,6 +366,14 @@ const Index = () => {
         setUserCity={setUserCity}
       >
       </CityModal>
+      <ProfileModal
+        isOpen={profileModalIsOpen}
+        setIsOpen={setProfileModalIsOpen}
+        setLoginModalIsOpen={setLoginModalIsOpen}
+        activeUser={activeUser}
+        setActiveUser={setActiveUser}
+      >
+      </ProfileModal>
       <ResModal
         isOpen={resModalIsOpen}
         setIsOpen={setResModalIsOpen}
@@ -354,6 +391,7 @@ const Index = () => {
         setLoginModalIsOpen={setLoginModalIsOpen}
         setSignupModalIsOpen={setSignupModalIsOpen}
         setCityModalIsOpen={setCityModalIsOpen}
+        setProfileModalIsOpen={setProfileModalIsOpen}
         messages={messages}
         setMessages={setMessages}
         activeUser={activeUser}
@@ -402,6 +440,7 @@ const Index = () => {
             usedBoth={usedBoth}
             usedNeighborhood={usedNeighborhood}
             usedCuisine={usedCuisine}
+            activeUser={activeUser}
             userCity={userCity}
             resModeToggleColor={resModeToggleColor}
             setResModeToggleColor={setResModeToggleColor}

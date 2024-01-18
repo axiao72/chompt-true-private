@@ -59,33 +59,35 @@ for city in cities:
             latitude = resto['latitude']
             longitude = resto['longitude']
             # Mongo location field structure
-            location_data = {
-                'geo': {
-                    'addressCountry': address_country,
-                    'addressCity': address_city,
-                    'addressState': address_state,
-                    'addressZipCode': address_zip_code,
-                    'streetAddress': street_address,
-                    'fullAddress': full_address,
-                    'latitude': latitude,
-                    'longitude': longitude
+            location_data = {"$set": {
+                    'geo': {
+                        'addressCountry': address_country,
+                        'addressCity': address_city,
+                        'addressState': address_state,
+                        'addressZipCode': address_zip_code,
+                        'streetAddress': street_address,
+                        'fullAddress': full_address,
+                        'latitude': latitude,
+                        'longitude': longitude
+                    }
                 }
             }
-            
-            # Loop through review docs for this exact review and update with location data 
-            cursor = mongo_reviews.find({
-                'resto_name': cleaned_resto_name,
-                'cuisine': cuisine,
-                'perfect_for_tags': cleaned_resto_tags,
-                'price_range': resto['price_range'],
-                'review_date': review_date,
-                'image_url': resto['resto_image'],
-                'resto_website': resto['resto_website'],
-                'neighborhood': neighborhood
-            })
-            for doc in cursor:
-                mongo_reviews.update_one({'_id': doc['_id']}, 
-                                        {"$set": location_data})
+
+            # resto_filter = {
+            #     'resto_name': cleaned_resto_name,
+            #     'cuisine': cuisine,
+            #     'perfect_for_tags': cleaned_resto_tags,
+            #     'price_range': resto['price_range'],
+            #     'review_date': review_date,
+            #     'image_url': resto['resto_image'],
+            #     'resto_website': resto['resto_website'],
+            #     'neighborhood': neighborhood
+            # }
+            resto_filter = {
+                'text': cleaned_review
+            }
+    
+            mongo_reviews.update_many(resto_filter, location_data)
             
         except Exception as e:
             print(f"Exception while storing {cleaned_resto_name}: {e}")
