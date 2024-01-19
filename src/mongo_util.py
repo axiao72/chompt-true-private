@@ -8,7 +8,9 @@ from src.resy_util import *
 def connect_to_mongo():
     # Connect to Mongo chompt database and return database object
     try:
-        MONGO_CLIENT = pymongo.MongoClient("mongodb+srv://axiao72:McSplash7013$@chomptcluster.k5sqjpd.mongodb.net/?retryWrites=true&w=majority")
+        MONGO_CLIENT = pymongo.MongoClient('mongodb+srv://axiao72:McSplash7013$@chomptcluster.k5sqjpd.mongodb.net/?retryWrites=true&w=majority')
+        # MONGO_CLIENT = pymongo.MongoClient(os.environ.get('MONGO_CONNECTION_STRING'))
+        # print(os.environ.get('MONGO_CONNECTION_STRING'), file=sys.stderr)
         DB = MONGO_CLIENT.chompt
         print("Connected to Mongo!")
         return DB
