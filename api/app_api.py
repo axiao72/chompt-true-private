@@ -71,6 +71,22 @@ async def login(credentials: LoginCredentials, response: Response):
         }
 
 
+# Clears session UUID from cookies
+@app.post("/api/logout")
+async def logout(response: Response):
+    try:
+        response.delete_cookie(key='session_uuid')  
+        return {
+            'success': True,
+            'message': 'Cleared cookie!'
+        }
+    except Exception as e:
+        return {
+            'success': False,
+            'error': str(e)
+        }
+
+
 @app.post("/api/get_mongo_user_by_username/{username}")
 async def get_mongo_user_by_username(username: str):
     try:

@@ -125,6 +125,7 @@ const Index = () => {
         };
         console.log(loggedInUser.username);
         setActiveUser(loggedInUser);
+        setPrimerModalIsOpen(false);
     }
     else {
         console.log(responseJson.error);
@@ -146,7 +147,7 @@ const Index = () => {
         getUserFromUUID(cookie_uuid);
       }
       else {
-        console.log('No username in cookies, user staysssss chompt_guest');
+        console.log('No uuid in cookies, user staysssss chompt_guest');
         // setActiveUser("chompt_guest"); Don't think i need this, setting activeUser default value as 'chompt_guest'
       }
     }

@@ -27,12 +27,25 @@ export const ProfileModal = ({
     const handleClose = () => {
       setIsOpen(false);
     };
-    const handleLogout = () => {
-        setActiveUser({'username': 'chompt_guest'});
-        const pastDate = new Date(0);
-        document.cookie = `session_uuid=; expires=${pastDate.toUTCString()};`;
-        setIsOpen(false);
-    };
+    const handleLogout = useCallback(async () => {
+        const response = await fetch('/api/logout', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-type': 'application/json'
+            },
+        });
+        const responseJson = await response.json();
+        if (responseJson.success) {
+            setActiveUser({'username': 'chompt_guest'});
+            setIsOpen(false);
+        }
+        else {
+            console.log('Error clearing session from cookie (log out): ', responseJson.error);
+        }
+        // const pastDate = new Date(0);
+        // document.cookie = `session_uuid=; expires=${pastDate.toUTCString()};`;
+    }, [activeUser]);
 
     return (
       <Modal 

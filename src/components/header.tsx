@@ -216,7 +216,7 @@ export const Header = ({
           />
         </Button>
         }
-        {activeUser.username !== 'chompt_guest' && <Button
+        {/* {activeUser.username !== 'chompt_guest' && <Button
           // startEnhancer={<Upload />}
           size={SIZE.compact}
           kind={KIND.secondary}
@@ -224,7 +224,7 @@ export const Header = ({
           shape={SHAPE.pill}
         >
           Logout
-        </Button>}
+        </Button>} */}
       </Group>
     </Container>
   );
