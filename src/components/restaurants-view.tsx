@@ -18,7 +18,7 @@ import infoIcon from './icons/info_icon_1.png';
 import {Block} from 'baseui/block';
 import {Notification, KIND as NotiKIND} from 'baseui/notification';
 import { ArrowRight, ChevronRight } from 'baseui/icon';
-import ReactGA from 'react-ga';
+import ReactGA from 'react-ga4';
 
 
 const Container = styled('div', ({$theme}) => ({
