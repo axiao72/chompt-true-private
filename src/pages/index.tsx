@@ -325,7 +325,7 @@ const Index = () => {
       <Head>
         <title>chompt</title>
         {/* Google tag (gtag.js) */}
-        <script async src={"https://www.googletagmanager.com/gtag/js?id=G-0DKDCC3XSH"}/>
+        <script async src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GA_ID}`}/>
         <script
           dangerouslySetInnerHTML={{
             __html: `
@@ -333,7 +333,7 @@ const Index = () => {
               function gtag(){dataLayer.push(arguments);}
               gtag('js', new Date());
 
-              gtag('config', ${process.env.NEXT_PUBLIC_GA_ID});
+              gtag('config', '${process.env.NEXT_PUBLIC_GA_ID}');
             `,
           }}
         />
