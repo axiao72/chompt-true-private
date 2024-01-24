@@ -163,7 +163,7 @@ const Index = () => {
 
           // Use latitude and longitude to get city location through OpenCage
           const opencageApiKey = process.env.NEXT_PUBLIC_OPENCAGE_API_KEY;
-          console.log(process.env.NEXT_PUBLIC_OPENCAGE_API_KEY);
+          // console.log(process.env.NEXT_PUBLIC_OPENCAGE_API_KEY);
           // const opencageApiKey = '615ffe469cda4821adb01bd362b5692e';
           const opencageApiUrl = `https://api.opencagedata.com/geocode/v1/json?q=${latitude}+${longitude}&key=${opencageApiKey}`;
 
