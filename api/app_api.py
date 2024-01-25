@@ -28,7 +28,9 @@ async def signup(user: User, response: Response):
         new_user = await signup_user(user)
         # Generate uuid for session and add to session cookies
         generated_uuid = str(uuid.uuid4())
+        print(f"Generated session uuid: {generated_uuid}", file=sys.stderr)
         response.set_cookie(key='session_uuid', value=generated_uuid)
+        response.set_cookie(key='chompt_username', value=new_user['username'])
         session = await add_session(generated_uuid, new_user['username'])
         return {
             'username': new_user['username'],
@@ -53,8 +55,9 @@ async def login(credentials: LoginCredentials, response: Response):
         print(f"User from app_api: {user}")
         # Generate uuid for session and add to session cookies
         generated_uuid = str(uuid.uuid4())
-        response.set_cookie(key='session_uuid', value=generated_uuid)
         print(f"Generated session uuid: {generated_uuid}", file=sys.stderr)
+        response.set_cookie(key='session_uuid', value=generated_uuid)
+        response.set_cookie(key='chompt_username', value=user['username'])
         session = await add_session(generated_uuid, user['username'])
         return {
             'username': user['username'],
@@ -76,9 +79,10 @@ async def login(credentials: LoginCredentials, response: Response):
 async def logout(response: Response):
     try:
         response.delete_cookie(key='session_uuid')  
+        response.delete_cookie(key='chompt_username')
         return {
             'success': True,
-            'message': 'Cleared cookie!'
+            'message': 'Cleared cookies!'
         }
     except Exception as e:
         return {

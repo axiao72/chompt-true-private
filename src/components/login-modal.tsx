@@ -9,17 +9,25 @@ import type {User} from '../pages';
 export const LoginModal = ({
     isOpen,
     signupModalIsOpen,
+    primerModalIsOpen,
     setIsOpen,
     setSignupModalIsOpen,
+    setPrimerModalIsOpen,
     activeUser,
     setActiveUser,
+    primerModalClosed,
+    setPrimerModalClosed
   }: {
     isOpen: boolean;
     signupModalIsOpen: boolean
+    primerModalIsOpen: boolean
     setIsOpen: (isOpen: boolean) => void;
     setSignupModalIsOpen: (isOpen: boolean) => void;
+    setPrimerModalIsOpen: (isOpen: boolean) => void;
     activeUser: User;
     setActiveUser: (user: User) => void;
+    primerModalClosed: boolean;
+    setPrimerModalClosed: (closed: boolean) => void;
   }) => {
     const [, theme] = useStyletron();
     const [username, setUsername] = useState('');
@@ -28,6 +36,9 @@ export const LoginModal = ({
 
     const handleClose = () => {
       setIsOpen(false);
+      if (!primerModalClosed) {
+        setPrimerModalIsOpen(true);
+      }
     };
     const handleSignup = () => {
         setIsOpen(false);
@@ -60,6 +71,9 @@ export const LoginModal = ({
             console.log(loggedInUser.username);
             setActiveUser(loggedInUser);
             setIsOpen(false);
+            if (!primerModalClosed) {
+                setPrimerModalClosed(true);
+            }
         }
         else {
             console.log(responseJson.error);
@@ -127,7 +141,7 @@ export const LoginModal = ({
                     }
                 }}
             >
-                Let's Eat!
+                Let's Go!
             </ModalButton>
         </ModalFooter>
       </Modal>

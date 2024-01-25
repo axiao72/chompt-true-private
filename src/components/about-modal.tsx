@@ -16,21 +16,20 @@ export const AboutModal = ({
   };
   return (
     <Modal onClose={handleClose} closeable isOpen={isOpen} animate autoFocus>
-      <ModalHeader>CHOMPT - an AI restaurant chooser. </ModalHeader>
+      <ModalHeader>Chompt - an AI restaurant chooser. </ModalHeader>
       <ModalBody>
         <ParagraphMedium color={theme.colors.contentSecondary}>
           This application takes in a description of a restaurant, meal, night out, 
-          or honestly whatever you want to type in, and returns 3 restaurants you
+          or honestly whatever you want to type in, and returns up to 3 restaurants you
           should go to without a doubt (no more scrolling through Yelp, Google,
           Beli, or whatever app you use to decide where to eat for hours on hours). 
           All of the grunt work is taken care of for you, it just involves a little 
-          <i> truss</i> 😉 Don't worry, you're in good hands; the recommendations are 
-          derived from professional reviews of the best restaurants in NYC. 
-          Like Mr. Unlimited says himself - Broncos Country, Let's Ride.
+          trust. Don't worry, you're in good hands; the recommendations are 
+          derived from professional reviews of the best restaurants in NYC.
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
           To get started, type in as detailed of a meal description as you'd like 
-          and you will receive your 3 restaurant recommendations.
+          and you will receive your restaurant recommendations.
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
           If you need some inspiration, think about something like 
@@ -39,7 +38,7 @@ export const AboutModal = ({
           place with good music and drinks." Please, have fun with it.
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
-          Made by Arthur Xiao. Feel free to check out the {' '}
+          Feel free to check out the {' '}
           <StyledLink 
             href="https://github.com/axiao72/chompt-webapp-private"
             target='_blank'
@@ -47,7 +46,7 @@ export const AboutModal = ({
             GitHub
           </StyledLink>
           {' '}for a more detailed description of the mission, and please don't hesitate to reach
-          out at <b>axiao72@gmail.com</b> with any feedback! Would love to hear both good and bad.
+          out at <b>chompt.app@gmail.com</b> with any feedback! Would love to hear both good and bad.
         </ParagraphMedium>
         {/* <ParagraphSmall color={theme.colors.contentSecondary}>
           <StyledLink 

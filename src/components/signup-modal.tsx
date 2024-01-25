@@ -8,14 +8,22 @@ import type {User} from '../pages';
 
 export const SignupModal = ({
     isOpen,
+    primerModalIsOpen,
     setIsOpen,
+    setPrimerModalIsOpen,
     activeUser,
-    setActiveUser
+    setActiveUser,
+    primerModalClosed,
+    setPrimerModalClosed
   }: {
     isOpen: boolean;
+    primerModalIsOpen: boolean
     setIsOpen: (isOpen: boolean) => void;
+    setPrimerModalIsOpen: (isOpen: boolean) => void;
     activeUser: User;
     setActiveUser: (user: User) => void;
+    primerModalClosed: boolean;
+    setPrimerModalClosed: (closed: boolean) => void;
   }) => {
     const [, theme] = useStyletron();
     const [username, setUsername] = useState('');
@@ -26,6 +34,9 @@ export const SignupModal = ({
 
     const handleClose = () => {
       setIsOpen(false);
+      if (!primerModalClosed) {
+        setPrimerModalIsOpen(true);
+      }
     };
     
     const handleSignup = useCallback(async () => {
@@ -60,6 +71,9 @@ export const SignupModal = ({
             console.log(loggedInUser.username);
             setActiveUser(loggedInUser);
             setIsOpen(false);
+            if (!primerModalClosed) {
+                setPrimerModalClosed(true);
+            }
         }
         else {
             console.log(responseJson.error);
@@ -69,7 +83,7 @@ export const SignupModal = ({
 
     return (
       <Modal onClose={handleClose} closeable isOpen={isOpen} animate autoFocus={false}>
-        <ModalHeader>Get on board!</ModalHeader>
+        <ModalHeader>Join the party!</ModalHeader>
         <ModalBody>
             <FormControl label='Who are you?'>
                 <Input

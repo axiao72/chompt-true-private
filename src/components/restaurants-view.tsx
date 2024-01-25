@@ -41,7 +41,7 @@ const Container = styled('div', ({$theme}) => ({
     overflow: 'auto',
     display: 'flex',
     flexDirection: 'column',
-    height: '65vh'
+    height: '70vh'
   },
 
   '@media only screen and (max-width: 650px) and (min-height: 720px)': {

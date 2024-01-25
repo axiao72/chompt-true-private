@@ -105,6 +105,8 @@ const Index = () => {
   const [chatIsLoading, setChatIsLoading] = useState(false);
   const [userCoordinates, setUserCoordinates] = useState(null);
   const [userCity, setUserCity] = useState('New York');
+  // To keep track if the primer modal was clicked through. Once clicked through, never show again (unless page refresh)
+  const [primerModalClosed, setPrimerModalClosed] = useState(false);
 
   const getUserFromUUID = async (uuid) => {
     console.log("Getting user from cookies session uuid: ", uuid);
@@ -142,13 +144,23 @@ const Index = () => {
     // Get username from cookies if available
     if (typeof window !== 'undefined') {
       const cookie_uuid = document.cookie.replace(/(?:(?:^|.*;\s*)session_uuid\s*\=\s*([^;]*).*$)|^.*$/, "$1");
-      console.log('Cookie Username: ', cookie_uuid, ' !!!');
-      if (cookie_uuid !== '') {
+      const cookie_username = document.cookie.replace(/(?:(?:^|.*;\s*)chompt_username\s*\=\s*([^;]*).*$)|^.*$/, "$1");
+      // console.log('Cookie Username: ', cookie_username, ' !!!');
+      if (cookie_username !== '' && cookie_uuid !== '') {
+        setActiveUser({'username': cookie_username});
         getUserFromUUID(cookie_uuid);
+        // setPrimerModalIsOpen(false);
       }
       else {
         console.log('No uuid in cookies, user staysssss chompt_guest');
+        setPrimerModalIsOpen(true)
         // setActiveUser("chompt_guest"); Don't think i need this, setting activeUser default value as 'chompt_guest'
+      }
+    }
+    else {
+      // Open primer modal to give user rundown if not already an active user
+      if (activeUser.username === 'chompt_guest') {
+        setPrimerModalIsOpen(true)
       }
     }
 
@@ -189,15 +201,10 @@ const Index = () => {
     } else {
       console.error("Geolocation is not supported by user's browser");
     }
-
-    // Open primer modal to give user rundown if not already an active user
-    if (activeUser.username === 'chompt_guest') {
-      setPrimerModalIsOpen(true)
-    }
   }, []);
 
-  console.log(`User coordinates set to: ${userCoordinates}`);
-  console.log(`User city set to: ${userCity}`);
+  // console.log(`User coordinates set to: ${userCoordinates}`);
+  // console.log(`User city set to: ${userCity}`);
 
   const sendQuery = useCallback(async () => {
     const currentDate = new Date();
@@ -343,22 +350,32 @@ const Index = () => {
         setIsOpen={setPrimerModalIsOpen} 
         setSignupModalIsOpen={setSignupModalIsOpen}
         setLoginModalIsOpen={setLoginModalIsOpen}
+        primerModalClosed={primerModalClosed}
+        setPrimerModalClosed={setPrimerModalClosed}
       />
       <AboutModal isOpen={aboutModalIsOpen} setIsOpen={setAboutModalIsOpen} />
       <LoginModal 
         isOpen={loginModalIsOpen} 
         signupModalIsOpen={signupModalIsOpen}
+        primerModalIsOpen={primerModalIsOpen}
         setIsOpen={setLoginModalIsOpen}
         setSignupModalIsOpen={setSignupModalIsOpen}
+        setPrimerModalIsOpen={setPrimerModalIsOpen}
         activeUser={activeUser}
         setActiveUser={setActiveUser}
+        primerModalClosed={primerModalClosed}
+        setPrimerModalClosed={setPrimerModalClosed}
       >
       </LoginModal>
       <SignupModal 
         isOpen={signupModalIsOpen} 
+        primerModalIsOpen={primerModalIsOpen}
         setIsOpen={setSignupModalIsOpen}
+        setPrimerModalIsOpen={setPrimerModalIsOpen}
         activeUser={activeUser}
         setActiveUser={setActiveUser}
+        primerModalClosed={primerModalClosed}
+        setPrimerModalClosed={setPrimerModalClosed}
       >
       </SignupModal>
       <CityModal

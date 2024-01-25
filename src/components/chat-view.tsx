@@ -24,7 +24,7 @@ const Container = styled('div', ({$theme}) => ({
     overflow: 'auto',
     display: 'flex',
     flexDirection: 'column',
-    height: '65vh'
+    height: '70vh'
   },
 
   '@media only screen and (max-width: 650px) and (min-height: 720px)': {
@@ -140,7 +140,7 @@ const InputBar = ({input, setInput, sendQuery, chatIsLoading}) => {
             }
         }}
         >
-          Let's Ride
+          Let's Eat
         </Button>
       </InputContainer>
   );
@@ -152,7 +152,10 @@ const EmptyState = ({input, setInput, sendQuery, chatIsLoading}) => {
     <Container>
       <EmptyContainer>
         <ParagraphSmall color={theme.colors.contentTertiary}>
-          Can't pick a spot? Tell me what's on your mind, I got you.
+          {/* Can't pick a spot? Tell me what's on your mind, I got you. */}
+          <i>"Getting dinner on a Friday night with a group of friends and
+          we want Italian food. We're also going out after so we want a 
+          place with good music and drinks."</i>
         </ParagraphSmall>
       </EmptyContainer>
       <InputBar 

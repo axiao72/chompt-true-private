@@ -11,11 +11,15 @@ export const PrimerModal = ({
   setIsOpen,
   setLoginModalIsOpen,
   setSignupModalIsOpen,
+  primerModalClosed,
+  setPrimerModalClosed
 }: {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   setLoginModalIsOpen: (isOpen: boolean) => void;
   setSignupModalIsOpen: (isOpen: boolean) => void;
+  primerModalClosed: boolean;
+  setPrimerModalClosed: (closed: boolean) => void;
 }) => {
   const [, theme] = useStyletron();
   const handleClose = () => {
@@ -31,33 +35,34 @@ export const PrimerModal = ({
   };
   const handleGuest = () => {
     setIsOpen(false);
+    setPrimerModalClosed(true);
   };
   return (
     <Modal 
-      onClose={handleClose} 
+      // onClose={handleClose} 
       closeable={false} 
       isOpen={isOpen} 
       animate 
       autoFocus={false}
     >
-      <ModalHeader>Welcome to Chompt! </ModalHeader>
+      <ModalHeader>Welcome to Chompt!</ModalHeader>
       <ModalBody>
         <ParagraphMedium color={theme.colors.contentSecondary}>
-          So glad you could make it.
+          It's truly a pleasure to have you.
         </ParagraphMedium>
         <ParagraphMedium color={theme.colors.contentSecondary}>
-          Once you're logged in, type in as detailed of a dining description as you'd like 
-          and you will receive up to 3 restaurant recommendations.
+          Once you're logged in, just type in as detailed (or vague) of a dining description as you'd like 
+          and let us do the hard part - getting you up to 3 restaurant recommendations perfect for the occasion.
         </ParagraphMedium>
-        <ParagraphMedium color={theme.colors.contentSecondary}>
-          If you need some inspiration, think about something like 
+        {/* <ParagraphMedium color={theme.colors.contentSecondary}>
+          Get creative! If you need some inspiration, think about something like 
           "Getting dinner on a Friday night with a group of friends and 
-          we want Italian food. We are also going out after so we want a 
+          we want Italian food. We're also going out after so we want a 
           place with good music and drinks." Please - have fun with it.
-        </ParagraphMedium>
+        </ParagraphMedium> */}
         <ParagraphMedium color={theme.colors.contentSecondary}>
           Feel free to {' '}
-          <StyledLink 
+          {/* <StyledLink 
             href="#"
             onClick={handleLogin}
             style={{fontWeight: 'bold'}}
@@ -75,12 +80,21 @@ export const PrimerModal = ({
             // target='_blank'
           >
             sign up
+          </StyledLink> */}
+          <StyledLink 
+            href="#"
+            onClick={handleGuest}
+            style={{fontWeight: 700}}
+            // animateUnderline
+            // target='_blank'
+          >
+            continue as a guest
           </StyledLink>
-          {' '} to join the party, we'll be getting more and more personalized as we go.
+          {''}, but joining the party is highly encouraged as we'll be getting more and more personalized.
         </ParagraphMedium>
       </ModalBody>
       <ModalFooter>
-            <Button
+            {/* <Button
                 size={SIZE.default}
                 kind="tertiary"  
                 onClick={handleGuest} 
@@ -95,8 +109,8 @@ export const PrimerModal = ({
                 }}
             >
                 Continue as guest
-            </Button>
-            {/* <Button
+            </Button> */}
+            <Button
                 size={SIZE.default}
                 kind="primary"  
                 onClick={handleLogin} 
@@ -127,8 +141,8 @@ export const PrimerModal = ({
                     }
                 }}
             >
-                Join the party
-            </Button> */}
+                Sign up
+            </Button>
         </ModalFooter>
     </Modal>
   );
