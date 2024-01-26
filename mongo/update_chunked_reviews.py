@@ -23,27 +23,24 @@ except pymongo.errors.ConfigurationError:
 
 # Connect to Chompt db and reviews collection
 db = client.chompt 
-mongo_reviews = db["reviews"]
+mongo_chunked_reviews = db["chunked_reviews"]
 # mongo_chunked_reviews = db["chunked_reviews"]
 # CAREFUL only delete if you want to restart a collection fresh
 # deleted = mongo_chunked_reviews.delete_many({})
 # print(f"Deleted {deleted.deleted_count} records.")
 
 # Read infatuation reviews from file for each city and insert them to Mongo
-cities = ['new-york', 'pittsburgh', 'philadelphia', 'denver', 'washington-dc', 'los-angeles', 'boston', 'chicago']
+# cities = ['pittsburgh', 'philadelphia', 'denver', 'washington-dc', 'los-angeles', 'boston', 'chicago']
+cities = ['new-york']
 start_time = datetime.now()
-print(f"Insertion start time: {start_time}")
+print(f"Embeddings start time: {start_time}")
 for city in cities:
-    with open(f'../docker_webscraping/infatuation_reviews_v6_{city}.json', 'r') as file:
+    # with open(f'../docker_webscraping/infatuation_reviews_v6_{city}.json', 'r') as file:
+    with open(f'../docker_webscraping/infatuation_reviews_v6.json', 'r') as file:
         resto_reviews = json.load(file)
-    print(f"Read {len(resto_reviews)}  reviews from file for {city}. Inserting into reviews collection now...")
+    print(f"Read {len(resto_reviews)}  reviews from file for {city}. Updating city now...")
 
-    batch_limit = 30
-    batch_count = 1
-
-    insert_datas = []
-
-    total_word_cnt = 0
+    updated = []
 
     for i, resto in enumerate(tqdm(resto_reviews)):
         try:
@@ -55,16 +52,11 @@ for city in cities:
             review_date = resto['review_date'].split('T')[0]
             neighborhood = resto['resto_neighborhood'].split('/')[-1].replace('-', ' ').lower()
             cuisine = resto['cuisine'].lower()
+            # cleaned_city = resto['city'].replace("-", " ")
             cleaned_city = city.replace("-", " ")
 
-            # # Check if the restaurant is already in Mongo. If it is, skip. (Unless adding updated reviews)
-            # check_mongo = list(mongo_reviews.find({"$and": [{"resto_name": cleaned_resto_name}, {"neighborhood": neighborhood}, {"review_date": review_date}]}))
-            # if check_mongo:
-            #     print(f"Mongo already has a review for {cleaned_resto_name} from {review_date}! Skipping...")
-            #     continue
-            
-            # Set the data for this restaurant review
-            review_data = {
+            # Loop through review docs for this restaurant location and update with summary 
+            cursor = mongo_chunked_reviews.find({
                 'resto_name': cleaned_resto_name,
                 'cuisine': cuisine,
                 'perfect_for_tags': cleaned_resto_tags,
@@ -72,31 +64,14 @@ for city in cities:
                 'review_date': review_date,
                 'image_url': resto['resto_image'],
                 'resto_website': resto['resto_website'],
-                'neighborhood': neighborhood,
-                'city': cleaned_city,
-                'hasResy': False,
-                'text': cleaned_review
-            }
+                'neighborhood': neighborhood
+            })
+            for doc in cursor:
+                mongo_chunked_reviews.update_one({'_id': doc['_id']}, 
+                                        {"$set": {'city': cleaned_city}})
             
-            insert_datas.append(review_data)
-            # If we're at the batch_limit, store chunks in Pinecone
-            if len(insert_datas) >= batch_limit:
-                # ids = [unidecode(f"infatuation_{i['resto_name'].replace(' ', '_')}") for i in upsert_metadatas]
-                # Embed each review chunk
-                print(f"Batch full. Inserting reviews for dangerwich batch #{batch_count}...")
-                # Insert the review data to Mongo
-                insert_result = mongo_reviews.insert_many(insert_datas)
-                print(f"Finished inserting dangerwich batch #{batch_count}!!!")
-                batch_count += 1
-                insert_datas = []
         except Exception as e:
-            print(f"Exception while storing {cleaned_resto_name}: {e}")
-
-    if len(insert_datas) > 0:
-        print("Inserting left over dangerwiches...")
-        # ids = [str(uuid4()) for _ in range(len(upsert_chunks))]
-        insert_result = mongo_reviews.insert_many(insert_datas)
-    print(f"Finished inserting all dangerwiches for city {city}... BRONCOS COUNTRY. LET'S RIDE!!!")
+            print(f"Exception while updating {cleaned_resto_name}: {e}")
 
 end_time = datetime.now()
 print(f"End time: {end_time}")

@@ -16,6 +16,6 @@ RUN npm install --force
 RUN npm audit fix --force
 
 # Install Python packages
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt --timeout 1000
 
 CMD ["npm", "run", "dev"]

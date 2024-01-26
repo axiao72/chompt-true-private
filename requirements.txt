@@ -85,6 +85,7 @@ packaging==23.2
     # via
     #   langchain-core
     #   marshmallow
+passlib==1.7.4
 pinecone-client==2.2.4
     # via -r requirements.in
 pydantic==2.5.2

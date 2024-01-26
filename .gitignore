@@ -16,3 +16,5 @@ old_milvus_utils.py
 requirements_2.in
 notebooks
 old_functions.py
+package-lock.json
+requirements_passlib.txt

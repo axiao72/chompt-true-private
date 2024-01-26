@@ -1,34 +1,172 @@
 import {styled, useStyletron} from 'baseui';
 import {ParagraphSmall} from 'baseui/typography';
 import {Input} from 'baseui/input';
-import {Button} from 'baseui/button';
+import {Button, KIND, SIZE, SHAPE} from 'baseui/button';
 import {Skeleton} from 'baseui/skeleton';
-import {ReactNode, useEffect, useRef} from 'react';
+import {ReactNode, useEffect, useRef, useState} from 'react';
+import React from 'react';
 import {Document, Message, RestoRec} from '../pages';
+import {StyledLink} from 'baseui/link';
+
 
 const Container = styled('div', ({$theme}) => ({
-  background: $theme.colors.backgroundPrimary,
-  overflow: 'auto',
-  display: 'flex',
-  flexDirection: 'column',
+
+  // '@media only screen and (max-width: 650px)': {
+  //   background: $theme.colors.backgroundPrimary,
+  //   overflow: 'auto',
+  //   display: 'flex',
+  //   flexDirection: 'column',
+  //   height: '65vh'
+  // },
+
+  '@media only screen and (max-width: 650px) and (max-height: 719px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '70vh'
+  },
+
+  '@media only screen and (max-width: 650px) and (min-height: 720px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '68vh'
+  },
+
+  '@media only screen and (min-width: 651px) and (max-width: 1024px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '70vh'
+  },
+
+  '@media only screen and (min-width: 1025px) and (max-width: 1400px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '75vh'
+  },
+  
+  '@media only screen and (min-width: 1401px)': {
+    background: $theme.colors.backgroundPrimary,
+    overflow: 'auto',
+    display: 'flex',
+    flexDirection: 'column',
+    height: '79vh'
+  },
+
 }));
 
-const MessagesContainer = styled('div', {
-  flex: 1,
+const EmptyContainer = styled('div', {
+  // flex: 1,
   display: 'flex',
   flexDirection: 'column',
   gap: '12px',
   overflowY: 'auto',
   padding: '16px',
+  height: '80vh',
+  alignItems: 'center',
+  justifyContent: 'center'
+});
+
+const MessagesContainer = styled('div', {
+  // flexGrow: 5,
+  // flexBasis: '90%',
+  // flexShrink: 0,
+  // flex: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '12px',
+  overflowY: 'auto',
+  padding: '16px',
+  height: '80vh'
 });
 
 const InputContainer = styled('div', ({$theme}) => ({
+  // flexGrow: 1,
+  // flexBasis: '10%',
+  // flexShrink: 2,
   display: 'flex',
   gap: '16px',
   borderTop: `1px solid ${$theme.colors.borderOpaque}`,
   paddingTop: '16px',
-  padding: '16px',
+  // padding: '16px',
+  height: '10vh'
 }));
+
+const HeaderContainer = styled('div', ({$theme}) => ({
+  display: 'flex',
+  gap: '8px',
+  // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
+  // paddingTop: '16px',
+  paddingTop: '12px',
+  paddingBottom:'20px',
+  justifyContent: 'center',
+  alignItems: 'center',
+  height: '10px'
+}));
+
+const InputBar = ({input, setInput, sendQuery, chatIsLoading}) => {
+  const [, theme] = useStyletron();
+  return (
+    <InputContainer>
+        <Input
+          value={input}
+          placeholder="Envision your perfect meal"
+          onChange={(event) => setInput(event.currentTarget.value)}
+          onKeyDown={(evt) => {
+            if (evt.key === 'Enter') {
+              sendQuery();
+            }
+          }}
+          overrides={{
+            Root: {
+                style: ({ $theme }) => ({
+                  borderRadius:'8px',
+                })
+            }
+          }}
+        />
+        <Button type="submit" onClick={sendQuery} isLoading={chatIsLoading}
+          overrides={{
+            BaseButton: {
+                style: ({ $theme }) => ({
+                    borderRadius:'8px',
+                })
+            }
+        }}
+        >
+          Let's Eat
+        </Button>
+      </InputContainer>
+  );
+};
+
+const EmptyState = ({input, setInput, sendQuery, chatIsLoading}) => {
+  const [, theme] = useStyletron();
+  return (
+    <Container>
+      <EmptyContainer>
+        <ParagraphSmall color={theme.colors.contentTertiary}>
+          {/* Can't pick a spot? Tell me what's on your mind, I got you. */}
+          <i>"Getting dinner on a Friday night with a group of friends and
+          we want Italian food. We're also going out after so we want a 
+          place with good music and drinks."</i>
+        </ParagraphSmall>
+      </EmptyContainer>
+      <InputBar 
+        input={input} 
+        setInput={setInput} 
+        sendQuery={sendQuery} 
+        chatIsLoading={chatIsLoading}
+      />
+    </Container>
+  );
+};
 
 const Message = ({
   children,
@@ -64,31 +202,69 @@ const Message = ({
     </div>
   );
 };
+
+
 export const ChatView = ({
   messages,
+  setMessages,
   input,
   setInput,
   sendQuery,
   restoRecs,
+  setRestoRecs,
+  chatIsLoading,
+  // setChatIsLoading
 }: {
   messages: Message[];
+  setMessages: (messageArray: Message[]) => void;
   input: string;
   setInput: (text: string) => void;
   sendQuery: () => void;
   restoRecs: RestoRec[];
+  setRestoRecs: (recs: RestoRec[]) => void;
+  chatIsLoading: boolean;
+  // setChatIsLoading: (isLoading: boolean) => void;
 }) => {
+  const [, theme] = useStyletron();
   const ref = useRef<HTMLDivElement | undefined>();
 
   useEffect(() => {
     //Ensure the most recent messages are visible
     if (ref.current) {
-      // @ts-ignore
-      ref.current.scrollTo(0, ref.current.offsetHeight);
+      ref.current.scrollTop = ref.current.scrollHeight;
     }
+
   }, [messages]);
+  
+  // Render an Empty state component which displays a helpful message
+  if (messages.length === 0) {
+    return <EmptyState 
+      input={input} 
+      setInput={setInput} 
+      sendQuery={sendQuery}
+      chatIsLoading={chatIsLoading}
+    />;
+  }
+
+  const handleReset = () => {
+    // Reset resto recs to empty
+    setRestoRecs([]);
+    // Reset chat messages to empty
+    setMessages([]);
+  };
 
   return (
     <Container>
+      <HeaderContainer>
+        <Button
+          size={SIZE.compact}
+          kind={KIND.secondary}
+          onClick={handleReset}
+          shape={SHAPE.pill}
+        >
+          Reset
+        </Button>
+      </HeaderContainer>
       <MessagesContainer ref={ref}>
         {messages.map(({role, content, isLoading}, index) => {
           return (
@@ -100,24 +276,14 @@ export const ChatView = ({
               {content}
             </Message>
           );
-        })}
+      })}
       </MessagesContainer>
-
-      <InputContainer>
-        <Input
-          value={input}
-          placeholder="Envision your perfect meal... (think cuisine, vibe, occasion, etc.)"
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(evt) => {
-            if (evt.key === 'Enter') {
-              sendQuery();
-            }
-          }}
-        />
-        <Button type="submit" onClick={sendQuery}>
-          Let's Ride
-        </Button>
-      </InputContainer>
+      <InputBar 
+        input={input} 
+        setInput={setInput} 
+        sendQuery={sendQuery}
+        chatIsLoading={chatIsLoading}
+      />
     </Container>
   );
 };

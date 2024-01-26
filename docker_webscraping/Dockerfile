@@ -10,4 +10,4 @@ COPY . .
 # Install Python packages
 RUN pip install --no-cache-dir -r requirements_webscraping.txt
 
-CMD ["python3", "infatuation_webscraping.py"]
+CMD ["python3", "updating_with_location_data.py"]

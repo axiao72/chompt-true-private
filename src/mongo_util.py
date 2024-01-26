@@ -8,7 +8,9 @@ from src.resy_util import *
 def connect_to_mongo():
     # Connect to Mongo chompt database and return database object
     try:
-        MONGO_CLIENT = pymongo.MongoClient("mongodb+srv://axiao72:McSplash7013$@chomptcluster.k5sqjpd.mongodb.net/?retryWrites=true&w=majority")
+        MONGO_CLIENT = pymongo.MongoClient('mongodb+srv://axiao72:McSplash7013$@chomptcluster.k5sqjpd.mongodb.net/?retryWrites=true&w=majority')
+        # MONGO_CLIENT = pymongo.MongoClient(os.environ.get('MONGO_CONNECTION_STRING'))
+        # print(os.environ.get('MONGO_CONNECTION_STRING'), file=sys.stderr)
         DB = MONGO_CLIENT.chompt
         print("Connected to Mongo!")
         return DB
@@ -36,6 +38,8 @@ def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbed
     try:
         # Prepare mongo vector search pipeline
         pipeline = get_search_pipeline(index, embedded_query=embedded_query, num_candidates=45, limit=45)
+        # Add city to filter
+        pipeline[0]['$vectorSearch']['filter'] = {'city': vision.city}
         print(f"Stage 1: Searching vector database for candidates with just User's query..." , file=sys.stderr)
         candidates = list(mongo_reviews.aggregate(pipeline))
         print(f"Stage 1: Generated {len(candidates)} candidates..")
@@ -114,8 +118,8 @@ def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbedding
         pipeline = get_search_pipeline(index, embedded_query=embedded_query, num_candidates=45, limit=45)
         # Initial Candidate generation
         print(f"Stage 1: Searching vector database for reservation data candidates..." , file=sys.stderr)
-        # add {'hasResy': True} to vector search filter and remove from filters
-        pipeline[0]['$vectorSearch']['filter'] = {'hasResy': post_metadata_filters.pop('hasResy')}
+        # add city and {'hasResy': True} to vector search filter and remove from filters
+        pipeline[0]['$vectorSearch']['filter'] = {'$and': [{'city': vision.city}, {'hasResy': post_metadata_filters.pop('hasResy')}]}
         # if not post_metadata_filters:
         #     post
         candidates = list(mongo_reviews.aggregate(pipeline))
@@ -193,6 +197,7 @@ def get_search_pipeline(index: str, embedded_query, num_candidates: int, limit: 
             '$project': {
                 '_id': 0,
                 'text': 1,
+                'review_date': 1,
                 'resto_name': 1,
                 'cuisine': 1,
                 'perfect_for_tags': 1,
@@ -203,6 +208,7 @@ def get_search_pipeline(index: str, embedded_query, num_candidates: int, limit: 
                 'resy_venue_id': 1,
                 'resy_venue_name': 1,
                 'resy_venue_url': 1,
+                'city': 1,
                 'score': {
                     '$meta': 'vectorSearchScore'
                 }
@@ -210,3 +216,18 @@ def get_search_pipeline(index: str, embedded_query, num_candidates: int, limit: 
         }
     ]
     return pipeline
+
+
+async def add_session(uuid: str, username: str):
+    try:
+        DB = connect_to_mongo()
+        mongo_sessions = DB['sessions']
+        session = {
+            'uuid': uuid,
+            'username': username
+        }
+        insert_result = mongo_sessions.insert_one(session)
+        print(f'Created new session for {username}', file=sys.stderr)
+        return insert_result
+    except Exception as e:
+        raise(e)
