@@ -90,7 +90,7 @@ export const LoginModal = ({
                     id="username-input-id"
                     value={username}
                     placeholder='Username'
-                    onChange={(event) => setUsername(event.currentTarget.value)}
+                    onChange={(event) => setUsername(event.currentTarget.value.toLowerCase())}
                     overrides={{
                         Root: {
                             style: ({ $theme }) => ({
