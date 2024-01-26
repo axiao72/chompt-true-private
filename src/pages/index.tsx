@@ -433,7 +433,7 @@ const Index = () => {
         //   }
         // }}
       >
-        <Tab title="Guru" 
+        <Tab title="Mr. Unlimited" 
         >
           <ChatView
             messages={messages}
