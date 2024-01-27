@@ -188,6 +188,7 @@ def chat(vision: IdealMeal):
         }
         restos_list = []        
         full_reviews = DB['reviews']
+        # For each rec, insert the name and score and get the full review from reviews collection
         for count, rec in enumerate(resto_recs):
             # print(f"Returned rec #{count}: \n{rec}")
             insert_recs[f'restaurant{count+1}_name'] = rec['resto_name']
@@ -235,6 +236,21 @@ def chat(vision: IdealMeal):
         except pymongo.errors.OperationFailure:
             raise("Exception when inserting rec to Mongo. Are you sure your database user is authorized to perform write operations?")
         
+        # Update User with input and recs in Mongo
+        try:
+            mongo_users = DB['users']
+            rec_names = [rec['resto_name'] for rec in resto_recs]
+            update_result = mongo_users.update_one(
+                {"username": vision.username},
+                {"$push": {
+                    "inputs": vision.description,
+                    "recs": {"$each": rec_names}
+                }}
+            )
+            print(f"Updated User in Mongo: {update_result}")
+        except pymongo.errors.OperationFailure:
+            raise("Exception when inserting rec to Mongo. Are you sure your database user is authorized to perform write operations?")
+
         top_rec = restos_list[0]
         pitch = query_llm(restaurant_name=top_rec['resto_name'], review=top_rec['review'], vision=vision.description, openai_api_key=os.getenv('OPENAI_API_KEY'))
         # print(restos_list)
