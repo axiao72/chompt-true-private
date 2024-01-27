@@ -10,7 +10,7 @@ import {
   } from "baseui/card";
 import { StyledLink } from 'baseui/link';
 import {Accordion, Panel} from 'baseui/accordion';
-import { Button, SIZE, KIND as ButtonKIND } from "baseui/button";
+import { Button, SHAPE, SIZE, KIND as ButtonKIND } from "baseui/button";
 import { StatefulTooltip } from "baseui/tooltip";
 import { Checkbox, STYLE_TYPE, LABEL_PLACEMENT } from "baseui/checkbox";
 import Image from "next/image";
@@ -99,7 +99,7 @@ const RecContainer = styled('div', ({$theme}) => ({
   overflowX: 'hidden',
 //   display: 'webkit-box',
   flexDirection: 'column',
-  rowGap: '10px',
+  gap: '50px',
 //   justifyContent: 'center',
   alignItems: 'center',
   WebkitBoxOrient: 'vertical',
@@ -109,8 +109,20 @@ const RecContainer = styled('div', ({$theme}) => ({
   
 }));
 
+const CardContainer = styled('div', {
+  margin: '0 0 20px', // Adjust the margin as needed
+});
+
 const FeatureContainer = styled('div', ({$theme}) => ({
   padding: '0 0 6px 0',
+  // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+}));
+
+const ButtonContainer = styled('div', ({$theme}) => ({
+  padding: '0 0 16px',
   // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
   display: 'flex',
   alignItems: 'center',
@@ -122,7 +134,7 @@ const FeatureGroup = styled('div', {
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: '2px',
-  fontWeight: 600 
+  fontWeight: 550 
 });
 
 const FooterContainer = styled('div', ({$theme}) => ({
@@ -275,6 +287,29 @@ export const RestaurantsView = ({
   const containerRef = useRef();
   const [changedModes, setChangedModes] = useState(true);
   const [css] = useStyletron();
+  const [isMobile, setIsMobile] = useState(true);
+
+  // Check if device is mobile
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 800); // Adjust the breakpoint as needed
+    };
+
+    // Initial check
+    handleResize();
+
+    // Add event listener for window resize
+    window.addEventListener('resize', handleResize);
+
+    // Cleanup the event listener on component unmount
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  const handleLove = () => {
+
+  };
 
   const clickResMode = () => {
     // Move this to an Apply button within the Modal so Res Mode only gets activated when user clicks "Apply". This should be when resMode get's changed
@@ -391,94 +426,153 @@ export const RestaurantsView = ({
       <RecContainer ref={containerRef}>
         {restoRecs.map((resto, index) => {
           return (
-            <Card
-              overrides={{Root: {style: {
-                  width: '100%', 
-                  flexDirection: 'column', 
-                  alignItems: 'center',
-                  WebkitBoxOrient: 'vertical', 
-                  WebkitBoxDirection: 'normal',
-                  WebkitBoxAlign: 'center',
-              }}}}
-              headerImage={resto.imageUrl}
-              title={resto.restoName}
-              key={`resto-${index}`}
-            >
-              <StyledBody>
-                  {resto.review}
-              </StyledBody>
-              <StyledBody>
-                <FeatureContainer>
-                  <FeatureGroup>
-                    {resto.nbrhood}&nbsp;&nbsp;|&nbsp;&nbsp;{resto.priceRange}&nbsp;&nbsp;
-                  </FeatureGroup>
-                  <FeatureGroup>
-                    <StyledLink 
-                      as="a"
-                      href={getMapsUrl(resto.restoName, resto.address)} 
-                      target="_blank"
-                      style={{ 
-                        color: '#5B91F5', 
-                        fontWeight: 700, 
-                        display: 'flex',
-                        alignItems: 'center' }}
-                    >
-                      Maps {<ChevronRight size={18} />}
-                    </StyledLink>
-                  </FeatureGroup>
-                </FeatureContainer>
-                  {/* <a href="https://maps.apple.com/?q=Hunan%20Slurp%20112%201st%20Ave,%20New%20York,%20NY%2010009" target="_blank">Open in Apple Maps</a> */}
-                  {/* <a href="https://www.google.com/maps/search/?api=1&query=Ray%27s+177%20Chrystie%20St,%20NY,%20New%20York%2010002" target="_blank">Open in Google Maps</a> */}
-              </StyledBody>
-              <StyledAction>
-                  <Button
-                    overrides={{BaseButton: {style: {width: '100%', borderRadius:'8px'}}}} 
-                    onClick={() => clickBookRes(resto)}
-                    disabled={!resto.resyUrl && !resto.websiteUrl}
+            <CardContainer key={`resto-${index}`}>
+              <Card
+                overrides={{Root: {style: {
+                    width: '100%', 
+                    flexDirection: 'column', 
+                    alignItems: 'center',
+                    WebkitBoxOrient: 'vertical', 
+                    WebkitBoxDirection: 'normal',
+                    WebkitBoxAlign: 'center',
+                }}}}
+                headerImage={resto.imageUrl}
+                title={resto.restoName}
+                // key={`resto-${index}`}
+              >
+                <StyledBody>
+                  <FeatureContainer>
+                    <FeatureGroup>
+                      {resto.nbrhood}&nbsp;&nbsp;|&nbsp;&nbsp;{resto.priceRange}&nbsp;&nbsp;
+                    </FeatureGroup>
+                    <FeatureGroup>
+                      <StyledLink 
+                        as="a"
+                        href={getMapsUrl(resto.restoName, resto.address)} 
+                        target="_blank"
+                        style={{ 
+                          color: '#5B91F5', 
+                          fontWeight: 700, 
+                          display: 'flex',
+                          alignItems: 'center' }}
+                      >
+                        Maps {<ChevronRight size={18} />}
+                      </StyledLink>
+                    </FeatureGroup>
+                  </FeatureContainer>
+                  
+                </StyledBody>
+                {isMobile && 
+                  <Accordion
+                    overrides={{
+                      Root: {
+                        style: ({ $theme }) => ({
+                          padding: '0px 0px 16px'
+                        })
+                      },
+                      Content: {
+                        style: ({ $theme }) => ({
+                          fontSize: '14px',
+                          padding: '8px 8px 16px'
+                        })
+                      },
+                      Header: {
+                        style: ({ $theme }) => ({
+                          padding: '0px 0px 12px'
+                        })
+                      }
+                    }}
                   >
-                      Book Reservation
-                  </Button>
-              </StyledAction>
-            </Card>
-            // <Accordion>
-            //   <Panel
-            //     title={resto.restoName}
-            //   >
-            //     <Card
-            //       overrides={{Root: {style: {
-            //           width: '100%', 
-            //           flexDirection: 'column', 
-            //           alignItems: 'center',
-            //           WebkitBoxOrient: 'vertical', 
-            //           WebkitBoxDirection: 'normal',
-            //           WebkitBoxAlign: 'center',
-            //       }}}}
-            //       headerImage={resto.imageUrl}
-            //       title={resto.restoName}
-            //       key={`resto-${index}`}
-            //     >
-            //       <StyledBody>
-            //           {resto.review}
-            //       </StyledBody>
-            //       <StyledBody>
-            //           {resto.nbrhood}&nbsp;&nbsp;|&nbsp;&nbsp;{resto.priceRange}&nbsp;&nbsp; 
-            //           {/* Put Maps link here!
-            //           <a href={resto.websiteUrl} target="_blank">
-            //             {resto.restoName} Website
-            //           </a> */}
-            //       </StyledBody>
-            //       <StyledAction>
-            //           <Button
-            //             overrides={{BaseButton: {style: {width: '100%'}}}} 
-            //             onClick={resto.resyUrl ? () => window.open(resto.resyUrl, '_blank') : () => window.open(resto.websiteUrl, '_blank')}
-            //             disabled={!resto.resyUrl && !resto.websiteUrl}
-            //           >
-            //               Book Reservation
-            //           </Button>
-            //       </StyledAction>
-            //     </Card>
-            //   </Panel>
-            // </Accordion>
+                    <Panel
+                      title={
+                        <div
+                          className={css({
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            fontWeight: 400, 
+                            fontSize: '15px', 
+                            padding: '0px 4px'
+                          })}
+                        >
+                          {resto.review.split(" ").slice(0, 12).join(" ")}...
+                        </div>
+                      }
+                    >
+                      {resto.review}
+                    </Panel>
+                  </Accordion>
+                }
+                {!isMobile && 
+                  <Accordion
+                    overrides={{
+                      Root: {
+                        style: ({ $theme }) => ({
+                          padding: '0px 0px 24px'
+                        })
+                      },
+                      Content: {
+                        style: ({ $theme }) => ({
+                          fontSize: '15px',
+                          padding: '8px 8px 24px'
+                        })
+                      },
+                      Header: {
+                        style: ({ $theme }) => ({
+                          padding: '0px 0px 16px'
+                        })
+                      }
+                    }}
+                  >
+                    <Panel
+                      title={
+                        <div
+                          className={css({
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            fontWeight: 400, 
+                            fontSize: '16px', 
+                            padding: '0px 4px'
+                          })}
+                        >
+                          {resto.review.split(" ").slice(0, 24).join(" ")}...
+                        </div>
+                      }
+                    >
+                      {resto.review}
+                    </Panel>
+                  </Accordion>
+                }
+                {/* <ButtonContainer>
+                  <FeatureGroup>
+                    <Button
+                      onClick={handleLove}
+                      kind={ButtonKIND.tertiary}
+                      shape={SHAPE.pill}
+                      size={SIZE.compact}
+                    >
+                      Love
+                    </Button>
+                    <Button
+                      onClick={handleLove}
+                      kind={ButtonKIND.tertiary}
+                      shape={SHAPE.pill}
+                      size={SIZE.compact}
+                    >
+                      Hate
+                    </Button>
+                  </FeatureGroup>
+                </ButtonContainer> */}
+                <StyledAction>
+                    <Button
+                      overrides={{BaseButton: {style: {width: '100%', borderRadius:'8px'}}}} 
+                      onClick={() => clickBookRes(resto)}
+                      disabled={!resto.resyUrl && !resto.websiteUrl}
+                    >
+                        Book Reservation
+                    </Button>
+                </StyledAction>
+              </Card>
+            </CardContainer>
           );
         })}
       </RecContainer>
