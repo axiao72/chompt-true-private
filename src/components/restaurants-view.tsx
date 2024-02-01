@@ -121,20 +121,29 @@ const FeatureContainer = styled('div', ({$theme}) => ({
   justifyContent: 'space-between',
 }));
 
-const ButtonContainer = styled('div', ({$theme}) => ({
-  padding: '0 0 16px',
-  // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'space-between',
-}));
-
 const FeatureGroup = styled('div', {
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'space-between',
   gap: '2px',
   fontWeight: 550 
+});
+
+const ButtonContainer = styled('div', ({$theme}) => ({
+  padding: '0 0 20px',
+  // borderBottom: `1px solid ${$theme.colors.borderOpaque}`,
+  display: 'flex',
+  alignItems: 'center',
+  // justifyContent: 'center',
+  gap: '8px'
+}));
+
+const ButtonGroup = styled('div', {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: '2px',
+  // width: '100%'
 });
 
 const FooterContainer = styled('div', ({$theme}) => ({
@@ -288,6 +297,9 @@ export const RestaurantsView = ({
   const [changedModes, setChangedModes] = useState(true);
   const [css] = useStyletron();
   const [isMobile, setIsMobile] = useState(true);
+  const [loveButtonColors, setLoveButtonColors] = useState({0: '#EEEEEE', 1: '#EEEEEE', 2: '#EEEEEE'});
+  const [hateButtonColors, setHateButtonColors] = useState({0: '#EEEEEE', 1: '#EEEEEE', 2: '#EEEEEE'});
+  const [beenButtonColors, setBeenButtonColors] = useState({0: '#EEEEEE', 1: '#EEEEEE', 2: '#EEEEEE'});
 
   // Check if device is mobile
   useEffect(() => {
@@ -307,9 +319,53 @@ export const RestaurantsView = ({
     };
   }, []);
 
-  const handleLove = () => {
+  const handleLove = (index) => {
+    console.log(index);
+    const newColors = { ...loveButtonColors };
+    if (newColors[index] === '#EEEEEE'){
+      newColors[index] = '#06C167';
+    }
+    else {
+      newColors[index] = '#EEEEEE';
+    }
+    setLoveButtonColors(newColors);
+  };
+
+  const handleHate = (index) => {
+    console.log(index);
+    const newColors = { ...hateButtonColors };
+    if (newColors[index] === '#EEEEEE'){
+      newColors[index] = '#E85C4A';
+    }
+    else {
+      newColors[index] = '#EEEEEE';
+    }
+    setHateButtonColors(newColors);
+  };
+
+  const handleBeen = (index) => {
+    console.log(index);
+    const newColors = { ...beenButtonColors };
+    if (newColors[index] === '#EEEEEE'){
+      newColors[index] = '#A0BFF8';
+    }
+    else {
+      newColors[index] = '#EEEEEE';
+    }
+    setBeenButtonColors(newColors);
+  };
+
+  const isLoved = (resto_name: string) => {
 
   };
+
+  const isHated = (resto_name: string) => {
+
+  };
+
+  // const buttonColor = (resto_name: string) => {
+
+  // };
 
   const clickResMode = () => {
     // Move this to an Apply button within the Modal so Res Mode only gets activated when user clicks "Apply". This should be when resMode get's changed
@@ -460,7 +516,6 @@ export const RestaurantsView = ({
                       </StyledLink>
                     </FeatureGroup>
                   </FeatureContainer>
-                  
                 </StyledBody>
                 {isMobile && 
                   <Accordion
@@ -542,26 +597,68 @@ export const RestaurantsView = ({
                     </Panel>
                   </Accordion>
                 }
-                {/* <ButtonContainer>
-                  <FeatureGroup>
-                    <Button
-                      onClick={handleLove}
-                      kind={ButtonKIND.tertiary}
-                      shape={SHAPE.pill}
-                      size={SIZE.compact}
-                    >
-                      Love
-                    </Button>
-                    <Button
-                      onClick={handleLove}
-                      kind={ButtonKIND.tertiary}
-                      shape={SHAPE.pill}
-                      size={SIZE.compact}
-                    >
-                      Hate
-                    </Button>
-                  </FeatureGroup>
-                </ButtonContainer> */}
+                <ButtonContainer>
+                  <Button
+                    onClick={() => handleLove(index)}
+                    kind={ButtonKIND.secondary}
+                    shape={SHAPE.pill}
+                    size={SIZE.mini}
+                    disabled={hateButtonColors[index] != '#EEEEEE'}
+                    overrides={{
+                      BaseButton: {
+                        style: ({ $theme }) => ({
+                          backgroundColor: loveButtonColors[index],
+                          width: '15%',
+                          ':hover': {
+                            backgroundColor: loveButtonColors[index]
+                          }
+                        })
+                      }
+                    }}
+                  >
+                    Love
+                  </Button>
+                  <Button
+                    onClick={() => handleHate(index)}
+                    kind={ButtonKIND.secondary}
+                    shape={SHAPE.pill}
+                    size={SIZE.mini}
+                    disabled={loveButtonColors[index] !== '#EEEEEE'}
+                    overrides={{
+                      BaseButton: {
+                        style: ({ $theme }) => ({
+                          backgroundColor: hateButtonColors[index],
+                          width: '15%',
+                          ':hover': {
+                            backgroundColor: hateButtonColors[index]
+                          }
+                        })
+                      }
+                    }}                  
+                  >
+                    Hate
+                  </Button>
+                  <Button
+                    onClick={() => handleBeen(index)}
+                    kind={ButtonKIND.secondary}
+                    shape={SHAPE.pill}
+                    size={SIZE.mini}
+                    // disabled={loveButtonColors[index] !== '#EEEEEE'}
+                    overrides={{
+                      BaseButton: {
+                        style: ({ $theme }) => ({
+                          backgroundColor: beenButtonColors[index],
+                          width: '25%',
+                          ':hover': {
+                            backgroundColor: beenButtonColors[index]
+                          }
+                        })
+                      }
+                    }}                  
+                  >
+                    I've Been
+                  </Button>
+                </ButtonContainer>
                 <StyledAction>
                     <Button
                       overrides={{BaseButton: {style: {width: '100%', borderRadius:'8px'}}}} 

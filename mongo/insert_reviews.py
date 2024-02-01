@@ -34,7 +34,7 @@ cities = ['new-york', 'pittsburgh', 'philadelphia', 'denver', 'washington-dc', '
 start_time = datetime.now()
 print(f"Insertion start time: {start_time}")
 for city in cities:
-    with open(f'../docker_webscraping/infatuation_reviews_v6_{city}.json', 'r') as file:
+    with open(f'../docker_webscraping/infatuation_reviews_v7_{city}.json', 'r') as file:
         resto_reviews = json.load(file)
     print(f"Read {len(resto_reviews)}  reviews from file for {city}. Inserting into reviews collection now...")
 
@@ -57,6 +57,16 @@ for city in cities:
             cuisine = resto['cuisine'].lower()
             cleaned_city = city.replace("-", " ")
 
+            # Location data
+            address_country = resto['address_country']
+            address_city = resto['address_city']
+            address_state = resto['address_state']
+            address_zip_code= resto['address_zip_code']
+            street_address = resto['street_address']
+            full_address = resto['full_address']
+            latitude = resto['latitude']
+            longitude = resto['longitude']
+
             # # Check if the restaurant is already in Mongo. If it is, skip. (Unless adding updated reviews)
             # check_mongo = list(mongo_reviews.find({"$and": [{"resto_name": cleaned_resto_name}, {"neighborhood": neighborhood}, {"review_date": review_date}]}))
             # if check_mongo:
@@ -75,7 +85,17 @@ for city in cities:
                 'neighborhood': neighborhood,
                 'city': cleaned_city,
                 'hasResy': False,
-                'text': cleaned_review
+                'text': cleaned_review,
+                'geo': {
+                    'addressCountry': address_country,
+                    'addressCity': address_city,
+                    'addressState': address_state,
+                    'addressZipCode': address_zip_code,
+                    'streetAddress': street_address,
+                    'fullAddress': full_address,
+                    'latitude': latitude,
+                    'longitude': longitude
+                }
             }
             
             insert_datas.append(review_data)

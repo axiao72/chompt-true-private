@@ -52,7 +52,7 @@ async def signup(user: User, response: Response):
 async def login(credentials: LoginCredentials, response: Response):
     try:
         user = await login_user(credentials)
-        print(f"User from app_api: {user}")
+        # print(f"User from app_api: {user}")
         # Generate uuid for session and add to session cookies
         generated_uuid = str(uuid.uuid4())
         print(f"Generated session uuid: {generated_uuid}", file=sys.stderr)
