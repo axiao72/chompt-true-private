@@ -107,6 +107,7 @@ const Index = () => {
   const [userCity, setUserCity] = useState('New York');
   // To keep track if the primer modal was clicked through. Once clicked through, never show again (unless page refresh)
   const [primerModalClosed, setPrimerModalClosed] = useState(false);
+  const supportedCities = ['new york', 'los angeles', 'philadelphia', 'chicago', 'denver', 'boston', 'pittsburgh'];
 
   const getUserFromUUID = async (uuid) => {
     console.log("Getting user from cookies session uuid: ", uuid);
@@ -185,7 +186,13 @@ const Index = () => {
 
             if (cityData.results && cityData.results.length > 0) {
               const city = cityData.results[0].components.city;
-              setUserCity(city);
+              if (supportedCities.includes(city.toLowerCase())){
+                setUserCity(city);
+                console.log(`User's location set to ${city}.`)
+              }
+              else {
+                console.log("User's location is not one of supported cities. Defaulting to NYC.")
+              }
               console.log('Opencage got city: ', city);
             }
           } catch (error) {

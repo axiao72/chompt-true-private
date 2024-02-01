@@ -120,7 +120,7 @@ export const SignupModal = ({
                     id="username-input-id"
                     value={username}
                     placeholder='Create a username'
-                    onChange={(event) => setUsername(event.currentTarget.value)}
+                    onChange={(event) => setUsername(event.currentTarget.value.toLowerCase())}
                     overrides={{
                         Root: {
                             style: ({ $theme }) => ({

@@ -37,7 +37,7 @@ def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbed
         index= 'chunked_reviews_content_index'
     try:
         # Prepare mongo vector search pipeline
-        pipeline = get_search_pipeline(index, embedded_query=embedded_query, num_candidates=45, limit=45)
+        pipeline = get_search_pipeline(index, embedded_query=embedded_query, num_candidates=50, limit=50)
         # Add city to filter
         pipeline[0]['$vectorSearch']['filter'] = {'city': vision.city}
         print(f"Stage 1: Searching vector database for candidates with just User's query..." , file=sys.stderr)
@@ -115,7 +115,7 @@ def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbedding
     try:
         # Restos are returned containing appropriate metadata and reviews
         # Get mongo vector search pipeline
-        pipeline = get_search_pipeline(index, embedded_query=embedded_query, num_candidates=45, limit=45)
+        pipeline = get_search_pipeline(index, embedded_query=embedded_query, num_candidates=50, limit=50)
         # Initial Candidate generation
         print(f"Stage 1: Searching vector database for reservation data candidates..." , file=sys.stderr)
         # add city and {'hasResy': True} to vector search filter and remove from filters

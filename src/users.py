@@ -37,7 +37,11 @@ async def signup_user(user: User):
         'password': hashed_pw, 
         'firstName': user.first_name,
         'lastName': user.last_name,
-        'inputs': 0,
+        'inputs': [],
+        'beenTo': [],
+        'hate': [],
+        'love': [],
+        'recs': [],
         'resyClicks': 0
     }
     try:
