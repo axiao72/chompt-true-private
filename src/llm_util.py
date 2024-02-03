@@ -21,7 +21,7 @@ class Restaurant(LangchainBaseModel):
 
 
 def instantiate_embed_model(model_name: str, model_type: str):
-    if model_type == 'OpenAI':
+    if model_type.lower() == 'openai':
         embed_model = OpenAIEmbeddings(
                     document_model_name=model_name,
                     query_model_name=model_name,
@@ -38,10 +38,10 @@ def instantiate_embed_model(model_name: str, model_type: str):
     return embed_model
 
 
-def extract_entities(query: str, openai_api_key):
+def extract_entities(query: str):
     # Extract cuisine and/or neighborhood to use as metadata filters
     llm = OpenAI(
-        openai_api_key=openai_api_key,
+        openai_api_key=os.getenv('OPENAI_API_KEY'),
         temperature=0, 
         model="gpt-3.5-turbo-instruct"
     )
@@ -58,38 +58,25 @@ def extract_entities(query: str, openai_api_key):
     try:
         output = llm(extract_input.to_string())
         filters = parser.parse(output)
-        # metadata_filter = {} # Pinecone filter
-        pre_metadata_filter = {'$and':[]} # Mongo filter
         post_metadata_filter = {} # Just plain dictionary to format later
         if filters.cuisine:
             # Mongo filter
-            pre_metadata_filter['$and'].append(
-                {
-                    'cuisine': {"$in": [i.lower() for i in filters.cuisine]}
-                }
-            )
             post_metadata_filter['cuisine'] = [i.lower() for i in filters.cuisine]
             # metadata_filter['cuisine'] = {"$in": [filters.cuisine.lower()]} # Pinecone filter
         if filters.neighborhood:
             # Mongo filter
-            pre_metadata_filter['$and'].append(
-                {
-                    'neighborhood': {"$in": [i.lower() for i in filters.neighborhood]}
-                }
-            )
             post_metadata_filter['neighborhood'] = [i.lower() for i in filters.neighborhood]
 
             # metadata_filter['neighborhood'] = {"$in": [filters.neighborhood.lower()]} # Pinecone filter
     except Exception as e:
         print(f"Exception while extracting cuisine and neighborhood: {e}", file=sys.stderr)
-        pre_metadata_filter = {'$and':[]} # Keep empty if exception happens so recommendation can continue without filters
         post_metadata_filter = {}
-    return pre_metadata_filter, post_metadata_filter
+    return post_metadata_filter
 
 
-def query_llm(restaurant_name: str, review: str, vision: str, openai_api_key):
+def query_llm(restaurant_name: str, review: str, vision: str):
     llm = ChatOpenAI(
-        openai_api_key=openai_api_key,
+        openai_api_key=os.getenv('OPENAI_API_KEY'),
         model_name='gpt-3.5-turbo',
         temperature=0.0
     )

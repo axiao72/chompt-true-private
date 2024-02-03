@@ -14,8 +14,9 @@ async def signup_user(user: User):
     # Validate sign up fields
     if not user.username or not user.password or not user.first_name or not user.last_name:
         raise Exception("Must fill out all fields.")
-
-    DB = connect_to_mongo()
+    
+    mongo_client = connect_to_mongo()
+    DB = mongo_client.chompt
     mongo_users = DB['users']
 
     # Check if Mongo already has user
@@ -48,8 +49,10 @@ async def signup_user(user: User):
         result = mongo_users.insert_one(new_user)
         # Return inserted user with hashed password if Mongo insert worked
         print(f"Inserted user: {new_user}", file=sys.stderr)
+        mongo_client.close()
         return new_user
     except pymongo.errors.OperationFailure:
+        mongo_client.close()
         raise Exception("Exception occured during insert of new user to Mongo!")
 
 
@@ -59,7 +62,8 @@ async def login_user(credentials: LoginCredentials):
     if not credentials.username or not credentials.password:
         raise Exception("Must provide username and password.")
     
-    DB = connect_to_mongo()
+    mongo_client = connect_to_mongo()
+    DB = mongo_client.chompt
     mongo_users = DB['users']
 
     # Get user by username
@@ -73,32 +77,40 @@ async def login_user(credentials: LoginCredentials):
     if match:
         # Passwords match! Return User Mongo Doc.
         print("Correct password! Returning logged in user.", file=sys.stderr)
+        mongo_client.close()
         return user
     else:
         print("Not a match!", file=sys.stderr)
+        mongo_client.close()
         raise Exception("Incorrect password")
     
 
 async def find_user_by_username(username: str):
-    DB = connect_to_mongo()
+    mongo_client = connect_to_mongo()
+    DB = mongo_client.chompt
     mongo_users = DB['users']
     user = mongo_users.find_one({'username': username})
     if not user:
         print(f"Error in find_user_by_username", file=sys.stderr)
+        mongo_client.close()       
         raise Exception("Username not found.")
     else:
         print(f"User {username} found!", file=sys.stderr)
+        mongo_client.close()  
         return user
     
 
 async def find_user_by_uuid(uuid: str):
-    DB = connect_to_mongo()
+    mongo_client = connect_to_mongo()
+    DB = mongo_client.chompt
     mongo_sessions = DB['sessions']
     user_session = mongo_sessions.find_one({'uuid': uuid})
     if not user_session:
         print(f"Error in find_user_by_uuid", file=sys.stderr)
+        mongo_client.close()
         raise Exception(f"User session not found with UUID: {uuid}.")
     else:
         print(f"Session for {user_session['username']} found!", file=sys.stderr)
+        mongo_client.close()
         return user_session
         

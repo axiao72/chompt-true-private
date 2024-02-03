@@ -1,197 +1,35 @@
 from langchain.embeddings import HuggingFaceEmbeddings
 import pymongo
 import sys
+from datetime import datetime
 from api.pydantic_models import IdealMeal
 from src.resy_util import *
+from src.constants import *
 
 
 def connect_to_mongo():
     # Connect to Mongo chompt database and return database object
     try:
-        MONGO_CLIENT = pymongo.MongoClient('mongodb+srv://axiao72:McSplash7013$@chomptcluster.k5sqjpd.mongodb.net/?retryWrites=true&w=majority')
-        # MONGO_CLIENT = pymongo.MongoClient(os.environ.get('MONGO_CONNECTION_STRING'))
+        mongo_client = pymongo.MongoClient('mongodb+srv://axiao72:McSplash7013$@chomptcluster.k5sqjpd.mongodb.net/?retryWrites=true&w=majority')
+        # mongo_client = pymongo.MongoClient(os.environ.get('MONGO_CONNECTION_STRING'))
         # print(os.environ.get('MONGO_CONNECTION_STRING'), file=sys.stderr)
-        DB = MONGO_CLIENT.chompt
+        # DB = mongo_client.chompt
         print("Connected to Mongo!")
-        return DB
+        return mongo_client
     except pymongo.errors.ConfigurationError:
         print("Invalid URI host, confirm Atlas host name and password is correct in the connection string!")
         return None
 
 
-# Post-filter searches
-def get_recs_mongo_non_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbeddings, mongo_reviews, collection_name, post_metadata_filters):
-    query = vision.description
-    embedded_query = embed_model.embed_query(query)
-    final_recs = []
-    # final_recs_names = []
-    # Keep track of which filters were used in final recommendations so we can display to user
-    used_neighborhood_and_cuisine = False
-    used_neighborhood = False
-    used_cuisine = False
-    unique_cands = []
-    unique_cand_names = []
-    if collection_name == 'reviews':
-        index = 'reviews_content_index'
-    elif collection_name == 'chunked_reviews':
-        index= 'chunked_reviews_content_index'
-    try:
-        # Prepare mongo vector search pipeline
-        pipeline = get_search_pipeline(index, embedded_query=embedded_query, num_candidates=50, limit=50)
-        # Add city to filter
-        pipeline[0]['$vectorSearch']['filter'] = {'city': vision.city}
-        print(f"Stage 1: Searching vector database for candidates with just User's query..." , file=sys.stderr)
-        candidates = list(mongo_reviews.aggregate(pipeline))
-        print(f"Stage 1: Generated {len(candidates)} candidates..")
-        for candidate in candidates:
-            if candidate['resto_name'] not in unique_cand_names:
-                unique_cands.append(candidate)
-                unique_cand_names.append(candidate['resto_name'])
-        print(f"Stage 1: Reduced to {len(unique_cands)} unique candidates..")
-        print(f"Final Stage: Filtering further by cuisine and neighborhood if possible...")
-        # If filters were extracted, apply them in prioritized order
-        if post_metadata_filters:
-            filter_cnt = 0  # To keep track of which filter i'm using
-            # Loop through each available candidate applying appropriate filters to get final recs (can be less than 3)
-            while not final_recs and filter_cnt < 4:
-                i = 0
-                while i < len(unique_cands) and len(final_recs) < 3 and filter_cnt < 3:
-                    cand = unique_cands[i]
-                    # Filter on both neighborhood and cuisine for final 3 recs
-                    if filter_cnt == 0:
-                        if ('cuisine' in post_metadata_filters and 'neighborhood' in post_metadata_filters) and (cand['cuisine'] in post_metadata_filters['cuisine'] and cand['neighborhood'] in post_metadata_filters['neighborhood']):
-                            final_recs.append(cand)
-                            used_neighborhood_and_cuisine = True
-                            print("Used both Neighborhood and Cuisine filters!")
-                    # Filter on neighborhood for final 3 recs if no recs with both neighborhood AND cuisine (prioritize neighborhood)
-                    elif filter_cnt == 1:
-                        if 'neighborhood' in post_metadata_filters and cand['neighborhood'] in post_metadata_filters['neighborhood']:
-                            final_recs.append(cand)
-                            used_neighborhood = True
-                            print("Used just Neighborhood filter!")
-                    # Filter on cuisine for final 3 recs if no recs with just neighborhood
-                    elif filter_cnt == 2:
-                        if 'cuisine' in post_metadata_filters and cand['cuisine'] in post_metadata_filters['cuisine']:
-                            final_recs.append(cand)
-                            used_cuisine = True
-                            print("Used just Cuisine filter!")
-                    i += 1
-                filter_cnt += 1
-                # If filter_cnt == 3, we exhausted all filters. Just take top 3 available restos
-                if filter_cnt == 3:
-                    final_recs = unique_cands[0:3]
-                    print("Used just query.")
-        # If no filters, just get top 3 candidates
-        else:
-            final_recs = unique_cands[0:3]
-            print(f'No filters provided. Got top {len(final_recs)} recs.')
-        for i in final_recs:
-            print(f"{i['resto_name']} similarity search score: {i['score']}\n")
-    except Exception as e:
-        print(f"Exception occured while vector searching Mongo: {e}") 
-        final_recs = [] 
-    return final_recs, used_neighborhood_and_cuisine, used_neighborhood, used_cuisine
-
-
-# Post-filter searches
-# When Reservation Mode is on, reservation availability is top priority!!! If user turned it on, this means they don't want to deal with walk-ins!
-def get_recs_mongo_res_mode(vision: IdealMeal, embed_model: HuggingFaceEmbeddings, mongo_reviews, collection_name, post_metadata_filters):
-    res_mode_on = vision.res_mode_on
-    query = vision.description
-    embedded_query = embed_model.embed_query(query)
-    final_recs = []
-    # final_recs_names = []
-    # Keep track of which filters were used in final recommendations so we can display to user
-    used_reservations = res_mode_on
-    used_neighborhood_and_cuisine = False
-    used_neighborhood = False
-    used_cuisine = False
-    unique_cand_names = []
-    unique_cands = []
-    if collection_name == 'reviews':
-        index = 'reviews_content_index'
-    elif collection_name == 'chunked_reviews':
-        index= 'chunked_reviews_content_index'
-    try:
-        # Restos are returned containing appropriate metadata and reviews
-        # Get mongo vector search pipeline
-        pipeline = get_search_pipeline(index, embedded_query=embedded_query, num_candidates=50, limit=50)
-        # Initial Candidate generation
-        print(f"Stage 1: Searching vector database for reservation data candidates..." , file=sys.stderr)
-        # add city and {'hasResy': True} to vector search filter and remove from filters
-        pipeline[0]['$vectorSearch']['filter'] = {'$and': [{'city': vision.city}, {'hasResy': post_metadata_filters.pop('hasResy')}]}
-        # if not post_metadata_filters:
-        #     post
-        candidates = list(mongo_reviews.aggregate(pipeline))
-        print(f"Stage 1: Generated {len(candidates)} candidates..")
-        for candidate in candidates:
-            if candidate['resto_name'] not in unique_cand_names:
-                unique_cands.append(candidate)
-                unique_cand_names.append(candidate['resto_name'])
-        print(f"Stage 1: Reduced to {len(unique_cands)} unique candidates..")
-        print(f"Stage 2: Filtering based on Resy availability...", file=sys.stderr)
-        available_candidates = get_top_available_candidates(unique_cands, vision.res_date, vision.res_time, vision.party_size)
-        # If there are any available candidates, do final filtering stage
-        if available_candidates:
-            # If filters were extracted, apply them in prioritized order
-            if post_metadata_filters:
-                print(f"Final Stage: Filtering further by cuisine and neighborhood if possible...", file=sys.stderr)
-                filter_cnt = 0  # To keep track of which filter i'm using
-                # Loop through each available candidate applying appropriate filters to get final recs (can be less than 3)
-                while not final_recs and filter_cnt < 4:
-                    i = 0
-                    while i < len(available_candidates) and len(final_recs) < 3 and filter_cnt < 3:
-                        cand = available_candidates[i]
-                        # Filter on both neighborhood and cuisine for final 3 recs
-                        if filter_cnt == 0:
-                            if ('cuisine' in post_metadata_filters and 'neighborhood' in post_metadata_filters) and (cand['cuisine'] in post_metadata_filters['cuisine'] and cand['neighborhood'] in post_metadata_filters['neighborhood']):
-                                final_recs.append(cand)
-                                used_neighborhood_and_cuisine = True
-                                print("Used both Neighborhood and Cuisine filters!", file=sys.stderr)
-                        # Filter on neighborhood for final 3 recs if no recs with both neighborhood AND cuisine (prioritize neighborhood)
-                        elif filter_cnt == 1:
-                            if 'neighborhood' in post_metadata_filters and cand['neighborhood'] in post_metadata_filters['neighborhood']:
-                                final_recs.append(cand)
-                                used_neighborhood = True
-                                print("Used just Neighborhood filter!", file=sys.stderr)
-                        # Filter on cuisine for final 3 recs if no recs with just neighborhood
-                        elif filter_cnt == 2:
-                            if 'cuisine' in post_metadata_filters and cand['cuisine'] in post_metadata_filters['cuisine']:
-                                final_recs.append(cand)
-                                used_cuisine = True
-                                print("Used just Cuisine filter!", file=sys.stderr)
-                        i += 1
-                    filter_cnt += 1
-                    # If filter_cnt == 3, we exhausted all filters. Just take top 3 available restos
-                    if filter_cnt == 3:
-                        final_recs = available_candidates[0:3]
-                        print("Used just reservation availability.", file=sys.stderr)
-            # If no filters, just get top 3 candidates
-            else:
-                final_recs = available_candidates[0:3]
-                print(f"No filters provided. Got top {len(final_recs)} recs.", file=sys.stderr)
-        # If no available candidates on Resy, then do non-reservation mode search as last resort
-        else:
-            final_recs, used_neighborhood_and_cuisine, used_neighborhood, used_cuisine = get_recs_mongo_non_res_mode(vision, embed_model, mongo_reviews, collection_name, post_metadata_filters)
-            used_reservations = False
-            print("Did not use reservation mode.")
-        for i in final_recs:
-            print(f"{i['resto_name']} similarity search score: {i['score']}\n", file=sys.stderr)
-    except Exception as e:
-        print(f"Exception occured while vector searching Mongo: {e}", file=sys.stderr) 
-        final_recs = [] 
-    return final_recs, used_reservations, used_neighborhood_and_cuisine, used_neighborhood, used_cuisine  
-
-
-def get_search_pipeline(index: str, embedded_query, num_candidates: int, limit: int):
+def get_search_pipeline(embedded_query):
     pipeline = [
         {
             '$vectorSearch': {
-                'index': index,
+                'index': EMBEDDINGS_INDEX,
                 'path': 'content_embedding',
                 'queryVector': embedded_query,
-                'numCandidates': num_candidates,
-                'limit': limit
+                'numCandidates': NUM_CANDIDATES,
+                'limit': NUM_CANDIDATES
             }
         }, {
             '$project': {
@@ -218,6 +56,28 @@ def get_search_pipeline(index: str, embedded_query, num_candidates: int, limit: 
     return pipeline
 
 
+def get_candidates(embedded_query, city, res_mode_on: bool):
+    try:
+        print(f"Stage 1: Searching vector database for candidates..." , file=sys.stderr)
+        mongo_client = connect_to_mongo()
+        db = mongo_client.chompt
+        mongo_reviews = db[EMBEDDINGS_COLLECTION_NAME]
+
+        pipeline = get_search_pipeline(embedded_query)
+        if res_mode_on:
+            # add city and {'hasResy': True} to vector search filter and remove hasResy from filters
+            pipeline[0]['$vectorSearch']['filter'] = {'$and': [{'city': city}, {'hasResy': res_mode_on}]}
+        else:
+            pipeline[0]['$vectorSearch']['filter'] = {'city': city}
+        candidates = list(mongo_reviews.aggregate(pipeline))
+        mongo_client.close()
+
+        return candidates
+    except Exception as ex:
+        mongo_client.close()
+        raise(f"Exception occured while vector searching Mongo: {ex}") 
+
+
 async def add_session(uuid: str, username: str):
     try:
         DB = connect_to_mongo()
@@ -231,3 +91,72 @@ async def add_session(uuid: str, username: str):
         return insert_result
     except Exception as e:
         raise(e)
+
+
+async def insert_recs_mongo(vision, recs):
+    """Insert the batch of recommendations into Mongo (watch out, they're spiiiicy!)"""
+    # Connect to Mongo
+    mongo_client = connect_to_mongo()
+    db = mongo_client.chompt
+    mongo_recs = db["recommendations"]
+    
+    insert_recs = {
+            'username': vision.username,
+            'date': datetime.today().strftime('%Y-%m-%d'),
+            'user_input': vision.description,
+            'reservation_mode': vision.res_mode_on
+        }
+    for count, rec in enumerate(recs):
+        insert_recs[f'restaurant{count+1}_name'] = rec['resto_name']
+        insert_recs[f'restaurant{count+1}_score'] = rec['score']
+    # Insert input + recs into Mongo
+    try:
+        insert_result = mongo_recs.insert_one(insert_recs)
+        print(f"Inserted recommendation to Mongo: {insert_result}")
+        mongo_client.close()
+        return insert_result
+    except pymongo.errors.OperationFailure:
+        mongo_client.close()
+        raise("Exception when inserting rec to Mongo. Are you sure your database user is authorized to perform write operations?")
+    
+
+async def update_user_info(vision, recs):
+    # Connect to Mongo
+    mongo_client = connect_to_mongo()
+    db = mongo_client.chompt
+    mongo_users = db["users"]
+    # Get just the names of the recs
+    rec_names = [rec['resto_name'] for rec in recs]
+    try:
+        update_result = mongo_users.update_one(
+            {"username": vision.username},
+            {"$push": {
+                "inputs": vision.description,
+                "recs": {"$each": rec_names}
+            }}
+        )
+        print(f"Updated User in Mongo: {update_result}")
+        mongo_client.close()
+        return update_result
+    except pymongo.errors.OperationFailure:
+        mongo_client.close()
+        raise("Exception when updating user in Mongo. Are you sure your database user is authorized to perform write operations?")
+
+
+async def get_full_review(rec):
+    # Connect to Mongo
+    mongo_client = connect_to_mongo()
+    db = mongo_client.chompt
+    full_reviews = db['reviews']
+    try:
+        full_review = list(full_reviews.find_one({
+            'resto_name': rec['resto_name'].lower(), 
+            'neighborhood': rec['neighborhood'],
+            'review_date': rec['review_date'],
+            'city': rec['city']
+        }))
+        mongo_client.close()
+        return full_review
+    except pymongo.errors.OperationFailure:
+        mongo_client.close()
+        raise("Exception when getting full review from Mongo. Are you sure your database user is authorized to perform write operations?")

@@ -317,13 +317,13 @@ const Index = () => {
         {role: 'assistant', content: responseJson.pitch},
       ]);
       setUsedReservations(responseJson.usedReservations);
-      setUsedBoth(responseJson.usedBoth);
-      setUsedNeighborhood(responseJson.usedNeighborhood);
-      setUsedCuisine(responseJson.usedCuisine);
+      // setUsedBoth(responseJson.usedBoth);
+      // setUsedNeighborhood(responseJson.usedNeighborhood);
+      // setUsedCuisine(responseJson.usedCuisine);
       console.log("Used Reservation Mode: ", usedReservations);
-      console.log("Used both filters: ", usedBoth);
-      console.log("Used neighborhood filter:", usedNeighborhood);
-      console.log("Used cuisine filter:", usedCuisine);
+      // console.log("Used both filters: ", usedBoth);
+      // console.log("Used neighborhood filter:", usedNeighborhood);
+      // console.log("Used cuisine filter:", usedCuisine);
     }
     else {
       setMessages((prev) => [
