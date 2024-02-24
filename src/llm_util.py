@@ -1,14 +1,12 @@
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.chat_models import ChatOpenAI
-from langchain.llms import OpenAI
-from langchain.chains.llm import LLMChain
-from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
-from langchain.schema.document import Document
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_openai import OpenAIEmbeddings
+from langchain_openai import ChatOpenAI
+from langchain_openai import OpenAI
+from langchain.chains import LLMChain
 from langchain.prompts import PromptTemplate
 from typing import List
 from langchain.output_parsers import PydanticOutputParser
-from langchain.pydantic_v1 import BaseModel as LangchainBaseModel, Field, validator
+from langchain_core.pydantic_v1 import BaseModel as LangchainBaseModel, Field, validator
 from src.prompts import *
 import sys
 import os
@@ -23,8 +21,8 @@ class Restaurant(LangchainBaseModel):
 def instantiate_embed_model(model_name: str, model_type: str):
     if model_type.lower() == 'openai':
         embed_model = OpenAIEmbeddings(
-                    document_model_name=model_name,
-                    query_model_name=model_name,
+                    model=model_name,
+                    dimensions=1024,
                     openai_api_key=os.getenv('OPENAI_API_KEY')
                 )
     elif model_type.lower() == 'hf':

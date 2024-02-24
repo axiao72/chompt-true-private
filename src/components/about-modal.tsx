@@ -48,6 +48,9 @@ export const AboutModal = ({
           {' '}for a more detailed description of the mission, and please don't hesitate to reach
           out at <b>chompt.app@gmail.com</b> with any feedback! Would love to hear both good and bad.
         </ParagraphMedium>
+        <ParagraphMedium color={theme.colors.contentSecondary}>
+          <i>Recommendations are driven by reviews made publicly available on theinfatuation.com</i>
+        </ParagraphMedium>
         {/* <ParagraphSmall color={theme.colors.contentSecondary}>
           <StyledLink 
             href="https://www.freepik.com/icon/information_545674#fromView=keyword&term=Information&page=1&position=0&uuid=8e294117-0ba3-4069-83e9-934df1da31b4"

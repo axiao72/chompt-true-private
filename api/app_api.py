@@ -1,12 +1,4 @@
 from fastapi import Body, FastAPI, Response
-from pydantic import BaseModel
-from typing import Optional
-from typing import Annotated
-import pymongo
-import time
-from passlib.context import CryptContext
-from passlib.hash import bcrypt
-import requests
 import uuid
 from api.pydantic_models import *
 from src.helpers import *
@@ -154,14 +146,15 @@ async def chat(vision: IdealMeal):
         # Get recommendations!
         resto_recs, used_reservations = get_recs(vision, post_metadata_filters)
         print(f"Broncos Country... Let's Ride!!!", file=sys.stderr)
-        print(f"Got {len(resto_recs)} recs.", file=sys.stderr)
-        final_recs_list = format_recs(resto_recs, vision)       
-        
+        # print(f"Got {len(resto_recs)} recs.", file=sys.stderr)
+        # Format recs
+        final_recs_list = format_recs(resto_recs, vision) 
+        # print(f"Formatted recs: {final_recs_list}")
         # Insert input + recs into Mongo
-        insert_result = await insert_recs_mongo(vision, resto_recs)
+        insert_result = insert_recs_mongo(vision, resto_recs)
         # Update User with input and recs in Mongo
-        update_result = await update_user_info(vision, resto_recs)
-
+        update_result = update_user_info(vision, resto_recs)
+        # print(f"Final recs: {final_recs_list}")
         # Generate pitch for the top rec
         top_rec = final_recs_list[0]
         pitch = query_llm(restaurant_name=top_rec['resto_name'], review=top_rec['review'], vision=vision.description)

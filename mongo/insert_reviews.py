@@ -97,7 +97,7 @@ for city in cities:
                     'longitude': longitude
                 }
             }
-            
+
             insert_datas.append(review_data)
             # If we're at the batch_limit, store chunks in Pinecone
             if len(insert_datas) >= batch_limit:

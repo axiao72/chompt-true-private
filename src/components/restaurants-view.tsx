@@ -1,5 +1,5 @@
 import {styled, useStyletron} from 'baseui';
-import {ParagraphSmall} from 'baseui/typography';
+import {ParagraphMedium, ParagraphSmall} from 'baseui/typography';
 import {NAV_HEIGHT, type Document, RestoRec, User} from '../pages';
 import {useState, useEffect, useRef, useCallback} from 'react';
 import * as React from 'react';
@@ -368,7 +368,7 @@ export const RestaurantsView = ({
   // };
 
   const clickResMode = () => {
-    // Move this to an Apply button within the Modal so Res Mode only gets activated when user clicks "Apply". This should be when resMode get's changed
+    // Move this to an Apply button within the Modal so Res Mode only gets activated when user clicks "Apply". This should be when resMode gets changed
     
     // If Res Mode is off, then clicking the checkbox should just open the modal    
     // If Res Mode is on, clicking the checkbox should just turn Res Mode off 
@@ -549,11 +549,11 @@ export const RestaurantsView = ({
                             padding: '0px 4px'
                           })}
                         >
-                          {resto.review.split(" ").slice(0, 12).join(" ")}...
+                          {resto.review.split(" ").slice(0, 12).join(" ")} ...
                         </div>
                       }
                     >
-                      {resto.review}
+                      {resto.review.split(" ").slice(12).join(" ")}
                     </Panel>
                   </Accordion>
                 }
@@ -593,11 +593,11 @@ export const RestaurantsView = ({
                         </div>
                       }
                     >
-                      {resto.review}
+                      {resto.review.split(" ").slice(24).join(" ")}
                     </Panel>
                   </Accordion>
                 }
-                <ButtonContainer>
+                {/* <ButtonContainer>
                   <Button
                     onClick={() => handleLove(index)}
                     kind={ButtonKIND.secondary}
@@ -658,7 +658,7 @@ export const RestaurantsView = ({
                   >
                     I've Been
                   </Button>
-                </ButtonContainer>
+                </ButtonContainer> */}
                 <StyledAction>
                     <Button
                       overrides={{BaseButton: {style: {width: '100%', borderRadius:'8px'}}}} 
@@ -672,6 +672,9 @@ export const RestaurantsView = ({
             </CardContainer>
           );
         })}
+        {/* <ParagraphSmall color={theme.colors.contentSecondary}>
+          <i>Recommendations are driven by reviews made publicly available on theinfatuation.com</i>
+        </ParagraphSmall> */}
       </RecContainer>
       <Footer 
         resMode={resMode} 

@@ -1,12 +1,9 @@
 import pickle
 import pymongo
 from langchain.text_splitter import CharacterTextSplitter, RecursiveCharacterTextSplitter
-from langchain.schema.document import Document
-import more_itertools
 from datetime import datetime
-from langchain.embeddings.openai import OpenAIEmbeddings
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import Pinecone
+from langchain_openai import OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
 import os
 from dotenv import load_dotenv
 from tqdm.auto import tqdm
@@ -15,13 +12,16 @@ from unidecode import unidecode
 
 
 # Initialize e5-large-v2 embeddings model
-print("Instantiating embeddings model...")
-model_kwargs = {'device': 'cpu'}
-encode_kwargs = {'normalize_embeddings': False}
+# print("Instantiating embeddings model...")
+# model_kwargs = {'device': 'cpu'}
+# encode_kwargs = {'normalize_embeddings': False}
 
-embeddings_model = HuggingFaceEmbeddings(model_name="intfloat/e5-large-v2",
-                                     model_kwargs=model_kwargs,
-                                     encode_kwargs=encode_kwargs)
+# embeddings_model = HuggingFaceEmbeddings(model_name="intfloat/e5-large-v2",
+#                                      model_kwargs=model_kwargs,
+#                                      encode_kwargs=encode_kwargs)
+
+# OpenAI Embeddings
+embeddings_model = OpenAIEmbeddings(model='text-embedding-3-large', dimensions=1024)
 print("Instantiated embeddings model!")
 
 # Connect to Mongo
@@ -33,18 +33,19 @@ except pymongo.errors.ConfigurationError:
 
 # Connect to Chompt db and reviews collection
 db = client.chompt 
-mongo_chunked_reviews = db["chunked_reviews"]
+mongo_chunked_reviews = db["chunked_reviews_openai"]
 # mongo_chunked_reviews = db["chunked_reviews"]
 # CAREFUL only delete if you want to restart a collection fresh
 # deleted = mongo_chunked_reviews.delete_many({})
 # print(f"Deleted {deleted.deleted_count} records.")
 
 # Read infatuation reviews from file for each city and insert them to Mongo
-cities = ['pittsburgh', 'philadelphia', 'denver', 'washington-dc', 'los-angeles', 'boston', 'chicago']
+# cities = ['pittsburgh', 'philadelphia', 'denver', 'washington-dc', 'los-angeles', 'boston', 'chicago']
+cities = ['new-york']
 start_time = datetime.now()
 print(f"Embeddings start time: {start_time}")
 for city in cities:
-    with open(f'../docker_webscraping/infatuation_reviews_v6_{city}.json', 'r') as file:
+    with open(f'../docker_webscraping/infatuation_reviews_v7_{city}.json', 'r') as file:
         resto_reviews = json.load(file)
     print(f"Read {len(resto_reviews)}  reviews from file for {city}. Generating and storing embeddings now...")
 
@@ -72,23 +73,45 @@ for city in cities:
             cuisine = resto['cuisine'].lower()
             cleaned_city = resto['city'].replace("-", " ")
 
-            # Check if the restaurant is already in Mongo. If it is, skip. (Unless adding updated reviews)
-            check_mongo = list(mongo_chunked_reviews.find({"$and": [{"resto_name": cleaned_resto_name}, {"neighborhood": neighborhood}, {"review_date": review_date}]}))
-            if check_mongo:
-                print(f"Mongo already has a review for {cleaned_resto_name} from {review_date}! Skipping...")
-                continue
+            # Location data
+            address_country = resto['address_country']
+            address_city = resto['address_city']
+            address_state = resto['address_state']
+            address_zip_code= resto['address_zip_code']
+            street_address = resto['street_address']
+            full_address = resto['full_address']
+            latitude = resto['latitude']
+            longitude = resto['longitude']
+
+            # # Check if the restaurant is already in Mongo. If it is, skip. (Unless adding updated reviews)
+            # check_mongo = list(mongo_chunked_reviews.find({"$and": [{"resto_name": cleaned_resto_name}, {"neighborhood": neighborhood}, {"review_date": review_date}]}))
+            # if check_mongo:
+            #     print(f"Mongo already has a review for {cleaned_resto_name} from {review_date}! Skipping...")
+            #     continue
             
             # Set the metadata for this restaurant review
             review_data = {
-                'resto_name': cleaned_resto_name,
+                'restoName': cleaned_resto_name,
                 'cuisine': cuisine,
-                'perfect_for_tags': cleaned_resto_tags,
-                'price_range': resto['price_range'],
-                'review_date': review_date,
-                'image_url': resto['resto_image'],
-                'resto_website': resto['resto_website'],
+                'perfectForTags': cleaned_resto_tags,
+                'priceFange': resto['price_range'],
+                'reviewDate': review_date,
+                'imageUrl': resto['resto_image'],
+                'restoWebsite': resto['resto_website'],
                 'neighborhood': neighborhood,
-                'city': cleaned_city
+                'city': cleaned_city,
+                'hasResy': False,
+                'fullText': cleaned_review,
+                'geo': {
+                    'addressCountry': address_country,
+                    'addressCity': address_city,
+                    'addressState': address_state,
+                    'addressZipCode': address_zip_code,
+                    'streetAddress': street_address,
+                    'fullAddress': full_address,
+                    'latitude': latitude,
+                    'longitude': longitude
+                }
             }
             # Split review into chunks
             review_chunks = text_splitter.split_text(cleaned_review)
