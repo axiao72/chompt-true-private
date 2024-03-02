@@ -11,6 +11,12 @@ Vision: {vision}
 Helpful Answer:
 """
 
+LOCATION_CLASSIFIER_TEMPLATE = """You are a helpful assistant that determines if a user inputs a New York City borough, neighborhood, or in relation to a more specific point of interest.
+A point of interest could be a street, landmark, park, or anything that is not a defined borough or neighborhood of New York City.
+If the user mentions a borough or neighborhood AND point of interest, answer 'point of interest'.
+Answer only with 'borough', 'neighborhood', or 'point of interest'.
+"""
+
 PYDANTIC_TEMPLATE = """You are an assistant that excels at extracting specific restaurant attributes from a description of a restaurant.
 {format_instructions}
 If you are unsure of a field or don't see the field in the description, then do not include anything for that field! Do not take a guess.

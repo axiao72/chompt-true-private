@@ -46,6 +46,7 @@ def get_search_pipeline(embedded_query):
                 'resy_venue_name': 1,
                 'resy_venue_url': 1,
                 'city': 1,
+                'geo': 1,
                 'score': {
                     '$meta': 'vectorSearchScore'
                 }

@@ -1,4 +1,6 @@
 from pydantic import BaseModel
+from typing import List, Optional
+from langchain_core.pydantic_v1 import BaseModel as LangchainBaseModel
 
 
 class IdealMeal(BaseModel):
@@ -12,11 +14,13 @@ class IdealMeal(BaseModel):
     # Optional, defaults to 'guest'
     username: str = 'chompt_guest'
 
+
 class User(BaseModel):
     username: str
     password: str
     first_name: str
     last_name: str
+
 
 class LoginCredentials(BaseModel):
     username: str
@@ -30,3 +34,8 @@ class Event(BaseModel):
     date: str
     username: str
     user_city: str
+
+
+class Restaurant(LangchainBaseModel):
+    cuisine: Optional[List[str]]
+    location: Optional[List[str]]

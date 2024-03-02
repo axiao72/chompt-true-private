@@ -1,88 +1,63 @@
-from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_openai import OpenAIEmbeddings
-from langchain_openai import ChatOpenAI
-from langchain_openai import OpenAI
-from langchain.chains import LLMChain
+from langchain.chains import LLMChain, create_extraction_chain_pydantic
 from langchain.prompts import PromptTemplate
-from typing import List
+from langchain.prompts.chat import (
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    SystemMessagePromptTemplate,
+)
+from langchain.schema import HumanMessage, SystemMessage
 from langchain.output_parsers import PydanticOutputParser
-from langchain_core.pydantic_v1 import BaseModel as LangchainBaseModel, Field, validator
 from src.prompts import *
+from src.constants import *
+from api.pydantic_models import *
 import sys
 import os
 
 
-class Restaurant(LangchainBaseModel):
-    # Pydantic class for extracting entities using LLM
-    cuisine: List[str] = Field(description="List of cuisines of a restaurant")
-    neighborhood: List[str] = Field(description="List of neighborhoods a restaurant is located in")
-
-
-def instantiate_embed_model(model_name: str, model_type: str):
-    if model_type.lower() == 'openai':
-        embed_model = OpenAIEmbeddings(
-                    model=model_name,
-                    dimensions=1024,
-                    openai_api_key=os.getenv('OPENAI_API_KEY')
-                )
-    elif model_type.lower() == 'hf':
-        # Initialize e5-large-v2 embeddings model
-        model_kwargs = {'device': 'cpu'}
-        encode_kwargs = {'normalize_embeddings': False}
-
-        embed_model = HuggingFaceEmbeddings(model_name=model_name,
-                                            model_kwargs=model_kwargs,
-                                            encode_kwargs=encode_kwargs)
-    return embed_model
-
-
-def extract_entities(query: str):
-    # Extract cuisine and/or neighborhood to use as metadata filters
-    llm = OpenAI(
-        openai_api_key=os.getenv('OPENAI_API_KEY'),
-        temperature=0, 
-        model="gpt-3.5-turbo-instruct"
-    )
-
-    parser = PydanticOutputParser(pydantic_object=Restaurant)
-    pydantic_prompt = PromptTemplate(
-        template=PYDANTIC_TEMPLATE,
-        input_variables=['query'],
-        partial_variables={"format_instructions": parser.get_format_instructions()},
-    )
-
-    extract_input = pydantic_prompt.format_prompt(query=query)
-    # print(f"Using prompt: {extract_input.to_string()}", file=sys.stderr)
+def extract_filters(query: str) -> dict:
+    filter_dict = {} # Just plain dictionary to format later
     try:
-        output = llm(extract_input.to_string())
-        filters = parser.parse(output)
-        post_metadata_filter = {} # Just plain dictionary to format later
+        # Extract cuisine and/or neighborhood to use as metadata filters
+        chain = create_extraction_chain_pydantic(pydantic_schema=Restaurant, llm=CHAT_MODEL)
+        filters = chain.run(query)[0] # Get index 0 because a list is returned and there should only be one object in the list
         if filters.cuisine:
             # Mongo filter
-            post_metadata_filter['cuisine'] = [i.lower() for i in filters.cuisine]
-            # metadata_filter['cuisine'] = {"$in": [filters.cuisine.lower()]} # Pinecone filter
-        if filters.neighborhood:
+            filter_dict['cuisine'] = [i.lower() for i in filters.cuisine]
+        if filters.location:
             # Mongo filter
-            post_metadata_filter['neighborhood'] = [i.lower() for i in filters.neighborhood]
-
-            # metadata_filter['neighborhood'] = {"$in": [filters.neighborhood.lower()]} # Pinecone filter
+            filter_dict['location'] = [i.lower() for i in filters.location]
     except Exception as e:
         print(f"Exception while extracting cuisine and neighborhood: {e}", file=sys.stderr)
-        post_metadata_filter = {}
-    return post_metadata_filter
+        filter_dict = {}
+    return filter_dict
+
+
+def classify_location(location: str) -> str:
+    try:
+        # Prompts
+        system_message_prompt = SystemMessagePromptTemplate.from_template(LOCATION_CLASSIFIER_TEMPLATE)
+        human_template = "{text}"
+        human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+        chat_prompt = ChatPromptTemplate.from_messages(
+            [system_message_prompt, human_message_prompt]
+        )
+        # Classify location
+        classified_response = CHAT_MODEL(
+            chat_prompt.format_prompt(
+                text=location
+            ).to_messages()
+        )
+        return classified_response.content
+    except Exception as ex:
+        raise(f"Exception while classifying location: {ex}")
 
 
 def query_llm(restaurant_name: str, review: str, vision: str):
-    llm = ChatOpenAI(
-        openai_api_key=os.getenv('OPENAI_API_KEY'),
-        model_name='gpt-3.5-turbo',
-        temperature=0.0
-    )
     convince_prompt = PromptTemplate(
         template=CONVINCE_PROMPT_TEMPLATE,
         input_variables=['restaurant_name', 'review', 'vision']
     )
-    convince_chain = LLMChain(llm=llm, prompt=convince_prompt)
+    convince_chain = LLMChain(llm=CHAT_MODEL, prompt=convince_prompt)
     response = convince_chain(
         {
             "restaurant_name": restaurant_name,

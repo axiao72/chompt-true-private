@@ -1,11 +1,11 @@
+import os
 import json
 import googlemaps
 from pprint import pprint
 import pymongo
 from tqdm.auto import tqdm
-import os
-from src.google_util import *
-    
+from google_util import *
+
 
 # Testing code
 try:
@@ -17,7 +17,7 @@ except pymongo.errors.ConfigurationError:
 mongo_reviews = DB['reviews']
 
 restos = list(mongo_reviews.find({'neighborhood': 'east village'}))[0:3]
-restos_w_distance = get_geo_distances(restos, 'penn station new york', get_gmaps_client())
+restos_w_distance = get_geo_distances(restos, 'sheeps meadow central park')
 for resto in restos_w_distance:
     pprint(resto)
     print(f"\n\n{resto['resto_name']}: {resto['distance_to_origin']}")

@@ -141,10 +141,23 @@ async def chat(vision: IdealMeal):
     try: 
         print(f"Getting recommendations in {vision.city} for the query: '{vision.description}'....", file=sys.stderr)
         # Extract cuisine and neighborhood for metadata filter. Keeping these as post filters just for extra layer of re-ranking/validation
-        post_metadata_filters = extract_entities(vision.description)
-        print(f"Got post search filters: {post_metadata_filters}")
+        filters = extract_filters(vision.description)
+        print(f"Got post search filters: {filters}")
+        poi_string = '' # Will be used as a poi flag and for google distances api
+        if filters['location']:
+            location_str = ' '.join(filters['location'])
+            location_type = classify_location(location_str)
+            # If point of interest, set poi string and remove location from filters 
+            # because we will be using it to score instead.
+            print(f"Location Type: {location_type}", file=sys.stderr)
+            if location_type == 'point of interest':
+                poi_string = location_str
+                del filters['location']
+            # If borough, set location filter to list of all neighborhoods in the borough.
+            elif location_type == 'borough':
+                filters['location'] = get_borough_neighborhoods(location_str) # IMPLEMENT LIST OF NEIGHBORHOODS!!!
         # Get recommendations!
-        resto_recs, used_reservations = get_recs(vision, post_metadata_filters)
+        resto_recs, used_reservations = get_recs(vision, filters, poi_string)
         print(f"Broncos Country... Let's Ride!!!", file=sys.stderr)
         # print(f"Got {len(resto_recs)} recs.", file=sys.stderr)
         # Format recs
@@ -163,18 +176,22 @@ async def chat(vision: IdealMeal):
             print("Did NOT use reservation data for recs!", file=sys.stderr)
         else:
             print("DID use reservation data for recs!!", file=sys.stderr)
-
+        final_recs_jsons = [json.dumps(d) for d in final_recs_list]
         return {
             'success': True,
-            'restos': final_recs_list,
+            'restos': final_recs_jsons,
             'usedReservations': used_reservations,
             # 'usedBoth': used_neighborhood_and_cuisine,
             # 'usedNeighborhood': used_neighborhood,
             # 'usedCuisine': used_cuisine,
             'pitch': pitch
         }
+    except GoogleMapsError as gmaps_ex:
+        return {
+            'success': False,
+            'error': str(gmaps_ex)
+        }
     except Exception as ex:
-        print(ex)
         return {
             'success': False,
             'error': "Congrats, you broke me! Jk, the dangerwiches were probably just a little too spicy... Arthur will fix me in a bit. Sorry for the interruption, I know you must be dying to get out and eat. Feel free to let Arthur know incase he's busy and doesn't notice this right away! In the meantime.. Broncos Country, Let's Ride." 
