@@ -87,6 +87,7 @@ packaging==23.2
     # via
     #   langchain-core
     #   marshmallow
+pandas==1.5.3
 passlib==1.7.4
 pinecone-client==2.2.4
     # via -r requirements.in
