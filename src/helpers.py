@@ -96,6 +96,7 @@ def apply_filters(df_candidates: pd.DataFrame, post_metadata_filters: dict):
         # Loop through each candidate and add to filtered_cands if it fits the filters
         df_filtered = df_candidates.copy()
         for filt in post_metadata_filters:
+            # If location is still in the filters at this point, it's a neighborhood so we need to change the key to 'neighborhood' in the actual review data.
             if filt == 'location':
                 df_filt = 'neighborhood'
             else:
@@ -107,48 +108,6 @@ def apply_filters(df_candidates: pd.DataFrame, post_metadata_filters: dict):
             return df_filtered
     except Exception as ex:
         raise ex
-
-
-def score_recs_poi(candidates):
-    """
-    Apply point of interest scoring function to the candidates. 
-    This scoring function takes into account:
-        - Distance to the user's desired point of interest (extracted from their query).
-        - Frequency of restaurant in similarity search results
-
-    Args:
-        candidates (list): A list of candidate recommendations.
-    
-    Returns:
-        list: The candidates after applying scoring function, sorted by adjusted score.
-    """
-    scored_candidates = deepcopy(candidates)
-    for cand in scored_candidates:
-        distance_log = math.log(cand['distance_to_origin']) * 0.01
-        cand['adjusted_score'] = cand['score'] - distance_log
-    scored_candidates.sort(key=lambda x: x['adjusted_score'], reverse=True)
-    return scored_candidates
-
-
-def score_recs_neighborhood(candidates):
-    """
-    Apply non-point of interest scoring function to the candidates. 
-    Distance is not used in this scoring because candidates should have been filtered by neighborhood.
-    This scoring function takes into account:
-        - Frequency of restaurant in similarity search results
-
-    Args:
-        candidates (list): A list of candidate recommendations.
-    
-    Returns:
-        list: The candidates after applying scoring function, sorted by adjusted score.
-    """
-    scored_candidates = deepcopy(candidates)
-    for cand in scored_candidates:
-        distance_log = math.log(cand['distance_to_origin']) * 0.01
-        cand['adjusted_score'] = cand['score'] - distance_log
-    scored_candidates.sort(key=lambda x: x['adjusted_score'], reverse=True)
-    return scored_candidates
 
 
 def score_recs(df_candidates: pd.DataFrame):

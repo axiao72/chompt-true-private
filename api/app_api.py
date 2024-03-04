@@ -144,7 +144,7 @@ async def chat(vision: IdealMeal):
         filters = extract_filters(vision.description)
         print(f"Got post search filters: {filters}")
         poi_string = '' # Will be used as a poi flag and for google distances api
-        if filters['location']:
+        if 'location' in filters:
             location_str = ' '.join(filters['location'])
             location_type = classify_location(location_str)
             # If point of interest, set poi string and remove location from filters 
