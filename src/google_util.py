@@ -37,6 +37,8 @@ def get_geo_distances(restos: dict, query_origin: str):
             )
             final_distances.extend(result_distances['rows'][0]['elements'])
         for idx, resto in enumerate(distance_restos):
+            if 'distance' not in final_distances[idx]:
+                return restos
             # Currently using miles, could use just meters from value field to make it more direct,
             # but would have to adjust scoring 
             distance_str = final_distances[idx]['distance']['text']
