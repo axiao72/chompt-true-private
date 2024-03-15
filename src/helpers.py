@@ -179,7 +179,7 @@ def format_recs(resto_recs, vision):
             'resto_name': capitalize_resto_name(rec['restoName']),
             'review': full_review,
             'perfect_for': rec['perfectForTags'],
-            'price_range': rec['priceFange'],
+            'price_range': rec['priceRange'],
             'image_url': rec['imageUrl'],
             'website': rec['restoWebsite'],
             'neighborhood': rec['neighborhood'].title(),

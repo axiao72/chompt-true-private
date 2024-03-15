@@ -38,7 +38,7 @@ def get_search_pipeline(embedded_query):
                 'restoName': 1,
                 'cuisine': 1,
                 'perfectForTags': 1,
-                'priceFange': 1,
+                'priceRange': 1,
                 'imageUrl': 1,
                 'restoWebsite': 1,
                 'neighborhood': 1,
@@ -80,7 +80,8 @@ def get_candidates(embedded_query, city, res_mode_on: bool):
 
 async def add_session(uuid: str, username: str):
     try:
-        DB = connect_to_mongo()
+        mongo_client = connect_to_mongo()
+        DB = mongo_client.chompt
         mongo_sessions = DB['sessions']
         session = {
             'uuid': uuid,

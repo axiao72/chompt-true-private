@@ -192,6 +192,7 @@ async def chat(vision: IdealMeal):
             'error': str(gmaps_ex)
         }
     except Exception as ex:
+        print(ex, file=sys.stderr)
         return {
             'success': False,
             'error': "Congrats, you broke me! Jk, the dangerwiches were probably just a little too spicy... Arthur will fix me in a bit. Sorry for the interruption, I know you must be dying to get out and eat. Feel free to let Arthur know incase he's busy and doesn't notice this right away! In the meantime.. Broncos Country, Let's Ride." 
