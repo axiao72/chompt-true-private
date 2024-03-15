@@ -296,16 +296,17 @@ const Index = () => {
       const responseRestos = responseJson.restos;
       if (responseRestos.length > 0) {
         const responseRestoRecs: RestoRec[] = responseRestos.map((resto) => {
+          const resto_json = JSON.parse(resto);
           const restoRec: RestoRec = {
-            restoName: resto.resto_name,
-            review: resto.review,
-            perfectFor: resto.perfect_for,
-            priceRange: resto.price_range,
-            imageUrl: resto.image_url,
-            websiteUrl: resto.website,
-            nbrhood: resto.neighborhood,
-            resyUrl: resto.resy_url,
-            address: resto.full_address
+            restoName: resto_json.resto_name,
+            review: resto_json.review,
+            perfectFor: resto_json.perfect_for,
+            priceRange: resto_json.price_range,
+            imageUrl: resto_json.image_url,
+            websiteUrl: resto_json.website,
+            nbrhood: resto_json.neighborhood,
+            resyUrl: resto_json.resy_url,
+            address: resto_json.full_address
           };
           return restoRec;
         });
@@ -317,13 +318,13 @@ const Index = () => {
         {role: 'assistant', content: responseJson.pitch},
       ]);
       setUsedReservations(responseJson.usedReservations);
-      setUsedBoth(responseJson.usedBoth);
-      setUsedNeighborhood(responseJson.usedNeighborhood);
-      setUsedCuisine(responseJson.usedCuisine);
+      // setUsedBoth(responseJson.usedBoth);
+      // setUsedNeighborhood(responseJson.usedNeighborhood);
+      // setUsedCuisine(responseJson.usedCuisine);
       console.log("Used Reservation Mode: ", usedReservations);
-      console.log("Used both filters: ", usedBoth);
-      console.log("Used neighborhood filter:", usedNeighborhood);
-      console.log("Used cuisine filter:", usedCuisine);
+      // console.log("Used both filters: ", usedBoth);
+      // console.log("Used neighborhood filter:", usedNeighborhood);
+      // console.log("Used cuisine filter:", usedCuisine);
     }
     else {
       setMessages((prev) => [

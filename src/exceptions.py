@@ -1,0 +1,2 @@
+class GoogleMapsError(Exception):
+    pass

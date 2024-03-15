@@ -39,6 +39,7 @@ frozenlist==1.4.0
     # via
     #   aiohttp
     #   aiosignal
+googlemaps==4.10.0
 greenlet==3.0.2
     # via sqlalchemy
 idna==3.6
@@ -52,15 +53,16 @@ jsonpatch==1.33
     #   langchain-core
 jsonpointer==2.4
     # via jsonpatch
-langchain==0.0.349
+langchain==0.1.5
     # via -r requirements.in
-langchain-community==0.0.1
+langchain-community==0.0.17
     # via langchain
-langchain-core==0.0.13
+langchain-core==0.1.18
     # via
     #   langchain
     #   langchain-community
-langsmith==0.0.69
+langchain-openai==0.0.5
+langsmith==0.0.86
     # via
     #   langchain
     #   langchain-community
@@ -80,11 +82,12 @@ numpy==1.26.2
     #   langchain
     #   langchain-community
     #   pinecone-client
-openai==0.28.1
+openai==1.11.0
 packaging==23.2
     # via
     #   langchain-core
     #   marshmallow
+pandas==1.5.3
 passlib==1.7.4
 pinecone-client==2.2.4
     # via -r requirements.in
