@@ -1,10 +1,19 @@
 from fastapi import Body, FastAPI, Response
+from fastapi.middleware.cors import CORSMiddleware
 import uuid
 from api.pydantic_models import *
 from src.helpers import *
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Replace ["*"] with the origins you want to allow
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Include OPTIONS method
+    allow_headers=["*"],  # Allow all headers
+)
 
 
 @app.post("/api/signup")
@@ -118,21 +127,48 @@ async def get_mongo_user_by_uuid(uuid: str):
 @app.post("/api/track_event")
 async def track_activity(event: Event):
     try:
-        mongo_client = connect_to_mongo()
-        DB = mongo_client.chompt
+        DB = MONGO_CLIENT.chompt
         mongo_events = DB['events']
         event_data = dict(event)
         print(event_data, file=sys.stderr)
         mongo_events.insert_one(event_data)
-        mongo_client.close()
         return {
             'success': True
         }
     except Exception as e:
-        mongo_client.close()
         return {
             'success': False,
             'error': e
+        }
+    
+
+@app.post("/api/update_user_resto/")
+async def update_user_resto(operation: str, button: str, resto_id: str, username: str):
+    '''
+    Args:
+        - operation (str): push or pull
+        - button (str): love, hate, or beenTo
+        - resto_id (str): string representation of the object ID of restaurant
+        - username (str): user's username
+    '''
+    try:
+        db = MONGO_CLIENT.chompt
+        mongo_users = db['users']
+        update_result = mongo_users.update_one(
+            {"username": username},
+            {f"${operation}": {
+                button: ObjectId(resto_id),
+            }}
+        )
+        print(f"Updated user's {button} restos!", file=sys.stderr)
+        return {
+            'success': True
+        }
+    except Exception as ex:
+        print(ex, file=sys.stderr)
+        return {
+            'success': False,
+            'error': f"Exception while updating user's {button} restaurants"
         }
 
 
@@ -170,7 +206,7 @@ async def chat(vision: IdealMeal):
         # print(f"Final recs: {final_recs_list}")
         # Generate pitch for the top rec
         top_rec = final_recs_list[0]
-        pitch = query_llm(restaurant_name=top_rec['resto_name'], review=top_rec['review'], vision=vision.description)
+        pitch = query_llm(restaurant_name=top_rec['restoName'], review=top_rec['review'], vision=vision.description)
         
         if not used_reservations:
             print("Did NOT use reservation data for recs!", file=sys.stderr)
@@ -195,8 +231,7 @@ async def chat(vision: IdealMeal):
         print(ex, file=sys.stderr)
         return {
             'success': False,
-            'error': "Congrats, you broke me! Jk, the dangerwiches were probably just a little too spicy... Arthur will fix me in a bit. Sorry for the interruption, I know you must be dying to get out and eat. Feel free to let Arthur know incase he's busy and doesn't notice this right away! In the meantime.. Broncos Country, Let's Ride." 
-            # 'error': ex
+            'error': "Yikes, Mr. Unlimited was a little... limited. Arthur will fix him in a bit. Sorry for the interruption, I know you must be dying to get out and eat. Feel free to let Arthur know incase he's busy and doesn't notice this right away! In the meantime.. Broncos Country, Let's Ride." 
         }
 
 

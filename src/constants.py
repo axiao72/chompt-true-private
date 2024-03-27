@@ -1,6 +1,7 @@
 from langchain_openai import ChatOpenAI
 from langchain_openai import OpenAIEmbeddings
 import googlemaps
+import pymongo
 import os
 
 
@@ -16,8 +17,16 @@ EMBED_MODEL = OpenAIEmbeddings(
 )
 EMBEDDINGS_COLLECTION_NAME = "chunked_reviews_openai"
 EMBEDDINGS_INDEX= 'chunked_reviews_openai_index'
+# EMBEDDINGS_COLLECTION_NAME = "chunked_reviews_openai_150_30"
+# EMBEDDINGS_INDEX= 'chunked_reviews_openai_150_30_index'
 NUM_CANDIDATES=50
 NEIGHBORHOOD_DISTANCE_THRESHOLD = 0.5   # in miles
+
+# Reference this as an environment variable!!
+mongo_username = os.environ.get('MONGO_USER_NAME')
+mongo_pw = os.environ.get('MONGO_PW')
+mongo_host = os.environ.get('MONGO_HOST')
+MONGO_CLIENT = pymongo.MongoClient(f'mongodb+srv://{mongo_username}:{mongo_pw}@{mongo_host}/?retryWrites=true&w=majority')
 
 GMAPS_CLIENT = googlemaps.Client(key=os.environ.get('GOOGLE_API_KEY'))
 

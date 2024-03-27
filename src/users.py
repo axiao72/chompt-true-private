@@ -3,6 +3,7 @@ import sys
 from api.pydantic_models import *
 from src.mongo_util import *
 from passlib.hash import bcrypt
+from bson import ObjectId
 
 
 async def signup_user(user: User):
@@ -15,8 +16,7 @@ async def signup_user(user: User):
     if not user.username or not user.password or not user.first_name or not user.last_name:
         raise Exception("Must fill out all fields.")
     
-    mongo_client = connect_to_mongo()
-    DB = mongo_client.chompt
+    DB = MONGO_CLIENT.chompt
     mongo_users = DB['users']
 
     # Check if Mongo already has user
@@ -31,6 +31,7 @@ async def signup_user(user: User):
     # Hash password
     hashed_pw = bcrypt.hash(pw_to_hash)
     print(f"Hashed password!", file=sys.stderr)
+    signup_date = str(datetime.now())
 
     # Store new user with username and password in Mongo
     new_user = {
@@ -43,16 +44,15 @@ async def signup_user(user: User):
         'hate': [],
         'love': [],
         'recs': [],
-        'resyClicks': 0
+        'resyClicks': 0,
+        'signupDate': signup_date
     }
     try:
         result = mongo_users.insert_one(new_user)
         # Return inserted user with hashed password if Mongo insert worked
         print(f"Inserted user: {new_user}", file=sys.stderr)
-        mongo_client.close()
         return new_user
     except pymongo.errors.OperationFailure:
-        mongo_client.close()
         raise Exception("Exception occured during insert of new user to Mongo!")
 
 
@@ -62,8 +62,7 @@ async def login_user(credentials: LoginCredentials):
     if not credentials.username or not credentials.password:
         raise Exception("Must provide username and password.")
     
-    mongo_client = connect_to_mongo()
-    DB = mongo_client.chompt
+    DB = MONGO_CLIENT.chompt
     mongo_users = DB['users']
 
     # Get user by username
@@ -77,40 +76,79 @@ async def login_user(credentials: LoginCredentials):
     if match:
         # Passwords match! Return User Mongo Doc.
         print("Correct password! Returning logged in user.", file=sys.stderr)
-        mongo_client.close()
         return user
     else:
         print("Not a match!", file=sys.stderr)
-        mongo_client.close()
         raise Exception("Incorrect password")
     
 
 async def find_user_by_username(username: str):
-    mongo_client = connect_to_mongo()
-    DB = mongo_client.chompt
+    DB = MONGO_CLIENT.chompt
     mongo_users = DB['users']
     user = mongo_users.find_one({'username': username})
     if not user:
         print(f"Error in find_user_by_username", file=sys.stderr)
-        mongo_client.close()       
         raise Exception("Username not found.")
     else:
         print(f"User {username} found!", file=sys.stderr)
-        mongo_client.close()  
         return user
     
 
 async def find_user_by_uuid(uuid: str):
-    mongo_client = connect_to_mongo()
-    DB = mongo_client.chompt
+    DB = MONGO_CLIENT.chompt
     mongo_sessions = DB['sessions']
     user_session = mongo_sessions.find_one({'uuid': uuid})
     if not user_session:
         print(f"Error in find_user_by_uuid", file=sys.stderr)
-        mongo_client.close()
         raise Exception(f"User session not found with UUID: {uuid}.")
     else:
         print(f"Session for {user_session['username']} found!", file=sys.stderr)
-        mongo_client.close()
         return user_session
+    
+
+def update_user_info(vision, recs):
+    try:
+        # Connect to Mongo
+        db = MONGO_CLIENT.chompt
+        mongo_users = db["users"]
+        # Get just the names of the recs
+        rec_names = [rec['restoName'] for rec in recs]
+        try:
+            update_result = mongo_users.update_one(
+                {"username": vision.username},
+                {"$push": {
+                    "inputs": vision.description,
+                    "recs": {"$each": rec_names}
+                }}
+            )
+            print(f"Updated User in Mongo: {update_result}")
+            return update_result
+        except pymongo.errors.OperationFailure:
+            raise Exception("Exception when updating user inputs and recs in Mongo. Are you sure your database user is authorized to perform write operations?")
+    except Exception as ex:
+        print(f"Exception occured while updating user data: {ex}")
         
+
+def assign_user_attrs(recs: list, username: str):
+    db = MONGO_CLIENT.chompt
+    mongo_users = db['users']
+    user = mongo_users.find_one({'username': username})
+    hates = user['hate']
+    loves = user['love']
+    beenTos = user['beenTo']
+    return_recs = []
+    for rec in recs:
+        obj_resto_id = ObjectId(rec['restoId'])
+        if obj_resto_id in loves:
+            rec['flag'] = 2
+        elif obj_resto_id in hates:
+            rec['flag'] = 0
+            continue
+        else:
+            rec['flag'] = 1
+        if obj_resto_id in beenTos:
+            rec['beenTo'] = 1
+        else:
+            rec['beenTo'] = 0
+        return_recs.append(rec)
+    return return_recs

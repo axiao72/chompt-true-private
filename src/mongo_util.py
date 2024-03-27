@@ -1,23 +1,8 @@
-import pymongo
 import sys
 from datetime import datetime
 from api.pydantic_models import IdealMeal
 from src.resy_util import *
 from src.constants import *
-
-
-def connect_to_mongo():
-    # Connect to Mongo chompt database and return database object
-    try:
-        mongo_client = pymongo.MongoClient('mongodb+srv://axiao72:McSplash7013$@chomptcluster.k5sqjpd.mongodb.net/?retryWrites=true&w=majority')
-        # mongo_client = pymongo.MongoClient(os.environ.get('MONGO_CONNECTION_STRING'))
-        # print(os.environ.get('MONGO_CONNECTION_STRING'), file=sys.stderr)
-        # DB = mongo_client.chompt
-        print("Connected to Mongo!")
-        return mongo_client
-    except pymongo.errors.ConfigurationError:
-        print("Invalid URI host, confirm Atlas host name and password is correct in the connection string!")
-        return None
 
 
 def get_search_pipeline(embedded_query):
@@ -39,6 +24,7 @@ def get_search_pipeline(embedded_query):
                 'cuisine': 1,
                 'perfectForTags': 1,
                 'priceRange': 1,
+                'priceRange': 1,
                 'imageUrl': 1,
                 'restoWebsite': 1,
                 'neighborhood': 1,
@@ -59,8 +45,7 @@ def get_search_pipeline(embedded_query):
 def get_candidates(embedded_query, city, res_mode_on: bool):
     try:
         print(f"Stage 1: Searching vector database for candidates..." , file=sys.stderr)
-        mongo_client = connect_to_mongo()
-        db = mongo_client.chompt
+        db = MONGO_CLIENT.chompt
         mongo_reviews = db[EMBEDDINGS_COLLECTION_NAME]
 
         pipeline = get_search_pipeline(embedded_query)
@@ -70,19 +55,16 @@ def get_candidates(embedded_query, city, res_mode_on: bool):
         else:
             pipeline[0]['$vectorSearch']['filter'] = {'city': city}
         candidates = list(mongo_reviews.aggregate(pipeline))
-        mongo_client.close()
 
         return candidates
     except Exception as ex:
-        mongo_client.close()
         raise(f"Exception occured while vector searching Mongo: {ex}") 
 
 
 async def add_session(uuid: str, username: str):
     try:
-        mongo_client = connect_to_mongo()
-        DB = mongo_client.chompt
-        mongo_sessions = DB['sessions']
+        db = MONGO_CLIENT.chompt
+        mongo_sessions = db['sessions']
         session = {
             'uuid': uuid,
             'username': username
@@ -99,8 +81,7 @@ def insert_recs_mongo(vision, recs):
     try:
         # print(f"From insert_recs_mongo: {recs}")
         # Connect to Mongo
-        mongo_client = connect_to_mongo()
-        db = mongo_client.chompt
+        db = MONGO_CLIENT.chompt
         mongo_recs = db["recommendations"]
         
         insert_recs = {
@@ -116,55 +97,23 @@ def insert_recs_mongo(vision, recs):
         try:
             insert_result = mongo_recs.insert_one(insert_recs)
             # print(f"Inserted recommendation to Mongo: {insert_result}")
-            mongo_client.close()
             return insert_result
         except pymongo.errors.OperationFailure:
-            mongo_client.close()
             raise("Exception when inserting rec to Mongo. Are you sure your database user is authorized to perform write operations?")
     except Exception as ex:
         raise(f'Exception while inserting recs into Mongo: {ex}')
     
 
-def update_user_info(vision, recs):
-    try:
-        # Connect to Mongo
-        mongo_client = connect_to_mongo()
-        db = mongo_client.chompt
-        mongo_users = db["users"]
-        # Get just the names of the recs
-        rec_names = [rec['restoName'] for rec in recs]
-        try:
-            update_result = mongo_users.update_one(
-                {"username": vision.username},
-                {"$push": {
-                    "inputs": vision.description,
-                    "recs": {"$each": rec_names}
-                }}
-            )
-            print(f"Updated User in Mongo: {update_result}")
-            mongo_client.close()
-            return update_result
-        except pymongo.errors.OperationFailure:
-            mongo_client.close()
-            raise("Exception when updating user in Mongo. Are you sure your database user is authorized to perform write operations?")
-    except Exception as ex:
-        print(f"Exception occured while updating user data: {ex}")
-
-
 def get_full_review(rec):
     # Connect to Mongo
-    mongo_client = connect_to_mongo()
-    db = mongo_client.chompt
+    db = MONGO_CLIENT.chompt
     full_reviews = db['reviews']
     try:
         full_review = full_reviews.find_one({
             'resto_name': rec['restoName'].lower(), 
             'neighborhood': rec['neighborhood'],
-            # 'review_date': rec['reviewDate'],
             'city': rec['city']
         })
-        mongo_client.close()
         return full_review
     except pymongo.errors.OperationFailure:
-        mongo_client.close()
         raise("Exception when getting full review from Mongo. Are you sure your database user is authorized to perform write operations?")

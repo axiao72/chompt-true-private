@@ -276,7 +276,14 @@ export const RestaurantsView = ({
   activeUser,
   userCity,
   resModeToggleColor,
-  setResModeToggleColor
+  setResModeToggleColor,
+  handleLove,
+  handleHate,
+  handleBeen,
+  getColor,
+  getHoverColor,
+  flagArray,
+  beenButtonColors
 }: {
   restoRecs: Array<RestoRec>;
   resMode: boolean;
@@ -291,16 +298,20 @@ export const RestaurantsView = ({
   userCity: string;
   resModeToggleColor: string;
   setResModeToggleColor: (color: string) => void;
+  handleLove: (index: number, restoId: string) => void;
+  handleHate: (index: number, restoId: string) => void;
+  handleBeen: (index: number, restoId: string) => void;
+  getColor: (index: number) => string;
+  getHoverColor: (button: string, index: number) => string;
+  flagArray: number[];
+  beenButtonColors: string[];
 }) => {
   const [, theme] = useStyletron();
   const containerRef = useRef();
   const [changedModes, setChangedModes] = useState(true);
   const [css] = useStyletron();
   const [isMobile, setIsMobile] = useState(true);
-  const [loveButtonColors, setLoveButtonColors] = useState({0: '#EEEEEE', 1: '#EEEEEE', 2: '#EEEEEE'});
-  const [hateButtonColors, setHateButtonColors] = useState({0: '#EEEEEE', 1: '#EEEEEE', 2: '#EEEEEE'});
-  const [beenButtonColors, setBeenButtonColors] = useState({0: '#EEEEEE', 1: '#EEEEEE', 2: '#EEEEEE'});
-
+  
   // Check if device is mobile
   useEffect(() => {
     const handleResize = () => {
@@ -319,41 +330,6 @@ export const RestaurantsView = ({
     };
   }, []);
 
-  const handleLove = (index) => {
-    console.log(index);
-    const newColors = { ...loveButtonColors };
-    if (newColors[index] === '#EEEEEE'){
-      newColors[index] = '#06C167';
-    }
-    else {
-      newColors[index] = '#EEEEEE';
-    }
-    setLoveButtonColors(newColors);
-  };
-
-  const handleHate = (index) => {
-    console.log(index);
-    const newColors = { ...hateButtonColors };
-    if (newColors[index] === '#EEEEEE'){
-      newColors[index] = '#E85C4A';
-    }
-    else {
-      newColors[index] = '#EEEEEE';
-    }
-    setHateButtonColors(newColors);
-  };
-
-  const handleBeen = (index) => {
-    console.log(index);
-    const newColors = { ...beenButtonColors };
-    if (newColors[index] === '#EEEEEE'){
-      newColors[index] = '#A0BFF8';
-    }
-    else {
-      newColors[index] = '#EEEEEE';
-    }
-    setBeenButtonColors(newColors);
-  };
 
   const isLoved = (resto_name: string) => {
 
@@ -382,6 +358,42 @@ export const RestaurantsView = ({
     // To keep track of res mode notification
     setChangedModes(true);
   };
+
+  const addLoveResto = useCallback(async (restoId: string, username: string) => {
+    const queryParams = new URLSearchParams({
+      resto_id: restoId,
+      username: username,
+    });
+    const loveResponse = await fetch(`/api/love_resto?${queryParams}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-type': 'application/json'
+        }
+    });
+    const loveResponseJson = await loveResponse.json();
+    if (!loveResponseJson.success) {
+      console.log("Couldn't add restaurant to user's loved restaurants.")
+    }
+  }, [restoRecs]);
+
+  const addHateResto = useCallback(async (restoId: string, username: string) => {
+    const queryParams = new URLSearchParams({
+      resto_id: restoId,
+      username: username,
+    });
+    const hateResponse = await fetch(`/api/hate_resto?${queryParams}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-type': 'application/json'
+        }
+    });
+    const hateResponseJson = await hateResponse.json();
+    if (!hateResponseJson.success) {
+      console.log("Couldn't add restaurant to user's hated restaurants.")
+    }
+  }, [restoRecs]);
 
   const clickBookRes = useCallback(async (resto: RestoRec) => {
     const currentDate = new Date();
@@ -597,20 +609,20 @@ export const RestaurantsView = ({
                     </Panel>
                   </Accordion>
                 }
-                {/* <ButtonContainer>
+                <ButtonContainer>
                   <Button
-                    onClick={() => handleLove(index)}
+                    onClick={() => handleLove(index, resto.restoId)}
                     kind={ButtonKIND.secondary}
                     shape={SHAPE.pill}
                     size={SIZE.mini}
-                    disabled={hateButtonColors[index] != '#EEEEEE'}
+                    disabled={flagArray[index] === 0 || activeUser.username == 'chompt_guest'}
                     overrides={{
                       BaseButton: {
                         style: ({ $theme }) => ({
-                          backgroundColor: loveButtonColors[index],
+                          backgroundColor: getColor(index),
                           width: '15%',
                           ':hover': {
-                            backgroundColor: loveButtonColors[index]
+                            backgroundColor: getHoverColor('love', index)
                           }
                         })
                       }
@@ -619,18 +631,18 @@ export const RestaurantsView = ({
                     Love
                   </Button>
                   <Button
-                    onClick={() => handleHate(index)}
+                    onClick={() => handleHate(index, resto.restoId)}
                     kind={ButtonKIND.secondary}
                     shape={SHAPE.pill}
                     size={SIZE.mini}
-                    disabled={loveButtonColors[index] !== '#EEEEEE'}
+                    disabled={flagArray[index] === 2 || activeUser.username == 'chompt_guest'}
                     overrides={{
                       BaseButton: {
                         style: ({ $theme }) => ({
-                          backgroundColor: hateButtonColors[index],
+                          backgroundColor: getColor(index),
                           width: '15%',
                           ':hover': {
-                            backgroundColor: hateButtonColors[index]
+                            backgroundColor: getHoverColor('hate', index)
                           }
                         })
                       }
@@ -639,11 +651,11 @@ export const RestaurantsView = ({
                     Hate
                   </Button>
                   <Button
-                    onClick={() => handleBeen(index)}
+                    onClick={() => handleBeen(index, resto.restoId)}
                     kind={ButtonKIND.secondary}
                     shape={SHAPE.pill}
                     size={SIZE.mini}
-                    // disabled={loveButtonColors[index] !== '#EEEEEE'}
+                    disabled={activeUser.username == 'chompt_guest'}
                     overrides={{
                       BaseButton: {
                         style: ({ $theme }) => ({
@@ -658,7 +670,7 @@ export const RestaurantsView = ({
                   >
                     I've Been
                   </Button>
-                </ButtonContainer> */}
+                </ButtonContainer>
                 <StyledAction>
                     <Button
                       overrides={{BaseButton: {style: {width: '100%', borderRadius:'8px'}}}} 

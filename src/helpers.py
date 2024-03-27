@@ -36,21 +36,25 @@ def get_recs(vision, post_metadata_filters, poi_string):
             df_cands = apply_filters(df_cands, post_metadata_filters)
             print(f"Filtered to {len(df_cands)} candidates.")
         df_cands = df_cands.round(6)
-        cands_dict = df_cands.to_dict(orient='records')
+        cands_list = df_cands.to_dict(orient='records')
+        # Format recs and get resto ID for each rec
+        cands_list = get_attributes(cands_list, vision) 
+        # Assign love/hate/been-to user attributes to candidates (remove any hated candidates)
+        cands_list = assign_user_attrs(cands_list, vision.username)
         if vision.res_mode_on:
-            backup_cands = deepcopy(cands_dict)
+            backup_cands = deepcopy(cands_list)
             print(f"Res Mode on: Filtering based on Resy availability...", file=sys.stderr)
             # Filter out restaurants not available for reservations
-            cands_dict = get_top_available_candidates(cands_dict, vision.res_date, vision.res_time, vision.party_size)
+            cands_list = get_top_available_candidates(cands_list, vision.res_date, vision.res_time, vision.party_size)
             # If no available restaurants for reservations, use candidates without Resy filter
-            if not cands_dict:
+            if not cands_list:
                 print(f"Res Mode off. There were no available reservations among the candidates, proceeding without Res Mode....", file=sys.stderr)
-                cands_dict = backup_cands
+                cands_list = backup_cands
                 used_reservations = False
         if poi_string:
             # If point of interest present in query, call gmaps distance function. TEST!!!
-            cands_dict = get_geo_distances(cands_dict, poi_string)
-        df_cands = pd.DataFrame(cands_dict)
+            cands_list = get_geo_distances(cands_list, poi_string)
+        df_cands = pd.DataFrame(cands_list)
         df_cands = score_recs(df_cands)
         df_cands = df_cands.round(6)
         final_cands = df_cands.to_dict(orient='records')
@@ -61,8 +65,8 @@ def get_recs(vision, post_metadata_filters, poi_string):
                 f"\n{i['restoName']}:\nOriginal Similarity Search Score: {i['score']}\nAdjusted Score: {i['adjusted_score']}\nFrequncy: {i['frequency']}", 
                 file=sys.stderr
             )
-            if 'distance_to_origin' in i:
-                print(f"Distance to poi: {i['distance_to_origin']}\n", file=sys.stderr)
+            if 'distanceToOrigin' in i:
+                print(f"Distance to poi: {i['distanceToOrigin']}\n", file=sys.stderr)
         
         return final_recs, used_reservations
     
@@ -124,10 +128,14 @@ def score_recs(df_candidates: pd.DataFrame):
         list: The candidates after applying scoring function, sorted by adjusted score.
     """
     scored_candidates = df_candidates.copy()
+    # Get rid of any user's 'hated' restaurants
+    scored_candidates = scored_candidates[scored_candidates['flag'] != 0]
     # If distance to origin was calculated, then apply distance scoring
-    if 'distance_to_origin' in scored_candidates:
-        scored_candidates['distance_to_origin'] = scored_candidates['distance_to_origin'].astype(float)
-        distance_scores = scored_candidates['distance_to_origin'].apply(lambda x: math.log(x) * 3 * 0.01)
+    if 'distanceToOrigin' in scored_candidates:
+        scored_candidates['distanceToOrigin'] = scored_candidates['distanceToOrigin'].astype(float)
+        distance_scores = scored_candidates['distanceToOrigin'].apply(
+            lambda x: math.log(x) * 3 * 0.01 if x >= 0.1 else math.log(0.1) * 3 * 0.01
+        )
     else:
         distance_scores = 0.0
     # Frequency scoring
@@ -150,11 +158,12 @@ def replace_nan_with_none(d):
     return {k: None if isNaN(v) else v for k, v in d.items()}
 
 
-def format_recs(resto_recs, vision):
-    formatted_recs = []
-    for rec in resto_recs:
+def get_attributes(candidates, vision):
+    full_candidates = []
+    for rec in candidates:
         rec = replace_nan_with_none(rec)
         full_review_doc = get_full_review(rec)
+        resto_id = str(full_review_doc['_id'])
         # print(f"full review: {full_review_doc}")
         # print(f"{full_review_doc['resto_name']}: {full_review_doc.keys()}")
         if 'summarized_review' in full_review_doc:
@@ -173,19 +182,22 @@ def format_recs(resto_recs, vision):
                 resy_url = rec['resy_venue_url'].replace('<party_size>', f'{vision.party_size}').replace('<res_date>', f'{vision.res_date}') + f'&time={vision.res_time.replace(":", "")}'
             else:
                 resy_url = rec['resy_venue_url']
+        rec['restoId'] = resto_id
+        rec['review'] = full_review
+        rec['fullAddress'] = full_address
+        rec['resyUrl'] = resy_url
+        full_candidates.append(rec)
+    return full_candidates
 
-        # Add desired fields to final list
-        formatted_recs.append({
-            'resto_name': capitalize_resto_name(rec['restoName']),
-            'review': full_review,
-            'perfect_for': rec['perfectForTags'],
-            'price_range': rec['priceRange'],
-            'image_url': rec['imageUrl'],
-            'website': rec['restoWebsite'],
-            'neighborhood': rec['neighborhood'].title(),
-            'full_address': full_address,
-            'resy_url': resy_url
-        })
+
+def format_recs(resto_recs, vision):
+    formatted_recs = []
+    for rec in resto_recs:
+        # Format rec features for UI
+        rec = replace_nan_with_none(rec)
+        rec['restoName'] = capitalize_resto_name(rec['restoName'])
+        rec['neighborhood'] = rec['neighborhood'].title()
+        formatted_recs.append(rec)
     print('FORMATTED recs!')
     return formatted_recs
 

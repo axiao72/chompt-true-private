@@ -33,15 +33,14 @@ except pymongo.errors.ConfigurationError:
 
 # Connect to Chompt db and reviews collection
 db = client.chompt 
-mongo_chunked_reviews = db["chunked_reviews_openai"]
+mongo_chunked_reviews = db["chunked_reviews_openai_150_30"]
 # mongo_chunked_reviews = db["chunked_reviews"]
 # CAREFUL only delete if you want to restart a collection fresh
 # deleted = mongo_chunked_reviews.delete_many({})
 # print(f"Deleted {deleted.deleted_count} records.")
 
 # Read infatuation reviews from file for each city and insert them to Mongo
-# cities = ['pittsburgh', 'philadelphia', 'denver', 'washington-dc', 'los-angeles', 'boston', 'chicago']
-cities = ['new-york']
+cities = ['new-york', 'pittsburgh', 'philadelphia', 'denver', 'washington-dc', 'los-angeles', 'boston', 'chicago']
 start_time = datetime.now()
 print(f"Embeddings start time: {start_time}")
 for city in cities:
@@ -49,8 +48,8 @@ for city in cities:
         resto_reviews = json.load(file)
     print(f"Read {len(resto_reviews)}  reviews from file for {city}. Generating and storing embeddings now...")
 
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=700,
-                                    chunk_overlap=150,
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=150,
+                                    chunk_overlap=35,
                                     length_function=len)
 
     batch_limit = 30
@@ -94,7 +93,7 @@ for city in cities:
                 'restoName': cleaned_resto_name,
                 'cuisine': cuisine,
                 'perfectForTags': cleaned_resto_tags,
-                'priceFange': resto['price_range'],
+                'priceRange': resto['price_range'],
                 'reviewDate': review_date,
                 'imageUrl': resto['resto_image'],
                 'restoWebsite': resto['resto_website'],

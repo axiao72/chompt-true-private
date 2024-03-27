@@ -28,6 +28,7 @@ export const ProfileModal = ({
       setIsOpen(false);
     };
     const handleLogout = useCallback(async () => {
+        setIsLoading(true);
         const response = await fetch('/api/logout', {
             method: 'POST',
             headers: {
@@ -45,6 +46,7 @@ export const ProfileModal = ({
         }
         // const pastDate = new Date(0);
         // document.cookie = `session_uuid=; expires=${pastDate.toUTCString()};`;
+        setIsLoading(false);
     }, [activeUser]);
 
     return (
@@ -73,7 +75,7 @@ export const ProfileModal = ({
             <ModalButton 
                 onClick={handleLogout} 
                 shape={SHAPE.default}
-                // isLoading={isLoading}
+                isLoading={isLoading}
                 overrides={{
                     BaseButton: {
                         style: ({ $theme }) => ({

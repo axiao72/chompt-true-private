@@ -51,6 +51,7 @@ export type Message = {
 };
 
 export type RestoRec = {
+  restoId: string;
   restoName: string;
   review: string;
   perfectFor: string;
@@ -60,6 +61,13 @@ export type RestoRec = {
   nbrhood : string;
   resyUrl ? : string;
   address: string;
+  // Flag will be 0, 1, or 2. 
+  // 0 = Hated
+  // 1 = Not flagged
+  // 2 = Loved
+  flag: number;
+  // beenTo will be either 0 or 1. 0 = not been to, 1 = been to
+  beenTo: number;
 }
 
 export type Document = {
@@ -85,6 +93,9 @@ const Index = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [restoRecs, setRestoRecs] = useState<RestoRec[]>([]);
+  const [beenButtonColors, setBeenButtonColors] = useState(['#EEEEEE', '#EEEEEE', '#EEEEEE']);
+  // 0 denotes hate, 1 denotes neutral, 2 denotes love
+  const [flagArray, setFlagArray] = useState([1, 1, 1]);
   const [resMode, setResMode] = useState<boolean>(false);
   const [resModalIsOpen, setResModalIsOpen] = useState(false);
   const [resModeToggleColor, setResModeToggleColor] = useState('#FFFFFF');
@@ -210,6 +221,136 @@ const Index = () => {
     }
   }, []);
 
+  useEffect(() => {
+    const newFlagArray = restoRecs.map((resto) => {
+      if (resto.flag === 0) {
+        return 0;
+      } else if (resto.flag === 2) {
+        return 2;
+      } else {
+        return 1;
+      }
+    });
+    setFlagArray(newFlagArray);
+    const newBeenColors = restoRecs.map((resto) => {
+      if (resto.beenTo === 0) {
+        return '#EEEEEE';
+      } else {
+        return '#A0BFF8';
+      }
+    });
+    setBeenButtonColors(newBeenColors);
+  }, [restoRecs]);
+
+  const getColor = (index) => {
+    console.log(flagArray);
+    if (flagArray[index] === 0) {
+      return '#E85C4A'
+    } else if (flagArray[index] === 1) {
+      return '#EEEEEE'
+    } else {
+      return '#06C167'
+    }
+  };
+
+  const getHoverColor = (button: string, index: number) => {
+    if (button === 'hate' && flagArray[index] === 2) {
+      // Disabled Hate button case - can replace this with the disabled gray color
+      return '#EEEEEE'
+    } else if (button === 'love' && flagArray[index] === 0) {
+      // Disabled Love button case - can replace this with the disabled gray color
+      return '#EEEEEE'
+    }
+    else {
+      getColor(index)
+    }
+  };
+
+  const handleLove = (index: number, restoId: string) => {
+    console.log(index);
+    let operation = '';
+    // const newColors = { ...loveButtonColors };
+    // if (newColors[index] === '#EEEEEE') {
+    //   newColors[index] = '#06C167';
+    // }
+    // else {
+    //   newColors[index] = '#EEEEEE';
+    // }
+    // setLoveButtonColors(newColors);
+    const newFlagArray = { ...flagArray };
+    if (newFlagArray[index] === 1) {
+      newFlagArray[index] = 2;
+      operation = 'push';
+    } else if (newFlagArray[index] === 2) {
+      newFlagArray[index] = 1;
+      operation = 'pull';
+    }
+    setFlagArray(newFlagArray);
+    // Call update user resto API 
+    updateUserResto(operation, 'love', restoId, activeUser.username);
+  };
+
+  const handleHate = (index: number, restoId: string) => {
+    console.log(index);
+    let operation = '';
+    // const newColors = { ...hateButtonColors };
+    // if (newColors[index] === '#EEEEEE'){
+    //   newColors[index] = '#E85C4A';
+    // }
+    // else {
+    //   newColors[index] = '#EEEEEE';
+    // }
+    // setHateButtonColors(newColors);
+    const newFlagArray = { ...flagArray };
+    if (newFlagArray[index] === 1) {
+      newFlagArray[index] = 0;
+      operation = 'push';
+    } else if (newFlagArray[index] === 0) {
+      newFlagArray[index] = 1;
+      operation = 'pull';
+    }
+    setFlagArray(newFlagArray);
+    // Call update user resto API 
+    updateUserResto(operation, 'hate', restoId, activeUser.username);
+  };
+
+  const handleBeen = (index: number, restoId: string) => {
+    console.log(index);
+    let operation = '';
+    const newColors = { ...beenButtonColors };
+    if (newColors[index] === '#EEEEEE'){
+      newColors[index] = '#A0BFF8';
+      operation = 'push'
+    }
+    else {
+      newColors[index] = '#EEEEEE';
+      operation = 'pull'
+    }
+    setBeenButtonColors(newColors);
+    // Call update user resto API
+    updateUserResto(operation, 'beenTo', restoId, activeUser.username);
+  };
+
+  const updateUserResto = useCallback(async (operation: string, button: string, restoId: string, username: string) => {
+    const queryParams = new URLSearchParams({
+      operation: operation,
+      button: button,
+      resto_id: restoId,
+      username: username,
+    });
+    const updateResponse = await fetch(`/api/update_user_resto/?operation=${operation}&button=${button}&resto_id=${restoId}&username=${username}`, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-type': 'application/json'
+        }
+    });
+    const updateResponseJson = await updateResponse.json();
+    if (!updateResponseJson.success) {
+      console.log(`Could not update user's ${button} restaurants.`);
+    }
+  }, [restoRecs]);
+
   // console.log(`User coordinates set to: ${userCoordinates}`);
   // console.log(`User city set to: ${userCity}`);
 
@@ -298,15 +439,18 @@ const Index = () => {
         const responseRestoRecs: RestoRec[] = responseRestos.map((resto) => {
           const resto_json = JSON.parse(resto);
           const restoRec: RestoRec = {
-            restoName: resto_json.resto_name,
+            restoId: resto_json.restoId,
+            restoName: resto_json.restoName,
             review: resto_json.review,
-            perfectFor: resto_json.perfect_for,
-            priceRange: resto_json.price_range,
-            imageUrl: resto_json.image_url,
+            perfectFor: resto_json.perfectFor,
+            priceRange: resto_json.priceRange,
+            imageUrl: resto_json.imageUrl,
             websiteUrl: resto_json.website,
             nbrhood: resto_json.neighborhood,
-            resyUrl: resto_json.resy_url,
-            address: resto_json.full_address
+            resyUrl: resto_json.resyUrl,
+            address: resto_json.fullAddress,
+            flag: resto_json.flag,
+            beenTo: resto_json.beenTo
           };
           return restoRec;
         });
@@ -471,6 +615,13 @@ const Index = () => {
             userCity={userCity}
             resModeToggleColor={resModeToggleColor}
             setResModeToggleColor={setResModeToggleColor}
+            handleLove={handleLove}
+            handleHate={handleHate}
+            handleBeen={handleBeen}
+            getColor={getColor}
+            getHoverColor={getHoverColor}
+            flagArray={flagArray}
+            beenButtonColors={beenButtonColors}
           />
         </Tab>
       </Tabs>
