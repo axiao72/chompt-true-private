@@ -144,7 +144,7 @@ const Index = () => {
     else {
         console.log(responseJson.error);
     }
-};
+  };
 
   // const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
   // console.log(isMobile ? 'Mobile' : 'Desktop');
@@ -449,9 +449,13 @@ const Index = () => {
             nbrhood: resto_json.neighborhood,
             resyUrl: resto_json.resyUrl,
             address: resto_json.fullAddress,
-            flag: resto_json.flag,
-            beenTo: resto_json.beenTo
+            flag: 1,
+            beenTo: 1
           };
+          if (activeUser.username != 'chompt_guest') {
+            restoRec.flag = resto_json.flag;
+            restoRec.beenTo = resto_json.beenTo;
+          }
           return restoRec;
         });
         setRestoRecs(responseRestoRecs);

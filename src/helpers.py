@@ -40,7 +40,8 @@ def get_recs(vision, post_metadata_filters, poi_string):
         # Format recs and get resto ID for each rec
         cands_list = get_attributes(cands_list, vision) 
         # Assign love/hate/been-to user attributes to candidates (remove any hated candidates)
-        cands_list = assign_user_attrs(cands_list, vision.username)
+        if vision.username != 'chompt_guest':
+            cands_list = assign_user_attrs(cands_list, vision.username)
         if vision.res_mode_on:
             backup_cands = deepcopy(cands_list)
             print(f"Res Mode on: Filtering based on Resy availability...", file=sys.stderr)
@@ -129,7 +130,8 @@ def score_recs(df_candidates: pd.DataFrame):
     """
     scored_candidates = df_candidates.copy()
     # Get rid of any user's 'hated' restaurants
-    scored_candidates = scored_candidates[scored_candidates['flag'] != 0]
+    # if 'flag' in scored_candidates.columns:
+    #     scored_candidates = scored_candidates[scored_candidates['flag'] != 0]
     # If distance to origin was calculated, then apply distance scoring
     if 'distanceToOrigin' in scored_candidates:
         scored_candidates['distanceToOrigin'] = scored_candidates['distanceToOrigin'].astype(float)

@@ -143,6 +143,7 @@ def assign_user_attrs(recs: list, username: str):
             rec['flag'] = 2
         elif obj_resto_id in hates:
             rec['flag'] = 0
+            # Don't add rec to the returned recs if it's a 'Hate' restaurant - filters out 'Hate' restos
             continue
         else:
             rec['flag'] = 1
